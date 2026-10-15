@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1127‑刘馨月</title>
+    <style>
+        h2 {
+            background-color: black;
+            color: white;
+        }
+        h3 {
+            color: white; 
+        }
+        p {
+            color: rgb(76, 143, 242);
+        }
+        /*id选择器*/
+        #box {
+            width: 500px;
+            height: 300px;
+            background-color: rgb(253, 199, 239);
+        }
+        /* 新盒子 */
+        #newbox{
+            width:150px;
+            height:150px;
+            background-color:#b8d8ff;
+            margin-top:15px;
+        }
+        /*三个字分别设置颜色，span默认同一行*/
+        .z1{
+            color:#a5a2ff;
+        }
+        .z2{
+            color:#ce9ffd;
+        }
+        .z3{
+            color:#88c8ff;
+        }
+        .css-black{
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h2>层叠样式表CSS</h2>
+    <div id="box">
+        <h3><span class="css-black">CSS</span>选择器</h3>
+        <!-- span是行内元素，默认在同一行显示 -->
+        <p><span class="z1">刘</span><span class="z2">馨</span><span class="z3">月</span></p>
+        <p>CSS属性</p>
+    </div>
+    <!-- newbox移到粉色盒子外面，独立在下方 -->
+    <div id="newbox">1127</div>
+</body>
+</html>

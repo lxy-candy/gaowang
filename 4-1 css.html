@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        h2,h3,p{
+            padding: 0;
+            margin: 0;
+        }/*群组选择器*/
+        #box{
+            padding: 8px;
+            margin: 20px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            width: 480px;
+        }
+        #box h3{
+            font-size: 16px;
+            line-height: 33px;
+            text-align: center; /* CSS进阶标题居中 */
+            color: #034;
+            letter-spacing: 3px;
+        }
+        #box>p{
+            color: #666;
+            text-indent: 2em;
+            line-height: 150%;
+        }
+        #box>p a{
+            color: #c00;
+            text-decoration: none;
+        }
+        /* 1. h2 黑底白字 + 居中 + 行高150% */
+        h2 {
+            background-color: #000;
+            color: #fff;
+            padding: 10px 15px;
+            text-align: center;
+            line-height: 150%; /* 新增：行高设置为150% */
+        }
+        /* 2. 学号/姓名/班级 标签文字：黑色 */
+        .stu-label {
+            color: #000;
+        }
+        /* 学号/姓名/班级 对应值：蓝色加粗（单个CSS选择器控制） */
+        .stu-info {
+            color: rgb(63, 92, 255);
+            font-weight: bold;
+        }
+        /* 3. 知识点：蓝底白字 */
+        .knowledge {
+            background-color: rgb(93, 152, 255);
+            color: #fff;
+            padding: 2px 6px;
+        }
+    </style>
+</head>
+<body>
+    <h2>css群组选择器和后代选择器</h2>
+    <div id="box">
+        <h3>CSS进阶</h3>
+        <p>
+            <span class="stu-label">学号：</span><span class="stu-info">1127</span>，
+            <span class="stu-label">姓名：</span><span class="stu-info">刘馨月</span>，
+            <span class="stu-label">班级：</span><span class="stu-info">计算机24011</span>，
+            《高级网页设计》的学习难度：难，
+            本实例的知识点：<span class="knowledge">css群组选择器和后代选择器</span>
+            <a href="#">【更多】</a>
+        </p>
+    </div>
+</body>
+</html>

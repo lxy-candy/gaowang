@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1127 刘馨月</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        img{
+            display: block;
+        }
+        ul,ol{list-style: none;}
+        .tlist{
+            display: flex;
+            flex-wrap: wrap;
+            margin: 4px;
+        }
+        .tlist li{
+            width: 30%;
+            margin: 3px;
+            flex-grow: 2;
+            overflow: hidden;
+            position: relative;
+        }
+        .tlist img{
+            width: 100%;
+            transition: all 0.5s ease;
+        }
+        .text{
+            width: 100%;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            transition: all 0.5s ease;
+            height: 50px;       /* 文字条高度从33px加大到45px */
+            font-size: 20px;    /* 文字大小从12px加大到16px */
+        }
+        .text h3{
+            height: 45px;       /* 标题栏高度同步加大 */
+            line-height: 45px;  /* 行高同步加大，保持垂直居中 */
+            text-align: center;
+            font-weight: normal;
+        }
+        .text p{
+            height: 40px;
+            padding: 5px;
+            line-height: 20px;
+            text-indent: 2em;
+            overflow: hidden;
+            
+        }
+        .tlist li:nth-child(3n+1):hover img{
+            transform: scale(1.7);
+        }
+        .tlist li:nth-child(3n+2):hover .text{
+            height: 100%;
+        }
+        .tlist li:nth-child(3n):hover .text p{
+            height: 83px;
+        }
+    </style>
+</head>
+<body>
+    <h2>transition</h2>
+    <ul class="tlist">
+        
+        <li>
+            <img src="./img/1.jpg">
+            <div class="text">
+                <h3>刘馨月的标题1</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/2.jpg">
+            <div class="text">
+                <h3>刘馨月的标题2</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/3.jpg">
+            <div class="text">
+                <h3>刘馨月的标题3</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/4.jpg">
+            <div class="text">
+                <h3>刘馨月的标题4</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/5.jpg">
+            <div class="text">
+                <h3>刘馨月的标题5</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/6.jpg">
+            <div class="text">
+                <h3>刘馨月的标题6</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/7.jpg">
+            <div class="text">
+                <h3>刘馨月的标题7</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/8.jpg">
+            <div class="text">
+                <h3>刘馨月的标题8</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+        <li>
+            <img src="./img/9.jpg">
+            <div class="text">
+                <h3>刘馨月的标题9</h3>
+                <p>
+                    下面的文字是绝对定位，p元素默认隐藏，只显示h3，当鼠标hover的时候，会有动画效果。
+                </p>
+            </div>
+        </li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>响应式背景颜色</title>
+    <style>
+        :root {
+            font-size: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            background: #ff6b6b;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.7s ease, color 0.7s ease;
+        }
+
+        .content {
+            width: min(90vw, 720px);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 1rem;
+            font-size: 2rem;
+        }
+
+        p {
+            margin: 0;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                background: #f7b267;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (min-width: 701px) and (max-width: 1000px) {
+            body {
+                background: #5bc0be;
+            }
+
+            h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (min-width: 1001px) {
+            body {
+                background: #b2aff5;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="content">
+        <h1>刘馨月</h1>
+        <p>viewport 变化时，背景颜色和文字大小也会变化。</p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS3 3D 动画</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f5f7fa;
+      color: #1f2d3d;
+      line-height: 1.6;
+    }
+
+    .lxy_wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 1.6rem; margin-top: 0; }
+
+    h2 {
+      font-size: 1.2rem;
+      margin: 32px 0 12px;
+      padding-left: 10px;
+      border-left: 4px solid #409eff;
+    }
+
+    .lxy_note {
+      color: #909399;
+      font-size: 0.85rem;
+      margin: 8px 0 0;
+    }
+
+    .lxy_panel {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+    }
+
+    .lxy_grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .lxy_tag {
+      font-family: Consolas, monospace;
+      font-size: 0.85rem;
+      color: #606266;
+      text-align: center;
+      margin: 0;
+    }
+
+    /* ============ 一、旋转立方体 ============ */
+    .lxy_stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 35%, #2b3d51, #16202c);
+      perspective: 800px;
+    }
+
+    .lxy_cube {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      transform-style: preserve-3d;
+      animation: lxy_cube-spin 8s linear infinite;
+    }
+
+    .lxy_face {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 160px;
+      height: 160px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .5);
+    }
+
+    .lxy_face-front  { background: rgba(232, 120, 97, .92);  transform: translateZ(80px); }
+    .lxy_face-back   { background: rgba(80, 119, 169, .92);  transform: rotateY(180deg) translateZ(80px); }
+    .lxy_face-right  { background: rgba(245, 201, 107, .92); transform: rotateY(90deg) translateZ(80px); color: #1e2a3a; }
+    .lxy_face-left   { background: rgba(103, 194, 58, .92);  transform: rotateY(-90deg) translateZ(80px); }
+    .lxy_face-top    { background: rgba(144, 147, 153, .92); transform: rotateX(90deg) translateZ(80px); }
+    .lxy_face-bottom { background: rgba(230, 162, 60, .92);  transform: rotateX(-90deg) translateZ(80px); }
+
+    @keyframes lxy_cube-spin {
+      from { transform: rotateX(0deg) rotateY(0deg); }
+      to   { transform: rotateX(360deg) rotateY(360deg); }
+    }
+
+    /* ============ 二、三轴旋转 ============ */
+    .lxy_axis-stage {
+      display: flex;
+      justify-content: center;
+      padding: 34px 0;
+      perspective: 600px;
+    }
+
+    .lxy_plate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      transform-style: preserve-3d;
+    }
+
+    .lxy_plate-x { background: linear-gradient(135deg, #e87861, #f5a623); animation: lxy_spin-x 3s linear infinite; }
+    .lxy_plate-y { background: linear-gradient(135deg, #5077a9, #66b1ff); animation: lxy_spin-y 3s linear infinite; }
+    .lxy_plate-z { background: linear-gradient(135deg, #67c23a, #95d470); animation: lxy_spin-z 3s linear infinite; }
+
+    @keyframes lxy_spin-x { from { transform: rotateX(0deg); }   to { transform: rotateX(360deg); } }
+    @keyframes lxy_spin-y { from { transform: rotateY(0deg); }   to { transform: rotateY(360deg); } }
+    @keyframes lxy_spin-z { from { transform: rotateZ(0deg); }   to { transform: rotateZ(360deg); } }
+
+    /* ============ 三、3D 轮播环 ============ */
+    .lxy_ring-stage {
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 40%, #243447, #16202c);
+      perspective: 900px;
+    }
+
+    .lxy_ring {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      transform-style: preserve-3d;
+      animation: lxy_ring-spin 14s linear infinite;
+    }
+
+    .lxy_ring-item {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .35);
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .lxy_ring-item:nth-child(1) { transform: rotateY(0deg) translateZ(230px);   background: rgba(80, 119, 169, .88); }
+    .lxy_ring-item:nth-child(2) { transform: rotateY(60deg) translateZ(230px);  background: rgba(232, 120, 97, .88); }
+    .lxy_ring-item:nth-child(3) { transform: rotateY(120deg) translateZ(230px); background: rgba(245, 201, 107, .88); color: #1e2a3a; }
+    .lxy_ring-item:nth-child(4) { transform: rotateY(180deg) translateZ(230px); background: rgba(103, 194, 58, .88); }
+    .lxy_ring-item:nth-child(5) { transform: rotateY(240deg) translateZ(230px); background: rgba(144, 147, 153, .88); }
+    .lxy_ring-item:nth-child(6) { transform: rotateY(300deg) translateZ(230px); background: rgba(41, 75, 112, .92); }
+
+    @keyframes lxy_ring-spin {
+      from { transform: rotateY(0deg); }
+      to   { transform: rotateY(360deg); }
+    }
+
+    /* ============ 四、翻转卡片 ============ */
+    .lxy_flip-card {
+      width: 250px;
+      height: 165px;
+      margin: 30px auto;
+      perspective: 800px;
+      cursor: pointer;
+    }
+
+    .lxy_flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .6s ease;
+    }
+
+    .lxy_flip-card:hover .lxy_flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .lxy_flip-front,
+    .lxy_flip-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      backface-visibility: hidden;
+    }
+
+    .lxy_flip-front { background: #294b70; color: #fff; }
+    .lxy_flip-back  { background: #e87861; color: #fff; transform: rotateY(180deg); }
+
+    .lxy_flip-front strong,
+    .lxy_flip-back strong { font-size: 1.2rem; margin-bottom: 6px; }
+
+    .lxy_flip-front span,
+    .lxy_flip-back span { font-size: 0.85rem; opacity: .85; }
+
+    /* ============ 五、动画控制 ============ */
+    .lxy_controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 12px 0 4px;
+    }
+
+    .lxy_btn {
+      min-height: 40px;
+      padding: 0 22px;
+      border: none;
+      border-radius: 4px;
+      background: #409eff;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color .2s ease;
+    }
+
+    .lxy_btn:hover { background: #66b1ff; }
+
+    .lxy_speed-label {
+      font-size: 0.9rem;
+      color: #606266;
+    }
+
+    .lxy_speed-label input {
+      vertical-align: middle;
+      margin: 0 8px;
+      accent-color: #409eff;
+    }
+
+    #lxy_speed-val {
+      display: inline-block;
+      min-width: 64px;
+      font-family: Consolas, monospace;
+      color: #409eff;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="lxy_wrap">
+    <h1>CSS3 3D 动画</h1>
+    <p class="lxy_note">
+      核心要点：父容器 <code>perspective</code> 设置透视距离，子元素
+      <code>transform-style: preserve-3d</code> 保持三维空间，
+      <code>translateZ</code> 控制深度，<code>backface-visibility</code> 隐藏背面。
+      页面动画可由第五节控制暂停与速度。
+    </p>
+
+    <h2>一、旋转立方体</h2>
+    <div class="lxy_panel">
+      <div class="lxy_stage">
+        <div class="lxy_cube lxy_anim">
+          <div class="lxy_face lxy_face-front">前</div>
+          <div class="lxy_face lxy_face-back">后</div>
+          <div class="lxy_face lxy_face-right">右</div>
+          <div class="lxy_face lxy_face-left">左</div>
+          <div class="lxy_face lxy_face-top">上</div>
+          <div class="lxy_face lxy_face-bottom">下</div>
+        </div>
+      </div>
+      <p class="lxy_tag">六个面通过 rotateX / rotateY + translateZ(80px) 立体定位</p>
+    </div>
+
+    <h2>二、绕三个坐标轴旋转</h2>
+    <div class="lxy_grid">
+      <div class="lxy_panel">
+        <div class="lxy_axis-stage">
+          <div class="lxy_plate lxy_plate-x lxy_anim">rotateX</div>
+        </div>
+        <p class="lxy_tag">绕水平轴翻转（X 轴）</p>
+      </div>
+      <div class="lxy_panel">
+        <div class="lxy_axis-stage">
+          <div class="lxy_plate lxy_plate-y lxy_anim">rotateY</div>
+        </div>
+        <p class="lxy_tag">绕垂直轴翻转（Y 轴）</p>
+      </div>
+      <div class="lxy_panel">
+        <div class="lxy_axis-stage">
+          <div class="lxy_plate lxy_plate-z lxy_anim">rotateZ</div>
+        </div>
+        <p class="lxy_tag">在平面内旋转（Z 轴）</p>
+      </div>
+    </div>
+
+    <h2>三、3D 轮播环</h2>
+    <div class="lxy_panel">
+      <div class="lxy_ring-stage">
+        <div class="lxy_ring lxy_anim">
+          <div class="lxy_ring-item">结构</div>
+          <div class="lxy_ring-item">样式</div>
+          <div class="lxy_ring-item">布局</div>
+          <div class="lxy_ring-item">动画</div>
+          <div class="lxy_ring-item">交互</div>
+          <div class="lxy_ring-item">作品</div>
+        </div>
+      </div>
+      <p class="lxy_tag">6 个面按 60° 均分：rotateY(n×60°) + translateZ(230px) 排成环形</p>
+    </div>
+
+    <h2>四、翻转卡片（鼠标悬停触发）</h2>
+    <div class="lxy_panel">
+      <div class="lxy_flip-card">
+        <div class="lxy_flip-inner">
+          <div class="lxy_flip-front">
+            <strong>正面</strong>
+            <span>将鼠标移到卡片上</span>
+          </div>
+          <div class="lxy_flip-back">
+            <strong>背面</strong>
+            <span>backface-visibility: hidden</span>
+          </div>
+        </div>
+      </div>
+      <p class="lxy_tag">hover 时 rotateY(180deg)，正反两面互不透视</p>
+    </div>
+
+    <h2>五、动画控制台</h2>
+    <div class="lxy_panel">
+      <div class="lxy_controls">
+        <button id="lxy_toggle" class="lxy_btn" type="button">暂停动画</button>
+        <label class="lxy_speed-label">
+          动画周期
+          <input type="range" id="lxy_speed" min="2" max="20" step="1" value="8">
+          <span id="lxy_speed-val">默认</span>
+        </label>
+      </div>
+      <p class="lxy_tag" style="margin-top: 10px;">
+        暂停 = animation-play-state: paused；周期 = animation-duration（滑动后统一生效）
+      </p>
+    </div>
+  </div>
+
+  <script>
+    var lxy_paused = false;
+    var lxy_anims = document.querySelectorAll('.lxy_anim');
+    var lxy_btn = document.getElementById('lxy_toggle');
+    var lxy_range = document.getElementById('lxy_speed');
+    var lxy_out = document.getElementById('lxy_speed-val');
+
+    lxy_btn.addEventListener('click', function () {
+      lxy_paused = !lxy_paused;
+      for (var lxy_i = 0; lxy_i < lxy_anims.length; lxy_i++) {
+        lxy_anims[lxy_i].style.animationPlayState = lxy_paused ? 'paused' : 'running';
+      }
+      lxy_btn.textContent = lxy_paused ? '继续动画' : '暂停动画';
+    });
+
+    lxy_range.addEventListener('input', function () {
+      var lxy_val = lxy_range.value;
+      for (var lxy_j = 0; lxy_j < lxy_anims.length; lxy_j++) {
+        lxy_anims[lxy_j].style.animationDuration = lxy_val + 's';
+      }
+      lxy_out.textContent = lxy_val + 's';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纯 CSS 动画</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            background: #f4f1eb;
+            font-family: Arial, sans-serif;
+        }
+
+        .demo {
+            width: min(90vw, 560px);
+            text-align: center;
+        }
+
+        .box {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            border-radius: 24px;
+            background: #ff6b6b;
+            box-shadow: 0 24px 60px rgba(24, 20, 15, 0.18);
+            animation: color-change 8s ease-in-out infinite;
+        }
+
+        .box::before,
+        .box::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite alternate;
+        }
+
+        .box::before {
+            width: 160px;
+            height: 160px;
+            top: -40px;
+            right: -20px;
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .box::after {
+            width: 90px;
+            height: 90px;
+            left: 10%;
+            bottom: 10%;
+            border: 20px solid rgba(255, 255, 255, 0.18);
+            animation-delay: -2s;
+        }
+
+        .box h1 {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            margin: 0;
+            color: #fff;
+            font-size: clamp(2rem, 8vw, 4rem);
+            transform: translate(-50%, -50%);
+            animation: text-pop 2s ease-in-out infinite alternate;
+        }
+
+        .box p {
+            position: absolute;
+            z-index: 1;
+            bottom: 24px;
+            left: 50%;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        @keyframes color-change {
+            0%, 20% { background: #ff6b6b; }
+            25%, 45% { background: #f7b267; }
+            50%, 70% { background: #5bc0be; }
+            75%, 100% { background: #6c63ff; }
+        }
+
+        @keyframes text-pop {
+            from { letter-spacing: 0.02em; }
+            to { letter-spacing: 0.16em; }
+        }
+
+        @keyframes float {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(28px) rotate(20deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .box,
+            .box::before,
+            .box::after,
+            .box h1 {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="demo">
+        <div class="box">
+            <h1>CSS 动画</h1>
+            <p>背景颜色随时间变化</p>
+        </div>
+    </main>
+</body>
+</html>

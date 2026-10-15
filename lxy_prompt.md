@@ -1,0 +1,23 @@
+## 2026-10-12-15-55
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 在agents.md中设置项目规则 所有css类名，id名、js变量都以lxy_开始，所有的提示词都在执行之前写入文件lxy_prompt.md，以附加的方式写入，不覆盖之前的内容，写入的内容包括时间yyyy-mm-dd-hh-mm、使用的模型、提示词内容
+
+## 2026-10-12-16-23
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 完成11-2.html.展示css3 3d动画
+
+## 2026-10-12-16-30
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 设置规则,写入agents.md：新建的html文件加入超链接到首页index.html
+
+## 2026-10-12-16-39
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 11-4.html.3D 书本翻页效果
+
+## 2026-10-15-16-41
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 创建skill：提交项目：使用git commit并push当前项目到https://gitee.com/liu-xinyue-24001011127/advanced-web-pages
+
+## 2026-10-15-16-44
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 提交项目

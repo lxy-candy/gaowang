@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web 前端长度单位</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f5f7fa;
+      color: #1f2d3d;
+      line-height: 1.6;
+    }
+    h1 { font-size: 1.6rem; margin-top: 0; }
+    h2 {
+      font-size: 1.2rem;
+      margin: 32px 0 12px;
+      padding-left: 10px;
+      border-left: 4px solid #409eff;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+      margin-bottom: 16px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+    .label {
+      width: 140px;
+      flex: none;
+      font-family: Consolas, monospace;
+      color: #606266;
+      font-size: 0.9rem;
+    }
+    .bar {
+      height: 20px;
+      background: linear-gradient(90deg, #409eff, #66b1ff);
+      border-radius: 3px;
+    }
+    .note { color: #909399; font-size: 0.85rem; }
+
+    /* 绝对单位 */
+    .u-px  { width: 120px; }
+    .u-cm  { width: 3cm; background: linear-gradient(90deg,#67c23a,#85ce61); }
+    .u-mm  { width: 30mm; background: linear-gradient(90deg,#67c23a,#85ce61); }
+    .u-in  { width: 1in; background: linear-gradient(90deg,#67c23a,#85ce61); }
+    .u-pt  { width: 72pt; background: linear-gradient(90deg,#67c23a,#85ce61); }
+    .u-pc  { width: 6pc; background: linear-gradient(90deg,#67c23a,#85ce61); }
+
+    /* 相对单位 */
+    .u-em  { width: 10em; background: linear-gradient(90deg,#e6a23c,#ebb563); }
+    .u-rem { width: 10rem; background: linear-gradient(90deg,#e6a23c,#ebb563); }
+    .u-vw  { width: 20vw; background: linear-gradient(90deg,#f56c6c,#f78989); }
+    .u-vh  { width: 20vh; background: linear-gradient(90deg,#f56c6c,#f78989); }
+    .u-pct { width: 40%; background: linear-gradient(90deg,#909399,#c0c4cc); }
+
+    /* 字体相对单位示例 */
+    .font-demo { font-size: 20px; }
+    .font-em   { font-size: 1.5em; }
+    .font-rem  { font-size: 1.5rem; }
+
+    #vw-box, #vh-box {
+      background: #ecf5ff;
+      border: 1px dashed #409eff;
+      color: #409eff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Web 前端长度单位</h1>
+  <p class="note">窗口宽度：<span id="win-w"></span>px，根字号：<span id="root-fs"></span>。缩放窗口观察相对单位变化。</p>
+
+  <h2>一、绝对单位（固定物理尺寸）</h2>
+  <div class="card">
+    <div class="row"><span class="label">120px</span>      <div class="bar u-px"></div></div>
+    <div class="row"><span class="label">3cm</span>        <div class="bar u-cm"></div></div>
+    <div class="row"><span class="label">30mm</span>       <div class="bar u-mm"></div></div>
+    <div class="row"><span class="label">1in</span>        <div class="bar u-in"></div></div>
+    <div class="row"><span class="label">72pt</span>       <div class="bar u-pt"></div></div>
+    <div class="row"><span class="label">6pc</span>        <div class="bar u-pc"></div></div>
+    <p class="note">换算关系：1in = 96px = 2.54cm = 25.4mm = 72pt = 6pc</p>
+  </div>
+
+  <h2>二、相对单位（随参照物变化）</h2>
+  <div class="card">
+    <div class="row"><span class="label">10em (父字号16px)</span> <div class="bar u-em"></div></div>
+    <div class="row"><span class="label">10rem (根字号16px)</span> <div class="bar u-rem"></div></div>
+    <div class="row"><span class="label">20vw</span> <div class="bar u-vw"></div></div>
+    <div class="row"><span class="label">20vh</span> <div class="bar u-vh"></div></div>
+    <div class="row"><span class="label">40% (父元素宽)</span> <div class="bar u-pct"></div></div>
+    <p class="note">em 相对父元素字号，rem 相对根元素 html 字号，vw/vh 相对视口宽/高，% 相对父元素。</p>
+  </div>
+
+  <h2>三、字体大小中的应用</h2>
+  <div class="card font-demo">
+    <p>父元素 font-size: 20px</p>
+    <p class="font-em">子元素 font-size: 1.5em → 30px（相对父级 20px）</p>
+    <p class="font-rem">本行 font-size: 1.5rem → 24px（相对根级 16px）</p>
+  </div>
+
+  <h2>四、视口单位可视化</h2>
+  <div class="card">
+    <div id="vw-box" style="width: 50vw; height: 60px;">width: 50vw</div>
+    <div id="vh-box" style="width: 200px; height: 20vh;">height: 20vh</div>
+  </div>
+
+  <script>
+    function refresh() {
+      document.getElementById('win-w').textContent = window.innerWidth;
+      document.getElementById('root-fs').textContent =
+        getComputedStyle(document.documentElement).fontSize;
+    }
+    refresh();
+    window.addEventListener('resize', refresh);
+  </script>
+</body>
+</html>

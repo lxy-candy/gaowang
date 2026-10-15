@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暖心麦之屋 - 24001011127刘馨月</title>
+    <style>
+        /* ========== 全局公共CSS ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #faf6f1;
+            color: #4a3b2a;
+            line-height: 1.6;
+            margin: 0;
+            padding-bottom: 40px;
+        }
+        .lxy-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        .lxy-section-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #8b5a2b;
+            border-left: 4px solid #c97b44;
+            padding-left: 12px;
+        }
+
+        /* ========== 顶部导航栏 ========== */
+        .lxy-nav {
+            width: 100%;
+            background-color: #e6a744;
+        }
+        .lxy-nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #fff;
+        }
+        .lxy-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .lxy-logo-icon {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #fff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .lxy-nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+            font-size: 14px;
+        }
+        .lxy-nav-menu li {
+            cursor: pointer;
+        }
+        .lxy-nav-menu li.active {
+            font-weight: 500;
+        }
+
+       /* 顶部轮播图（单张静态） */
+        .lxy-banner {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .lxy-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lxy-banner-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.7);
+            color: #6b4423;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .lxy-banner-prev { left: 12px; }
+        .lxy-banner-next { right: 12px; }
+
+        .lxy-banner-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+             display: flex;
+            gap: 8px;
+        }
+
+        .lxy-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .lxy-dot.active {
+            background: #fff;
+            width: 20px;
+            border-radius: 4px;
+        }
+
+
+        /* ========== 元素1：上图下文 - 人气面包卡片 ========== */
+        .lxy-card-list {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .lxy-card {
+            width: 280px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(139, 90, 43, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .lxy-card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .lxy-card-body {
+            padding: 16px 20px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .lxy-card-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #6b4423;
+        }
+        .lxy-card-desc {
+            font-size: 14px;
+            color: #7a6b5a;
+            margin-bottom: 12px;
+            flex: 1;
+        }
+        .lxy-card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .lxy-tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f5e6d3;
+            color: #a06535;
+        }
+
+        /* ========== 元素2：左图右文 - 招牌产品列表 ========== */
+        .lxy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 650px;
+        }
+        .lxy-list-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(139, 90, 43, 0.06);
+        }
+        .lxy-item-img {
+            width: 100px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .lxy-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .lxy-item-title {
+            font-size: 16px;
+            color: #6b4423;
+            margin-bottom: 6px;
+        }
+        .lxy-item-desc {
+            font-size: 14px;
+            color: #7a6b5a;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .lxy-item-meta {
+            font-size: 12px;
+            color: #9c8b7a;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ========== 元素3：Tab标签 - 产品分类 ========== */
+        .lxy-tabs {
+            max-width: 700px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(139, 90, 43, 0.06);
+            overflow: hidden;
+        }
+        .lxy-tab-nav {
+            display: flex;
+            border-bottom: 1px solid #f0e6d8;
+        }
+        .lxy-tab-btn {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            background: none;
+            font-size: 15px;
+            color: #8a7865;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        .lxy-tab-btn.active {
+            color: #c97b44;
+            border-bottom-color: #c97b44;
+            font-weight: 500;
+        }
+        .lxy-tab-content {
+            padding: 24px;
+            min-height: 120px;
+            font-size: 14px;
+            color: #6b5d4e;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- 学号：24001011127 姓名：刘馨月 -->
+
+    <!-- 顶部导航栏 -->
+    <nav class="lxy-nav">
+        <div class="lxy-nav-inner">
+            <div class="lxy-logo">
+                <span class="lxy-logo-icon">B</span>
+                <span>多多烘焙屋</span>
+            </div>
+            <ul class="lxy-nav-menu">
+                <li class="active">首页</li>
+                <li>面包推荐</li>
+                <li>面包与健康</li>
+                <li>面包商城</li>
+                <li>关于面包</li>
+                <li>面包小教程</li>
+                <li>关于我们</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 顶部轮播图 -->
+    <div class="lxy-banner">
+        <img src="img/banner-bakery.png" alt="烘焙店每日现烤面包" class="lxy-banner-img">
+        <button class="lxy-banner-btn lxy-banner-prev">&lt;</button>
+        <button class="lxy-banner-btn lxy-banner-next">&gt;</button>
+        <div class="lxy-banner-dots">
+            <span class="lxy-dot active"></span>
+            <span class="lxy-dot"></span>
+            <span class="lxy-dot"></span>
+        </div>
+    </div>
+
+    <!-- 元素1：上图下文卡片组件 -->
+    <section class="lxy-section">
+        <h2 class="lxy-section-title">人气面包卡片</h2>
+        <div class="lxy-card-list">
+            <div class="lxy-card">
+                <img src="img/croissant.png" alt="法式可颂" class="lxy-card-img">
+                <div class="lxy-card-body">
+                    <h3 class="lxy-card-title">法式黄油可颂</h3>
+                    <p class="lxy-card-desc">进口黄油开酥，层层酥脆，内里松软，自带浓郁奶香气，是经典的法式早餐选择。</p>
+                    <div class="lxy-card-tags">
+                        <span class="lxy-tag">酥脆</span>
+                        <span class="lxy-tag">黄油</span>
+                        <span class="lxy-tag">法式</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-card">
+                <img src="img/european-bread.png" alt="全麦欧包" class="lxy-card-img">
+                <div class="lxy-card-body">
+                    <h3 class="lxy-card-title">全麦坚果欧包</h3>
+                    <p class="lxy-card-desc">低糖少油配方，内馅满满核桃与葡萄干，麦香浓郁，饱腹感强，健康代餐首选。</p>
+                    <div class="lxy-card-tags">
+                        <span class="lxy-tag">全麦</span>
+                        <span class="lxy-tag">低糖</span>
+                        <span class="lxy-tag">坚果</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-card">
+                <img src="img/pretzel.png" alt="碱水面包" class="lxy-card-img">
+                <div class="lxy-card-body">
+                    <h3 class="lxy-card-title">德式碱水面包</h3>
+                    <p class="lxy-card-desc">表皮紧实有嚼劲，内里柔软，淡淡碱香与咸香融合，低脂低卡，越嚼越香。</p>
+                    <div class="lxy-card-tags">
+                        <span class="lxy-tag">低脂</span>
+                        <span class="lxy-tag">德式</span>
+                        <span class="lxy-tag">咸香</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-card">
+                <img src="img/blueberry-cheese-bread.png" alt="蓝莓乳酪面包" class="lxy-card-img">
+                <div class="lxy-card-body">
+                    <h3 class="lxy-card-title">蓝莓乳酪面包</h3>
+                    <p class="lxy-card-desc">柔软面包体包裹浓郁乳酪馅，内嵌大颗蓝莓果粒，酸甜交织，奶香浓郁不腻口。</p>
+                    <div class="lxy-card-tags">
+                        <span class="lxy-tag">乳酪</span>
+                        <span class="lxy-tag">蓝莓</span>
+                        <span class="lxy-tag">酸甜</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-card">
+                <img src="img/classic-baguette.png" alt="经典法棍" class="lxy-card-img">
+                <div class="lxy-card-body">
+                    <h3 class="lxy-card-title">经典法式长棍</h3>
+                    <p class="lxy-card-desc">传统法式工艺制作，外皮酥脆内里柔韧，麦香纯粹无添加，越嚼越有原生风味。</p>
+                    <div class="lxy-card-tags">
+                        <span class="lxy-tag">法式</span>
+                        <span class="lxy-tag">酥脆</span>
+                        <span class="lxy-tag">低油</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 元素2：左图右文列表组件 -->
+    <section class="lxy-section">
+        <h2 class="lxy-section-title">招牌产品列表</h2>
+        <div class="lxy-list">
+            <div class="lxy-list-item">
+                <img src="img/butter-toast.png" alt="黄油吐司" class="lxy-item-img">
+                <div class="lxy-item-content">
+                    <div>
+                        <h3 class="lxy-item-title">北海道黄油吐司</h3>
+                        <p class="lxy-item-desc">采用北海道鲜奶与动物黄油长时间低温发酵，吐司组织绵密拉丝，入口奶香醇厚，柔软如云。</p>
+                    </div>
+                    <div class="lxy-item-meta">
+                        <span>招牌必点 · 每日限量</span>
+                        <span>甜度：★★★☆☆</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-list-item">
+                <img src="img/matcha-mille.png" alt="抹茶千层" class="lxy-item-img">
+                <div class="lxy-item-content">
+                    <div>
+                        <h3 class="lxy-item-title">宇治抹茶千层</h3>
+                        <p class="lxy-item-desc">日本宇治抹茶粉制作，薄韧蛋皮搭配轻盈奶油，茶香浓郁不甜腻，口感层次丰富。</p>
+                    </div>
+                    <div class="lxy-item-meta">
+                        <span>人气爆款 · 动物奶油</span>
+                        <span>甜度：★★☆☆☆</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-list-item">
+                <img src="img/matcha-cloud-roll.png" alt="抹茶云朵卷" class="lxy-item-img">
+                <div class="lxy-item-content">
+                    <div>
+                        <h3 class="lxy-item-title">抹茶云朵蛋糕卷</h3>
+                        <p class="lxy-item-desc">轻盈如云的抹茶蛋糕胚，包裹顺滑鲜奶奶油，口感绵密湿润，茶香清新不腻口。</p>
+                    </div>
+                    <div class="lxy-item-meta">
+                        <span>新品推荐 · 动物奶油</span>
+                        <span>甜度：★★☆☆☆</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lxy-list-item">
+                <img src="img/durian-mille.png" alt="榴莲千层" class="lxy-item-img">
+                <div class="lxy-item-content">
+                    <div>
+                        <h3 class="lxy-item-title">金枕榴莲千层</h3>
+                        <p class="lxy-item-desc">精选金枕榴莲果肉，搭配薄韧蛋皮与轻盈奶油，果肉饱满厚实，榴莲味浓郁醇厚。</p>
+                    </div>
+                    <div class="lxy-item-meta">
+                        <span>镇店爆款 · 足量果肉</span>
+                        <span>甜度：★★★☆☆</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 元素3：Tab标签组件 -->
+    <section class="lxy-section">
+        <h2 class="lxy-section-title">产品分类</h2>
+        <div class="lxy-tabs">
+            <div class="lxy-tab-nav">
+                <button class="lxy-tab-btn active">招牌必吃</button>
+                <button class="lxy-tab-btn">千层系列</button>
+                <button class="lxy-tab-btn">酥挞小食</button>
+            </div>
+            <div class="lxy-tab-content">
+                招牌必吃推荐：法式黄油可颂、北海道黄油吐司、全麦坚果欧包、德式碱水面包、蓝莓乳酪面包、经典法式长棍。每款每日现烤现卖，出炉时段香气浓郁，口感最佳，建议到店趁热品尝。
+            </div>
+        </div>
+    </section>
+</body>
+</html>

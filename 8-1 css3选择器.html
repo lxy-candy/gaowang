@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>css3</title>
+    <style>
+        .main{
+            display: flex;
+            flex-wrap: wrap;
+            margin:10px;
+        }
+        .box{
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            transition: all 0.6s;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* ========== 偶数盒子统一 hover 效果 ========== */
+        .box:nth-child(even):hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(65, 105, 225, 0.35);
+            background-color: #f0f7ff;
+            color: #3366cc;
+            border-color: #6699ff;
+        }
+
+        /* ========== 原有单个盒子专属 hover 效果 ========== */
+        .box:first-child:hover{
+            background-color: pink;
+            color: white;
+            font-size: 140px;
+        }
+        .box:nth-child(2):hover{
+            border-radius: 50%;
+            border-width: 10px;
+        }
+        .box:nth-child(3):hover{
+            box-shadow: 10px 10px 10px rgb(193, 233, 255);
+        }
+        .box:nth-of-type(4):hover{
+            text-shadow: 50px 10px 10px rgb(95, 247, 232);
+        }
+        .box:nth-of-type(5):hover{
+            background: linear-gradient(45deg, rgb(252, 218, 235), rgb(188, 229, 255));
+        }
+        .box:nth-of-type(6):hover{
+            background: radial-gradient(circle, rgb(255, 255, 255), rgb(194, 169, 255));
+        }
+        .box:nth-of-type(7):hover{
+            transform: scale(0.5);
+        }
+        .box:nth-of-type(8):hover{
+            transform: translateX(-150px);
+        }
+        .box:nth-of-type(9):hover{
+            transform: rotateZ(-180deg);
+        }
+        .box:nth-of-type(10):hover{
+            transform: skewX(20deg) translateY(50px);
+        }
+        .box:nth-last-child(2):hover::before{
+            content: "*";
+            color: red;
+            position: absolute;
+            top: 5px;
+            left: 10px;
+        }
+        .box:nth-child(12):hover::after{
+            content: "刘馨月";
+            display: block;
+            padding: 5px 10px;
+            font-size: 16px;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+        .box:nth-child(3n):hover{
+            border:3px solid red;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box">6</div>
+        <div class="box">7</div>
+        <div class="box">8</div>
+        <div class="box">9</div>
+        <div class="box">10</div>
+        <div class="box">11</div>
+        <div class="box">12</div>
+    </div>
+</body>
+</html>

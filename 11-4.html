@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 书本翻页效果</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f5f7fa;
+      color: #1f2d3d;
+      line-height: 1.6;
+    }
+
+    .lxy_wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 1.6rem; margin-top: 0; }
+
+    h2 {
+      font-size: 1.2rem;
+      margin: 32px 0 12px;
+      padding-left: 10px;
+      border-left: 4px solid #409eff;
+    }
+
+    .lxy_note {
+      color: #909399;
+      font-size: 0.85rem;
+      margin: 8px 0 0;
+    }
+
+    .lxy_panel {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+    }
+
+    /* ============ 舞台与书本 ============ */
+    .lxy_stage {
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 10px;
+      perspective: 2000px;
+    }
+
+    .lxy_book {
+      position: relative;
+      width: min(680px, 94vw);
+      aspect-ratio: 17 / 10;
+      transform-style: preserve-3d;
+      box-shadow: 0 26px 50px rgba(30, 42, 58, .25);
+      border-radius: 8px;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .lxy_board {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 0;
+      background: #efe8da;
+    }
+
+    .lxy_board-left {
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px 0 0 8px;
+      background-image: repeating-linear-gradient(45deg, rgba(30, 42, 58, .04) 0 2px, transparent 2px 10px);
+      color: #a89f8c;
+      font-size: 0.85rem;
+      letter-spacing: .3em;
+    }
+
+    .lxy_board-right {
+      left: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 8px 8px 0;
+      background: #fffdf8;
+      color: #b3a892;
+      font-size: 0.9rem;
+    }
+
+    .lxy_spine {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      z-index: 200;
+      transform: translateX(-1.5px);
+      background: linear-gradient(90deg, rgba(30, 42, 58, .35), rgba(30, 42, 58, .08), rgba(30, 42, 58, .35));
+      pointer-events: none;
+    }
+
+    /* ============ 书页 ============ */
+    .lxy_page {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 50%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transform-origin: left center;
+      transition: transform .8s ease;
+    }
+
+    .lxy_flipped { transform: rotateY(-180deg); }
+
+    .lxy_side {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 7% 9%;
+      overflow: hidden;
+      backface-visibility: hidden;
+      background: #fffdf8;
+      border: 1px solid rgba(30, 42, 58, .12);
+    }
+
+    .lxy_front {
+      border-radius: 0 8px 8px 0;
+      box-shadow: inset -18px 0 24px -18px rgba(30, 42, 58, .35);
+    }
+
+    .lxy_back {
+      border-radius: 8px 0 0 8px;
+      transform: rotateY(180deg);
+      background: #f6f1e6;
+      box-shadow: inset 18px 0 24px -18px rgba(30, 42, 58, .35);
+    }
+
+    .lxy_side h3 {
+      margin: 0 0 10px;
+      font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+      font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+      color: #294b70;
+    }
+
+    .lxy_side p {
+      margin: 0 0 8px;
+      font-size: clamp(.72rem, 1.7vw, .9rem);
+      color: #647083;
+    }
+
+    .lxy_side .lxy_pageno {
+      position: absolute;
+      right: 9%;
+      bottom: 6%;
+      font-family: Consolas, monospace;
+      font-size: .72rem;
+      color: #b3a892;
+    }
+
+    /* 封面 / 封底 */
+    .lxy_cover {
+      align-items: flex-start;
+      justify-content: center;
+      background: #294b70;
+      background-image: radial-gradient(circle at 85% 15%, rgba(245, 201, 107, .28), transparent 45%);
+      border-color: rgba(255, 255, 255, .15);
+    }
+
+    .lxy_cover h3 {
+      color: #fffdf8;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      margin-bottom: 14px;
+    }
+
+    .lxy_cover p { color: rgba(255, 253, 248, .78); }
+
+    .lxy_kicker {
+      letter-spacing: .35em;
+      font-size: .72rem !important;
+      color: #f5c96b !important;
+      margin-bottom: 6px !important;
+    }
+
+    .lxy_back-cover {
+      align-items: center;
+      text-align: center;
+      background: #294b70;
+      background-image: radial-gradient(circle at 20% 85%, rgba(232, 120, 97, .3), transparent 50%);
+      border-color: rgba(255, 255, 255, .15);
+    }
+
+    .lxy_back-cover h3 { color: #fffdf8; }
+    .lxy_back-cover p { color: rgba(255, 253, 248, .72); }
+
+    .lxy_toc {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .lxy_toc li {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(30, 42, 58, .18);
+      font-size: clamp(.72rem, 1.7vw, .9rem);
+      color: #647083;
+    }
+
+    .lxy_toc li span {
+      font-family: Consolas, monospace;
+      color: #e87861;
+    }
+
+    /* ============ 控制区 ============ */
+    .lxy_controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .lxy_btn {
+      min-height: 38px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 4px;
+      background: #409eff;
+      color: #fff;
+      font-size: .92rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background-color .2s ease;
+    }
+
+    .lxy_btn:hover:not(:disabled) { background: #66b1ff; }
+
+    .lxy_btn:disabled {
+      background: #c0c4cc;
+      cursor: not-allowed;
+    }
+
+    .lxy_indicator {
+      font-family: Consolas, monospace;
+      font-size: .9rem;
+      color: #606266;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .lxy_hint {
+      text-align: center;
+      color: #909399;
+      font-size: .82rem;
+      margin: 10px 0 0;
+    }
+
+    .lxy_points {
+      margin: 0;
+      padding-left: 20px;
+      color: #606266;
+      font-size: .9rem;
+    }
+
+    .lxy_points li { margin: 6px 0; }
+
+    .lxy_points code {
+      font-family: Consolas, monospace;
+      font-size: .85rem;
+      color: #e87861;
+      background: #f5f7fa;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="lxy_wrap">
+    <h1>3D 书本翻页效果</h1>
+    <p class="lxy_note">点击书页（右侧前进 / 左侧后退）或使用按钮翻页，共 4 张书页、8 个版面。</p>
+
+    <h2>一、3D 翻页书</h2>
+    <div class="lxy_panel">
+      <div class="lxy_stage">
+        <div class="lxy_book" id="lxy_book">
+          <div class="lxy_board lxy_board-left">封底内页</div>
+          <div class="lxy_board lxy_board-right">— 全书完 —</div>
+
+          <!-- 第 1 页 -->
+          <div class="lxy_page">
+            <div class="lxy_side lxy_front lxy_cover">
+              <p class="lxy_kicker">CSS3 · 立体课堂</p>
+              <h3>3D 翻页书</h3>
+              <p>transform / preserve-3d / backface-visibility</p>
+              <p style="margin-top: 18px;">高级网页设计 · 课堂实践</p>
+            </div>
+            <div class="lxy_side lxy_back">
+              <h3>目录</h3>
+              <ul class="lxy_toc">
+                <li>透视与深度 <span>01</span></li>
+                <li>三维空间 <span>02</span></li>
+                <li>立方体六面 <span>03</span></li>
+                <li>翻页公式 <span>04</span></li>
+                <li>动画节奏 <span>05</span></li>
+              </ul>
+              <span class="lxy_pageno">目录</span>
+            </div>
+          </div>
+
+          <!-- 第 2 页 -->
+          <div class="lxy_page">
+            <div class="lxy_side lxy_front">
+              <h3>01 · 透视与深度</h3>
+              <p>父容器设置 <code>perspective: 2000px</code>，为子元素建立近大远小的三维纵深感。</p>
+              <p>透视值越小，立体夸张；越大越接近正交投影。</p>
+              <span class="lxy_pageno">P1</span>
+            </div>
+            <div class="lxy_side lxy_back">
+              <h3>02 · 三维空间</h3>
+              <p>书页容器开启 <code>transform-style: preserve-3d</code>，让前后两面共享同一三维空间。</p>
+              <p>配合 <code>backface-visibility: hidden</code>，翻转时背面才不会「透视」到正面。</p>
+              <span class="lxy_pageno">P2</span>
+            </div>
+          </div>
+
+          <!-- 第 3 页 -->
+          <div class="lxy_page">
+            <div class="lxy_side lxy_front">
+              <h3>03 · 立方体六面</h3>
+              <p>六个面各自 <code>rotate + translateZ(半边长)</code> 定位，构成 3D 立方体。</p>
+              <p>这是本页翻书与 11-2 立方体共用的核心技巧。</p>
+              <span class="lxy_pageno">P3</span>
+            </div>
+            <div class="lxy_side lxy_back">
+              <h3>04 · 翻页公式</h3>
+              <p><code>transform-origin: left center</code> 以书脊为轴。</p>
+              <p><code>rotateY(-180deg)</code> 将书页从右半翻到左半，正反两面交替可见。</p>
+              <span class="lxy_pageno">P4</span>
+            </div>
+          </div>
+
+          <!-- 第 4 页 -->
+          <div class="lxy_page">
+            <div class="lxy_side lxy_front">
+              <h3>05 · 动画节奏</h3>
+              <p><code>transition: transform .8s ease</code> 控制翻页速度与缓动。</p>
+              <p>JS 用 <code>z-index</code> 分层：翻起时置顶，落定后按顺序归位，配合 <code>transitionend</code> 收尾。</p>
+              <span class="lxy_pageno">P5</span>
+            </div>
+            <div class="lxy_side lxy_back lxy_back-cover">
+              <h3>谢谢欣赏</h3>
+              <p>试试连点几下，感受书页的层叠次序</p>
+              <span class="lxy_pageno">封底</span>
+            </div>
+          </div>
+
+          <div class="lxy_spine"></div>
+        </div>
+      </div>
+
+      <div class="lxy_controls">
+        <button id="lxy_prev" class="lxy_btn" type="button">‹ 上一页</button>
+        <span id="lxy_indicator" class="lxy_indicator">已翻 0 / 4 页</span>
+        <button id="lxy_next" class="lxy_btn" type="button">下一页 ›</button>
+      </div>
+      <p class="lxy_hint">点击书页右半边前进、左半边后退</p>
+    </div>
+
+    <h2>二、实现要点</h2>
+    <div class="lxy_panel">
+      <ul class="lxy_points">
+        <li>舞台 <code>perspective: 2000px</code>，书页 <code>preserve-3d</code> 保持立体空间</li>
+        <li>书页以书脊为轴：<code>transform-origin: left center</code> + <code>rotateY(-180deg)</code></li>
+        <li>正反面绝对定位叠加，<code>backface-visibility: hidden</code> 互不透视</li>
+        <li><code>z-index</code> 分层：未翻页按 4→1 叠放，翻起时临时置顶，落定后按 1→4 排入左叠</li>
+        <li>JS 监听 <code>transitionend</code> 归位层级并解锁连点，按钮同步禁用边界状态</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    var lxy_book = document.getElementById('lxy_book');
+    var lxy_pages = lxy_book.querySelectorAll('.lxy_page');
+    var lxy_total = lxy_pages.length;
+    var lxy_current = 0;
+    var lxy_flipping = false;
+    var lxy_prevBtn = document.getElementById('lxy_prev');
+    var lxy_nextBtn = document.getElementById('lxy_next');
+    var lxy_indicator = document.getElementById('lxy_indicator');
+
+    for (var lxy_i = 0; lxy_i < lxy_total; lxy_i++) {
+      lxy_pages[lxy_i].style.zIndex = lxy_total - lxy_i;
+    }
+
+    function lxy_update() {
+      lxy_indicator.textContent = '已翻 ' + lxy_current + ' / ' + lxy_total + ' 页';
+      lxy_prevBtn.disabled = lxy_flipping || lxy_current <= 0;
+      lxy_nextBtn.disabled = lxy_flipping || lxy_current >= lxy_total;
+    }
+
+    function lxy_flip(lxy_dir) {
+      if (lxy_flipping) return;
+      var lxy_target = lxy_dir > 0 ? lxy_current : lxy_current - 1;
+      if (lxy_target < 0 || lxy_target >= lxy_total) return;
+
+      var lxy_page = lxy_pages[lxy_target];
+      lxy_flipping = true;
+      lxy_page.style.zIndex = lxy_total + 10 + lxy_target;
+      if (lxy_dir > 0) {
+        lxy_page.classList.add('lxy_flipped');
+      } else {
+        lxy_page.classList.remove('lxy_flipped');
+      }
+      lxy_update();
+
+      function lxy_onEnd(lxy_e) {
+        if (lxy_e.propertyName !== 'transform') return;
+        lxy_page.removeEventListener('transitionend', lxy_onEnd);
+        lxy_page.style.zIndex = lxy_dir > 0
+          ? lxy_target + 1
+          : lxy_total - lxy_target;
+        lxy_flipping = false;
+        lxy_current += lxy_dir;
+        lxy_update();
+      }
+      lxy_page.addEventListener('transitionend', lxy_onEnd);
+    }
+
+    lxy_prevBtn.addEventListener('click', function () { lxy_flip(-1); });
+    lxy_nextBtn.addEventListener('click', function () { lxy_flip(1); });
+
+    lxy_book.addEventListener('click', function (lxy_e) {
+      var lxy_rect = lxy_book.getBoundingClientRect();
+      var lxy_x = lxy_e.clientX - lxy_rect.left;
+      lxy_flip(lxy_x < lxy_rect.width / 2 ? -1 : 1);
+    });
+
+    lxy_update();
+  </script>
+</body>
+</html>
