@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 变量演示</title>
+    <style>
+        :root {
+            --lxy-primary: #409eff;
+            --lxy-primary-soft: rgba(64, 158, 255, 0.12);
+            --lxy-accent: #f7ba2a;
+            --lxy-bg: #f5f7fa;
+            --lxy-card: #ffffff;
+            --lxy-text: #1f2d3d;
+            --lxy-muted: #909399;
+            --lxy-radius: 8px;
+            --lxy-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            --lxy-gap: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: var(--lxy-bg);
+            color: var(--lxy-text);
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .lxy_wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+            padding-left: 10px;
+            border-left: 4px solid var(--lxy-primary);
+        }
+
+        .lxy_note {
+            color: var(--lxy-muted);
+            font-size: 0.85rem;
+            margin: 8px 0 0;
+        }
+
+        .lxy_panel {
+            background: var(--lxy-card);
+            border-radius: var(--lxy-radius);
+            padding: 20px;
+            box-shadow: var(--lxy-shadow);
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* 主题切换按钮组 */
+        .lxy_themes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .lxy_btn {
+            padding: 8px 18px;
+            border: 2px solid var(--lxy-primary);
+            border-radius: var(--lxy-radius);
+            background: var(--lxy-card);
+            color: var(--lxy-primary);
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .lxy_btn:hover {
+            background: var(--lxy-primary-soft);
+        }
+
+        .lxy_btn.lxy_active {
+            background: var(--lxy-primary);
+            color: var(--lxy-card);
+        }
+
+        /* 变量卡片列表：同一结构，仅靠变量区分配色 */
+        .lxy_cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--lxy-gap);
+            margin-top: 12px;
+        }
+
+        .lxy_card {
+            padding: 18px;
+            border-radius: var(--lxy-radius);
+            border: 1px solid var(--lxy-line, #e4e7ed);
+            background: var(--lxy-card);
+            box-shadow: var(--lxy-shadow);
+        }
+
+        .lxy_card strong {
+            display: block;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+            color: var(--lxy-card-color, var(--lxy-primary));
+        }
+
+        .lxy_card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--lxy-muted);
+        }
+
+        .lxy_card-a {
+            --lxy-card-color: #67c23a;
+            --lxy-line: rgba(103, 194, 58, 0.4);
+        }
+
+        .lxy_card-b {
+            --lxy-card-color: #e6a23c;
+            --lxy-line: rgba(230, 162, 60, 0.4);
+        }
+
+        .lxy_card-c {
+            --lxy-card-color: #f56c6c;
+            --lxy-line: rgba(245, 108, 108, 0.4);
+        }
+
+        .lxy_card-d {
+            --lxy-card-color: var(--lxy-primary);
+            --lxy-line: var(--lxy-primary-soft);
+        }
+
+        /* 代码展示块 */
+        .lxy_code {
+            margin: 12px 0 0;
+            padding: 14px 16px;
+            border-radius: var(--lxy-radius);
+            background: #2b2f36;
+            color: #d4d4d4;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .lxy_code .lxy_var {
+            color: #9cdcfe;
+        }
+
+        .lxy_code .lxy_val {
+            color: #ce9178;
+        }
+
+        .lxy_code .lxy_sel {
+            color: #d7ba7d;
+        }
+
+        /* 滑块：演示 var() 参与计算 */
+        .lxy_slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .lxy_slider-row input {
+            flex: 1;
+            accent-color: var(--lxy-primary);
+        }
+
+        .lxy_preview {
+            width: calc(var(--lxy-size, 60) * 1px);
+            height: calc(var(--lxy-size, 60) * 1px);
+            border-radius: var(--lxy-radius);
+            background: var(--lxy-primary);
+            box-shadow: var(--lxy-shadow);
+            transition: width 0.1s linear, height 0.1s linear, background-color 0.4s ease;
+            flex-shrink: 0;
+        }
+
+        /* 暗色主题变量覆盖 */
+        body.lxy_theme-dark {
+            --lxy-primary: #7aa2f7;
+            --lxy-primary-soft: rgba(122, 162, 247, 0.16);
+            --lxy-bg: #1a2030;
+            --lxy-card: #232a3b;
+            --lxy-text: #e6e9f0;
+            --lxy-muted: #8b93a7;
+            --lxy-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+        }
+
+        body.lxy_theme-forest {
+            --lxy-primary: #2f855a;
+            --lxy-primary-soft: rgba(47, 133, 90, 0.14);
+            --lxy-accent: #b7791f;
+            --lxy-bg: #f0f5f1;
+            --lxy-card: #ffffff;
+            --lxy-text: #1c3329;
+            --lxy-muted: #6b7f74;
+        }
+    </style>
+</head>
+<body>
+    <main class="lxy_wrap">
+        <h1>CSS 变量（自定义属性）演示</h1>
+        <p class="lxy_note">CSS 变量以 <code>--</code> 声明，通过 <code>var()</code> 读取；在选择器中重新赋值即可实现一键换肤。</p>
+
+        <h2>1. 在 :root 中声明全局变量</h2>
+        <div class="lxy_panel">
+            <p>页面的颜色、圆角、阴影都来自变量，修改一处即可全局生效。</p>
+            <pre class="lxy_code"><span class="lxy_sel">:root</span> {
+    <span class="lxy_var">--lxy-primary</span>: <span class="lxy_val">#409eff</span>;
+    <span class="lxy_var">--lxy-radius</span>: <span class="lxy_val">8px</span>;
+}
+<span class="lxy_sel">h2</span> { border-left: 4px solid <span class="lxy_var">var(--lxy-primary)</span>; }</pre>
+        </div>
+
+        <h2>2. 点击切换主题（改变变量值）</h2>
+        <div class="lxy_panel">
+            <p>下面的按钮只修改几个变量，整页配色随之变化：</p>
+            <div class="lxy_themes">
+                <button class="lxy_btn lxy_active" data-theme="">默认蓝</button>
+                <button class="lxy_btn" data-theme="lxy_theme-dark">暗夜模式</button>
+                <button class="lxy_btn" data-theme="lxy_theme-forest">森林绿</button>
+            </div>
+        </div>
+
+        <h2>3. 局部变量：同结构不同色的卡片</h2>
+        <div class="lxy_panel">
+            <p>四张卡片结构完全相同，仅在各自类中声明局部变量 <code>--lxy-card-color</code>：</p>
+            <div class="lxy_cards">
+                <div class="lxy_card lxy_card-a">
+                    <strong>绿色卡片</strong>
+                    <p>--lxy-card-color: #67c23a</p>
+                </div>
+                <div class="lxy_card lxy_card-b">
+                    <strong>橙色卡片</strong>
+                    <p>--lxy-card-color: #e6a23c</p>
+                </div>
+                <div class="lxy_card lxy_card-c">
+                    <strong>红色卡片</strong>
+                    <p>--lxy-card-color: #f56c6c</p>
+                </div>
+                <div class="lxy_card lxy_card-d">
+                    <strong>主题卡片</strong>
+                    <p>继承 var(--lxy-primary)</p>
+                </div>
+            </div>
+        </div>
+
+        <h2>4. var() 默认值与 calc() 计算</h2>
+        <div class="lxy_panel">
+            <p>拖动滑块修改变量 <code>--lxy-size</code>，方块尺寸通过 <code>calc(var(--lxy-size) * 1px)</code> 实时计算：</p>
+            <div class="lxy_slider-row">
+                <input type="range" min="20" max="140" value="60" id="lxy_sizeRange" aria-label="方块大小">
+                <div class="lxy_preview" id="lxy_preview"></div>
+            </div>
+            <pre class="lxy_code"><span class="lxy_sel">.lxy_preview</span> {
+    width: calc(<span class="lxy_var">var(--lxy-size, 60)</span> * 1px);  <span class="lxy_val">/* 带默认值 60 */</span>
+    background: <span class="lxy_var">var(--lxy-primary)</span>;
+}</pre>
+        </div>
+    </main>
+
+    <script>
+        var lxy_buttons = document.querySelectorAll(".lxy_btn");
+        var lxy_range = document.getElementById("lxy_sizeRange");
+        var lxy_preview = document.getElementById("lxy_preview");
+
+        lxy_buttons.forEach(function (lxy_btn) {
+            lxy_btn.addEventListener("click", function () {
+                document.body.className = lxy_btn.dataset.theme || "";
+                lxy_buttons.forEach(function (lxy_b) {
+                    lxy_b.classList.remove("lxy_active");
+                });
+                lxy_btn.classList.add("lxy_active");
+            });
+        });
+
+        lxy_range.addEventListener("input", function () {
+            document.body.style.setProperty("--lxy-size", lxy_range.value);
+        });
+    </script>
+</body>
+</html>

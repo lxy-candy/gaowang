@@ -25,3 +25,11 @@
 ## 2026-10-15-16-47
 - 模型: opencode/mimo-v2.6-flash-free
 - 提示词: 通过skill提交项目。
+
+## 2026-10-15-16-52
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 切换为 SSH 地址
+
+## 2026-10-15-16-54
+- 模型: opencode/mimo-v2.6-flash-free
+- 提示词: 创建网页12-1.html，展示css变量，然后提交项目
