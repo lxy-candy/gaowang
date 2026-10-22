@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-22
+    功能：JavaScript 六种基础数据类型演示页
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS 六种基础数据类型 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #1e2a3a 0%, #294b70 100%);
+            color: #fffdf8;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .Lxy_container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .Lxy_header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .Lxy_header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin-bottom: 10px;
+            color: #f5c96b;
+        }
+
+        .Lxy_header p {
+            color: rgba(255, 253, 248, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .Lxy_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .Lxy_card {
+            background: rgba(255, 253, 248, 0.08);
+            border: 1px solid rgba(255, 253, 248, 0.15);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .Lxy_card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .Lxy_card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 253, 248, 0.15);
+        }
+
+        .Lxy_type-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f5c96b;
+        }
+
+        .Lxy_type-tag {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(245, 201, 107, 0.2);
+            color: #f5c96b;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .Lxy_card-desc {
+            font-size: 0.88rem;
+            color: rgba(255, 253, 248, 0.75);
+            margin-bottom: 16px;
+        }
+
+        .Lxy_code-block {
+            background: #0d1421;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.85rem;
+            color: #e8e1d5;
+            overflow-x: auto;
+            margin-bottom: 12px;
+        }
+
+        .Lxy_code-block .Lxy_keyword { color: #e87861; }
+        .Lxy_code-block .Lxy_string  { color: #9cc5a1; }
+        .Lxy_code-block .Lxy_comment { color: #647083; }
+
+        .Lxy_result-block {
+            background: rgba(80, 119, 169, 0.3);
+            border-left: 3px solid #f5c96b;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-family: "Consolas", "Monaco", monospace;
+            min-height: 24px;
+            color: #fffdf8;
+        }
+
+        .Lxy_btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e2a3a;
+            background: #f5c96b;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        .Lxy_btn:hover { background: #ffd87a; }
+        .Lxy_btn:active { transform: scale(0.96); }
+
+        .Lxy_summary {
+            background: rgba(255, 253, 248, 0.08);
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid rgba(255, 253, 248, 0.15);
+        }
+
+        .Lxy_summary h2 {
+            color: #f5c96b;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+        }
+
+        .Lxy_summary table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .Lxy_summary th,
+        .Lxy_summary td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 253, 248, 0.12);
+        }
+
+        .Lxy_summary th {
+            color: #f5c96b;
+            font-weight: 600;
+            font-size: 0.82rem;
+            letter-spacing: 0.05em;
+        }
+
+        .Lxy_summary tr:last-child td { border-bottom: none; }
+
+        .Lxy_summary td code {
+            font-family: "Consolas", "Monaco", monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+
+        .Lxy_footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 253, 248, 0.5);
+            font-size: 0.82rem;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 24px 14px; }
+            .Lxy_grid { grid-template-columns: 1fr; gap: 18px; }
+            .Lxy_card { padding: 18px; }
+            .Lxy_summary table { font-size: 0.78rem; }
+            .Lxy_summary th, .Lxy_summary td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_container">
+        <header class="Lxy_header">
+            <h1>JavaScript 六种基础数据类型</h1>
+            <p>点击每张卡片的「运行演示」按钮，在控制台和页面中查看效果</p>
+        </header>
+
+        <section class="Lxy_grid">
+
+            <!-- 1. Number -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">Number</span>
+                    <span class="Lxy_type-tag">数值</span>
+                </div>
+                <p class="Lxy_card-desc">整数、浮点数、NaN、Infinity 都属于 Number 类型。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_num1 = <span class="Lxy_string">42</span>;
+<span class="Lxy_keyword">let</span> Lxy_num2 = <span class="Lxy_string">3.14</span>;
+<span class="Lxy_keyword">let</span> Lxy_num3 = <span class="Lxy_string">NaN</span>;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-number">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runNumber()">▶ 运行演示</button>
+            </article>
+
+            <!-- 2. String -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">String</span>
+                    <span class="Lxy_type-tag">字符串</span>
+                </div>
+                <p class="Lxy_card-desc">用单引号、双引号或反引号包裹的文本，反引号支持模板字符串。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_str1 = <span class="Lxy_string">'你好'</span>;
+<span class="Lxy_keyword">let</span> Lxy_str2 = <span class="Lxy_string">"JS"</span>;
+<span class="Lxy_keyword">let</span> Lxy_str3 = <span class="Lxy_string">`长度 ${5 + 1}`</span>;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-string">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runString()">▶ 运行演示</button>
+            </article>
+
+            <!-- 3. Boolean -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">Boolean</span>
+                    <span class="Lxy_type-tag">布尔</span>
+                </div>
+                <p class="Lxy_card-desc">只有 true 和 false 两个值，常用于条件判断。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_bool1 = <span class="Lxy_string">true</span>;
+<span class="Lxy_keyword">let</span> Lxy_bool2 = <span class="Lxy_string">false</span>;
+<span class="Lxy_keyword">let</span> Lxy_bool3 = <span class="Lxy_string">10 > 5</span>;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-boolean">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runBoolean()">▶ 运行演示</button>
+            </article>
+
+            <!-- 4. Undefined -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">Undefined</span>
+                    <span class="Lxy_type-tag">未定义</span>
+                </div>
+                <p class="Lxy_card-desc">变量已声明但未赋值，或访问不存在的对象属性时的值。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_val;
+<span class="Lxy_keyword">typeof</span> Lxy_val;
+<span class="Lxy_keyword">typeof</span> Lxy_xxx;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-undefined">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runUndefined()">▶ 运行演示</button>
+            </article>
+
+            <!-- 5. Null -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">Null</span>
+                    <span class="Lxy_type-tag">空值</span>
+                </div>
+                <p class="Lxy_card-desc">主动赋值"无"的状态。注意 <code>typeof null === 'object'</code> 是历史遗留 bug。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_empty = <span class="Lxy_string">null</span>;
+<span class="Lxy_keyword">typeof</span> Lxy_empty;
+<span class="Lxy_string">null === null</span>;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-null">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runNull()">▶ 运行演示</button>
+            </article>
+
+            <!-- 6. Symbol -->
+            <article class="Lxy_card">
+                <div class="Lxy_card-header">
+                    <span class="Lxy_type-name">Symbol</span>
+                    <span class="Lxy_type-tag">符号 (ES6+)</span>
+                </div>
+                <p class="Lxy_card-desc">ES6 新增，创建唯一标识符，常用于对象属性键，避免命名冲突。</p>
+                <pre class="Lxy_code-block"><span class="Lxy_keyword">let</span> Lxy_sym1 = <span class="Lxy_string">Symbol(</span><span class="Lxy_string">'id'</span><span class="Lxy_string">)</span>;
+<span class="Lxy_keyword">let</span> Lxy_sym2 = <span class="Lxy_string">Symbol(</span><span class="Lxy_string">'id'</span><span class="Lxy_string">)</span>;
+Lxy_sym1 === Lxy_sym2;</pre>
+                <div class="Lxy_result-block" id="Lxy_res-symbol">等待运行...</div>
+                <button class="Lxy_btn" onclick="Lxy_runSymbol()">▶ 运行演示</button>
+            </article>
+
+        </section>
+
+        <section class="Lxy_summary">
+            <h2>📋 六种基础数据类型速查表</h2>
+            <table>
+                <thead>
+                    <tr><th>类型</th><th>typeof 返回值</th><th>示例值</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Number</td><td><code>'number'</code></td><td><code>0</code> <code>3.14</code> <code>NaN</code> <code>Infinity</code></td></tr>
+                    <tr><td>String</td><td><code>'string'</code></td><td><code>'hi'</code> <code>"JS"</code> <code>`模板`</code></td></tr>
+                    <tr><td>Boolean</td><td><code>'boolean'</code></td><td><code>true</code> <code>false</code></td></tr>
+                    <tr><td>Undefined</td><td><code>'undefined'</code></td><td><code>undefined</code>（声明未赋值）</td></tr>
+                    <tr><td>Null</td><td><code>'object'</code> ⚠️</td><td><code>null</code></td></tr>
+                    <tr><td>Symbol</td><td><code>'symbol'</code></td><td><code>Symbol('desc')</code></td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 14px; font-size: 0.82rem; color: rgba(255,253,248,0.65);">
+                💡 ES2020 新增 <code>BigInt</code>（typeof 返回 <code>'bigint'</code>），可表示任意精度整数。此处演示传统六种基础类型。
+            </p>
+        </section>
+
+        <footer class="Lxy_footer">
+            刘馨月 · JavaScript 基础数据类型 · 2026
+        </footer>
+    </div>
+
+    <script>
+        // ===== 1. Number =====
+        function Lxy_runNumber() {
+            let Lxy_num1 = 42;
+            let Lxy_num2 = 3.14;
+            let Lxy_num3 = NaN;
+            let Lxy_result = `
+num1 = ${Lxy_num1}       typeof → ${typeof Lxy_num1}
+num2 = ${Lxy_num2}    typeof → ${typeof Lxy_num2}
+num3 = ${Lxy_num3}    typeof → ${typeof Lxy_num3}
+(1 / 0) = ${1 / 0}
+(0 / 0) = ${0 / 0}`;
+            document.getElementById('Lxy_res-number').textContent = Lxy_result.trim();
+            console.log('[Number]', Lxy_num1, Lxy_num2, Lxy_num3);
+        }
+
+        // ===== 2. String =====
+        function Lxy_runString() {
+            let Lxy_str1 = '你好';
+            let Lxy_str2 = "JS";
+            let Lxy_str3 = `长度 ${5 + 1}`;
+            let Lxy_result = `
+str1 = "${Lxy_str1}"     typeof → ${typeof Lxy_str1}
+str2 = "${Lxy_str2}"      typeof → ${typeof Lxy_str2}
+str3 = "${Lxy_str3}"   typeof → ${typeof Lxy_str3}
+str1.length = ${Lxy_str1.length}`;
+            document.getElementById('Lxy_res-string').textContent = Lxy_result.trim();
+            console.log('[String]', Lxy_str1, Lxy_str2, Lxy_str3);
+        }
+
+        // ===== 3. Boolean =====
+        function Lxy_runBoolean() {
+            let Lxy_bool1 = true;
+            let Lxy_bool2 = false;
+            let Lxy_bool3 = 10 > 5;
+            let Lxy_result = `
+bool1 = ${Lxy_bool1}      typeof → ${typeof Lxy_bool1}
+bool2 = ${Lxy_bool2}     typeof → ${typeof Lxy_bool2}
+bool3 = 10 > 5 → ${Lxy_bool3}
+bool1 && bool2 = ${Lxy_bool1 && Lxy_bool2}`;
+            document.getElementById('Lxy_res-boolean').textContent = Lxy_result.trim();
+            console.log('[Boolean]', Lxy_bool1, Lxy_bool2, Lxy_bool3);
+        }
+
+        // ===== 4. Undefined =====
+        function Lxy_runUndefined() {
+            let Lxy_val;
+            let Lxy_result = `
+val = ${Lxy_val}              typeof → ${typeof Lxy_val}
+typeof 未声明变量 → ${typeof Lxy_xxx}
+val === undefined → ${Lxy_val === undefined}`;
+            document.getElementById('Lxy_res-undefined').textContent = Lxy_result.trim();
+            console.log('[Undefined]', Lxy_val);
+        }
+
+        // ===== 5. Null =====
+        function Lxy_runNull() {
+            let Lxy_empty = null;
+            let Lxy_result = `
+empty = ${Lxy_empty}          typeof → ${typeof Lxy_empty}  ⚠️
+empty === null → ${Lxy_empty === null}
+typeof undefined → ${typeof undefined}`;
+            document.getElementById('Lxy_res-null').textContent = Lxy_result.trim();
+            console.log('[Null]', Lxy_empty);
+        }
+
+        // ===== 6. Symbol =====
+        function Lxy_runSymbol() {
+            let Lxy_sym1 = Symbol('id');
+            let Lxy_sym2 = Symbol('id');
+            let Lxy_result = `
+sym1 = ${Lxy_sym1.toString()}   typeof → ${typeof Lxy_sym1}
+sym2 = ${Lxy_sym2.toString()}   typeof → ${typeof Lxy_sym2}
+sym1 === sym2 → ${Lxy_sym1 === Lxy_sym2}  (唯一！)`;
+            document.getElementById('Lxy_res-symbol').textContent = Lxy_result.trim();
+            console.log('[Symbol]', Lxy_sym1, Lxy_sym2);
+        }
+    </script>
+</body>
+</html>
