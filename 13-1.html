@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Awesome 字体图标</title>
+    <link rel="stylesheet" href="cdn/font-awesome/css/all.min.css">
+    <style>
+        :root {
+            --lxy-primary: #1d4ed8;
+            --lxy-primary-soft: rgba(29, 78, 216, 0.1);
+            --lxy-accent: #f59e0b;
+            --lxy-bg: #f4f6fb;
+            --lxy-card: #ffffff;
+            --lxy-text: #1f2a3d;
+            --lxy-muted: #6b7688;
+            --lxy-line: #e4e8f0;
+            --lxy-radius: 10px;
+            --lxy-shadow: 0 2px 10px rgba(31, 42, 61, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px 20px 60px;
+            background: var(--lxy-bg);
+            color: var(--lxy-text);
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .lxy_wrap {
+            max-width: 1020px;
+            margin: 0 auto;
+        }
+
+        .lxy_head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.7rem;
+        }
+
+        .lxy_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--lxy-primary-soft);
+            color: var(--lxy-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .lxy_note {
+            margin: 0 0 26px;
+            color: var(--lxy-muted);
+            font-size: 0.9rem;
+        }
+
+        .lxy_note code,
+        .lxy_panel code {
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #e9edf5;
+            font-family: Consolas, monospace;
+            font-size: 0.85em;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 34px 0 12px;
+            font-size: 1.15rem;
+        }
+
+        h2::after {
+            flex: 1;
+            height: 1px;
+            content: "";
+            background: var(--lxy-line);
+        }
+
+        .lxy_panel {
+            padding: 20px;
+            border: 1px solid var(--lxy-line);
+            border-radius: var(--lxy-radius);
+            background: var(--lxy-card);
+            box-shadow: var(--lxy-shadow);
+        }
+
+        .lxy_code {
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            background: #242a36;
+            color: #d7dde8;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.83rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .lxy_code .lxy_tag {
+            color: #7dd3fc;
+        }
+
+        .lxy_code .lxy_attr {
+            color: #fbbf24;
+        }
+
+        .lxy_code .lxy_val {
+            color: #86efac;
+        }
+
+        /* 图标网格 */
+        .lxy_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .lxy_item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 8px;
+            border: 1px solid var(--lxy-line);
+            border-radius: 8px;
+            background: #fafbfe;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lxy_item:hover {
+            transform: translateY(-4px);
+            border-color: var(--lxy-primary);
+            box-shadow: var(--lxy-shadow);
+        }
+
+        .lxy_item i {
+            font-size: 1.7rem;
+            color: var(--lxy-primary);
+        }
+
+        .lxy_item span {
+            color: var(--lxy-muted);
+            font-size: 0.74rem;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        /* 字体大小修饰符演示 */
+        .lxy_sizes {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 26px;
+        }
+
+        .lxy_sizes div {
+            text-align: center;
+            color: var(--lxy-muted);
+            font-size: 0.75rem;
+        }
+
+        .lxy_sizes i {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--lxy-accent);
+        }
+
+        /* 颜色与效果 */
+        .lxy_rows {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .lxy_chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            background: var(--lxy-primary-soft);
+            color: var(--lxy-primary);
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .lxy_chip i {
+            font-size: 1.1rem;
+        }
+
+        .lxy_chip-a {
+            background: rgba(16, 185, 129, 0.14);
+            color: #059669;
+        }
+
+        .lxy_chip-b {
+            background: rgba(239, 68, 68, 0.13);
+            color: #dc2626;
+        }
+
+        .lxy_chip-c {
+            background: rgba(245, 158, 11, 0.16);
+            color: #b45309;
+        }
+
+        .lxy_spin {
+            animation: lxy_rot 1.4s linear infinite;
+        }
+
+        @keyframes lxy_rot {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 图标 + 按钮组合 */
+        .lxy_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .lxy_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border: 1px solid var(--lxy-primary);
+            border-radius: 8px;
+            background: var(--lxy-card);
+            color: var(--lxy-primary);
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .lxy_btn:hover {
+            background: var(--lxy-primary);
+            color: #fff;
+        }
+
+        .lxy_btn-main {
+            background: var(--lxy-primary);
+            color: #fff;
+        }
+
+        .lxy_btn-main:hover {
+            background: #153ea8;
+        }
+
+        .lxy_btns i {
+            font-size: 1rem;
+        }
+
+        .lxy_back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+            color: var(--lxy-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .lxy_back:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <main class="lxy_wrap">
+        <div class="lxy_head">
+            <h1>13-1 · Font Awesome 字体图标</h1>
+            <span class="lxy_badge"><i class="fa-solid fa-icons"></i> 字体图标 Font Icon</span>
+        </div>
+        <p class="lxy_note">
+            Font Awesome 把图标做成一套<strong>字体文件</strong>：每个图标对应一个字符编码，用
+            <code>&lt;i class="fa-solid fa-图标名"&gt;</code> 像写文字一样输出图标，因此可以像字体一样用
+            <code>color</code>、<code>font-size</code> 控制颜色与大小。样式表与字体文件已下载到本地
+            <code>cdn/font-awesome/</code>，页面不依赖外部网络。
+        </p>
+
+        <h2>1. 使用方式（本地字体图标）</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_tag">&lt;link</span> <span class="lxy_attr">rel</span>=<span class="lxy_val">"stylesheet"</span> <span class="lxy_attr">href</span>=<span class="lxy_val">"cdn/font-awesome/css/all.min.css"</span><span class="lxy_tag">&gt;</span>
+
+<span class="lxy_tag">&lt;i</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"fa-solid fa-house"</span><span class="lxy_tag">&gt;&lt;/i;</span>   <span style="color:#9aa4b8">/* 实心 */</span>
+<span class="lxy_tag">&lt;i</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"fa-regular fa-heart"</span><span class="lxy_tag">&gt;&lt;/i;</span>  <span style="color:#9aa4b8">/* 线框 */</span>
+<span class="lxy_tag">&lt;i</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"fa-brands fa-github"</span><span class="lxy_tag">&gt;&lt;/i;</span>  <span style="color:#9aa4b8">/* 品牌 */</span></pre>
+        </div>
+
+        <h2>2. 实心图标（fa-solid）</h2>
+        <div class="lxy_panel">
+            <div class="lxy_grid">
+                <div class="lxy_item"><i class="fa-solid fa-house"></i><span>fa-house</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-user"></i><span>fa-user</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-magnifying-glass"></i><span>fa-magnifying-glass</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-gear"></i><span>fa-gear</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-bell"></i><span>fa-bell</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-envelope"></i><span>fa-envelope</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-heart"></i><span>fa-heart</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-star"></i><span>fa-star</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-circle-check"></i><span>fa-circle-check</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-triangle-exclamation"></i><span>fa-triangle-exclamation</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-download"></i><span>fa-download</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-trash-can"></i><span>fa-trash-can</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-pen-to-square"></i><span>fa-pen-to-square</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-calendar"></i><span>fa-calendar</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-clock"></i><span>fa-clock</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-camera"></i><span>fa-camera</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-map-location-dot"></i><span>fa-map-location-dot</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-lock"></i><span>fa-lock</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-eye"></i><span>fa-eye</span></div>
+                <div class="lxy_item"><i class="fa-solid fa-bolt"></i><span>fa-bolt</span></div>
+            </div>
+        </div>
+
+        <h2>3. 线框与品牌图标（fa-regular / fa-brands）</h2>
+        <div class="lxy_panel">
+            <div class="lxy_grid">
+                <div class="lxy_item"><i class="fa-regular fa-heart"></i><span>regular · heart</span></div>
+                <div class="lxy_item"><i class="fa-regular fa-star"></i><span>regular · star</span></div>
+                <div class="lxy_item"><i class="fa-regular fa-user"></i><span>regular · user</span></div>
+                <div class="lxy_item"><i class="fa-regular fa-bell"></i><span>regular · bell</span></div>
+                <div class="lxy_item"><i class="fa-regular fa-envelope"></i><span>regular · envelope</span></div>
+                <div class="lxy_item"><i class="fa-regular fa-circle-check"></i><span>regular · circle-check</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-html5"></i><span>brands · html5</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-css3-alt"></i><span>brands · css3-alt</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-js"></i><span>brands · js</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-react"></i><span>brands · react</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-github"></i><span>brands · github</span></div>
+                <div class="lxy_item"><i class="fa-brands fa-python"></i><span>brands · python</span></div>
+            </div>
+        </div>
+
+        <h2>4. 像字体一样调节大小</h2>
+        <div class="lxy_panel">
+            <div class="lxy_sizes">
+                <div><i class="fa-solid fa-heart fa-xs"></i>fa-xs（12px）</div>
+                <div><i class="fa-solid fa-heart fa-sm"></i>fa-sm（14px）</div>
+                <div><i class="fa-solid fa-heart fa-lg"></i>fa-lg（18px）</div>
+                <div><i class="fa-solid fa-heart fa-2x"></i>fa-2x（24px）</div>
+                <div><i class="fa-solid fa-heart fa-3x"></i>fa-3x（36px）</div>
+                <div><i class="fa-solid fa-heart fa-5x"></i>fa-5x（60px）</div>
+            </div>
+            <p class="lxy_note" style="margin-top:14px">
+                也可以直接写 CSS：<code>.lxy_item i { font-size: 2rem; color: #1d4ed8; }</code>，
+                因为图标本质上就是文字，<code>font-size</code> 与 <code>color</code> 全部生效。
+            </p>
+        </div>
+
+        <h2>5. 颜色、旋转与组合</h2>
+        <div class="lxy_panel">
+            <div class="lxy_rows" style="margin-bottom:16px">
+                <span class="lxy_chip lxy_chip-a"><i class="fa-solid fa-circle-check"></i> 发布成功</span>
+                <span class="lxy_chip lxy_chip-b"><i class="fa-solid fa-circle-xmark"></i> 操作失败</span>
+                <span class="lxy_chip lxy_chip-c"><i class="fa-solid fa-triangle-exclamation"></i> 注意警告</span>
+                <span class="lxy_chip"><i class="fa-solid fa-arrows-rotate lxy_spin"></i> 加载中 fa-spin</span>
+            </div>
+            <div class="lxy_btns">
+                <button class="lxy_btn lxy_btn-main" type="button"><i class="fa-solid fa-download"></i> 下载文件</button>
+                <button class="lxy_btn" type="button"><i class="fa-solid fa-pen-to-square"></i> 编辑</button>
+                <button class="lxy_btn" type="button"><i class="fa-solid fa-trash-can"></i> 删除</button>
+                <button class="lxy_btn" type="button"><i class="fa-solid fa-share-nodes"></i> 分享</button>
+            </div>
+        </div>
+
+        <a class="lxy_back" href="index.html"><i class="fa-solid fa-arrow-left"></i> 返回作品集首页</a>
+    </main>
+</body>
+</html>

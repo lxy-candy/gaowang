@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Iconfont 字体图标移动端底部导航</title>
+    <style>
+        @font-face {
+            font-family: "lxy_iconfont";
+            src: url("font/font_5244874_dxs3wbl8ev/iconfont.woff2") format("woff2"),
+                 url("font/font_5244874_dxs3wbl8ev/iconfont.woff") format("woff"),
+                 url("font/font_5244874_dxs3wbl8ev/iconfont.ttf") format("truetype");
+            font-display: block;
+        }
+
+        :root {
+            --lxy-primary: #4f46e5;
+            --lxy-primary-soft: rgba(79, 70, 229, 0.1);
+            --lxy-red: #f43f5e;
+            --lxy-bg: #f4f5fb;
+            --lxy-card: #ffffff;
+            --lxy-text: #1e2338;
+            --lxy-muted: #6b7280;
+            --lxy-line: #e4e7f1;
+            --lxy-radius: 10px;
+            --lxy-shadow: 0 2px 10px rgba(30, 35, 56, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px 20px calc(120px + env(safe-area-inset-bottom));
+            background: var(--lxy-bg);
+            color: var(--lxy-text);
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .lxy_wrap {
+            max-width: 1020px;
+            margin: 0 auto;
+        }
+
+        .lxy_head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.7rem;
+        }
+
+        .lxy_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--lxy-primary-soft);
+            color: var(--lxy-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .lxy_note {
+            margin: 0 0 26px;
+            color: var(--lxy-muted);
+            font-size: 0.9rem;
+        }
+
+        .lxy_note code,
+        .lxy_panel code {
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #e7e9f8;
+            font-family: Consolas, monospace;
+            font-size: 0.85em;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 34px 0 12px;
+            font-size: 1.15rem;
+        }
+
+        h2::after {
+            flex: 1;
+            height: 1px;
+            content: "";
+            background: var(--lxy-line);
+        }
+
+        .lxy_panel {
+            padding: 20px;
+            border: 1px solid var(--lxy-line);
+            border-radius: var(--lxy-radius);
+            background: var(--lxy-card);
+            box-shadow: var(--lxy-shadow);
+        }
+
+        .lxy_code {
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            background: #22302e;
+            color: #d3e3e0;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.83rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .lxy_code .lxy_tag {
+            color: #7dd3fc;
+        }
+
+        .lxy_code .lxy_attr {
+            color: #fbbf24;
+        }
+
+        .lxy_code .lxy_val {
+            color: #86efac;
+        }
+
+        .lxy_back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+            color: var(--lxy-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .lxy_back::before {
+            content: "\2190";
+        }
+
+        .lxy_back:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ 字体图标（iconfont 字形） ============ */
+        .lxy_if {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-family: "lxy_iconfont" !important;
+            font-size: 1em;
+            font-style: normal;
+            font-weight: normal;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .lxy_if-home::before {
+            content: "\e64f";
+        }
+
+        .lxy_if-cat::before {
+            content: "\e828";
+        }
+
+        .lxy_if-cart::before {
+            content: "\e827";
+        }
+
+        .lxy_if-me::before {
+            content: "\e82d";
+        }
+
+        /* ============ 全屏固体底部导航 ============ */
+        .lxy_tabbar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            background: var(--lxy-card);
+            border-top: 1px solid var(--lxy-line);
+            box-shadow: 0 -6px 18px rgba(30, 35, 56, 0.08);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .lxy_tab {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 9px 2px 8px;
+            color: var(--lxy-muted);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.2s ease;
+        }
+
+        .lxy_tab:active {
+            opacity: 0.7;
+        }
+
+        .lxy_tab.lxy_active {
+            color: var(--lxy-primary);
+        }
+
+        .lxy_ico {
+            position: relative;
+            display: block;
+            width: clamp(22px, 6vw, 27px);
+            height: clamp(22px, 6vw, 27px);
+            font-size: clamp(22px, 6vw, 27px);
+        }
+
+        .lxy_tab_text {
+            font-size: clamp(11px, 3.2vw, 13px);
+            line-height: 1;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lxy_tab.lxy_active .lxy_tab_text {
+            font-weight: 700;
+        }
+
+        /* 右上角红点 */
+        .lxy_dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            z-index: 2;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--lxy-red);
+            border: 1.5px solid var(--lxy-card);
+        }
+
+        /* 数字徽章 */
+        .lxy_num {
+            position: absolute;
+            top: clamp(7px, 2vw, 8px);
+            right: calc(-1 * clamp(8px, 3vw, 13px));
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: clamp(15px, 4.4vw, 18px);
+            height: clamp(15px, 4.4vw, 18px);
+            padding: 0 clamp(3px, 1vw, 5px);
+            border-radius: 999px;
+            background: var(--lxy-red);
+            border: 1.5px solid var(--lxy-card);
+            color: #fff;
+            font-size: clamp(9px, 2.6vw, 11px);
+            font-weight: 700;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ============ 不同屏宽演示 ============ */
+        .lxy_frames {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .lxy_frame {
+            margin: 0;
+        }
+
+        .lxy_frame figcaption {
+            margin-top: 8px;
+            color: var(--lxy-muted);
+            font-size: 0.78rem;
+            text-align: center;
+        }
+
+        .lxy_screen {
+            position: relative;
+            height: 170px;
+            max-width: 100%;
+            margin: 0 auto;
+            border: 1px solid var(--lxy-line);
+            border-radius: 14px;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .lxy_screen-sm {
+            width: 320px;
+        }
+
+        .lxy_screen-md {
+            width: 375px;
+        }
+
+        .lxy_screen-lg {
+            width: 414px;
+        }
+
+        .lxy_ph {
+            display: block;
+            width: 58%;
+            height: 10px;
+            margin: 16px 16px 0;
+            border-radius: 999px;
+            background: #e6e9f4;
+        }
+
+        .lxy_ph + .lxy_ph {
+            width: 34%;
+            margin-top: 10px;
+        }
+
+        .lxy_tabbar.lxy_static {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            box-shadow: 0 -4px 12px rgba(30, 35, 56, 0.06);
+        }
+
+        /* ============ 字形对照 ============ */
+        .lxy_glyphs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .lxy_glyph {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 8px;
+            border: 1px solid var(--lxy-line);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .lxy_glyph .lxy_if {
+            width: 38px;
+            height: 38px;
+            font-size: 38px;
+            color: var(--lxy-primary);
+        }
+
+        .lxy_glyph b {
+            font-size: 0.9rem;
+        }
+
+        .lxy_glyph span {
+            color: var(--lxy-muted);
+            font-size: 0.74rem;
+            font-family: Consolas, monospace;
+        }
+
+        .lxy_tip {
+            margin: 0;
+            color: var(--lxy-muted);
+            font-size: 0.88rem;
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            h1 {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="lxy_wrap">
+        <div class="lxy_head">
+            <h1>13-3 · Iconfont 字体图标底部导航</h1>
+            <span class="lxy_badge">字体图标 · @font-face</span>
+        </div>
+        <p class="lxy_note">
+            图标来自本项目 <code>font/font_5244874_dxs3wbl8ev/</code> 下的 iconfont 字体文件，
+            用 <code>@font-face</code> 引入本地 <code>woff2 / woff / ttf</code>，再以
+            <code>::before</code> 输出字形编码。页面底部是一条<strong>全屏宽度、固定定位、纯色实体背景</strong>
+            的移动端下导航：4 个导航项用 flex 等分自适应屏宽，每项自带数字徽章与右上角红点，
+            尺寸用 <code>clamp()</code> 随屏宽缩放，并预留 iOS 安全区。点击导航项可切换选中态。
+        </p>
+
+        <h2>1. 导航结构</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_tag">&lt;nav</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tabbar"</span> <span class="lxy_attr">aria-label</span>=<span class="lxy_val">"底部导航"</span><span class="lxy_tag">&gt;</span>
+    <span class="lxy_tag">&lt;a</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tab lxy_active"</span> <span class="lxy_attr">href</span>=<span class="lxy_val">"#"</span><span class="lxy_tag">&gt;</span>
+        <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_ico"</span><span class="lxy_tag">&gt;</span>
+            <span class="lxy_tag">&lt;i</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_if lxy_if-home"</span><span class="lxy_tag">&gt;&lt;/i&gt;</span>   <span style="color:#9aa4b8">/* 字体图标字形 */</span>
+            <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_num"</span><span class="lxy_tag">&gt;</span>8<span class="lxy_tag">&lt;/span&gt;</span>       <span style="color:#9aa4b8">/* 数字徽章 */</span>
+            <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_dot"</span><span class="lxy_tag">&gt;&lt;/span&gt;</span>        <span style="color:#9aa4b8">/* 右上角红点 */</span>
+        <span class="lxy_tag">&lt;/span&gt;</span>
+        <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tab_text"</span><span class="lxy_tag">&gt;</span>首页<span class="lxy_tag">&lt;/span&gt;</span>
+    <span class="lxy_tag">&lt;/a&gt;</span>
+    <span style="color:#9aa4b8">/* 其余 3 项：分类 / 购物车 / 我的，结构完全相同 */</span>
+<span class="lxy_tag">&lt;/nav&gt;</span></pre>
+        </div>
+
+        <h2>2. 关键样式：全屏固定 + flex 等分 + 响应式尺寸</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_attr">.lxy_tabbar</span> {
+    <span class="lxy_attr">position</span>: <span class="lxy_val">fixed</span>;            <span style="color:#9aa4b8">/* 固定在视口底部，始终可见 */</span>
+    <span class="lxy_attr">left</span>: <span class="lxy_val">0</span>; <span class="lxy_attr">right</span>: <span class="lxy_val">0</span>; <span class="lxy_attr">bottom</span>: <span class="lxy_val">0</span>;
+    <span class="lxy_attr">width</span>: <span class="lxy_val">100%</span>;                <span style="color:#9aa4b8">/* 全屏宽度 */</span>
+    <span class="lxy_attr">display</span>: <span class="lxy_val">flex</span>;              <span style="color:#9aa4b8">/* 4 项水平排列 */</span>
+    <span class="lxy_attr">background</span>: <span class="lxy_val">#fff</span>;           <span style="color:#9aa4b8">/* 固体（不透明）背景 */</span>
+    <span class="lxy_attr">border-top</span>: <span class="lxy_val">1px</span> solid <span style="color:#9aa4b8">var(--lxy-line)</span>;
+    <span class="lxy_attr">padding-bottom</span>: <span class="lxy_val">env(safe-area-inset-bottom)</span>;
+}
+
+<span class="lxy_attr">.lxy_tab</span> { <span class="lxy_attr">flex</span>: <span class="lxy_val">1 1 0</span>; <span class="lxy_attr">min-width</span>: <span class="lxy_val">0</span>; }   <span style="color:#9aa4b8">/* 等分剩余宽度，自适应任意屏宽 */</span>
+
+<span class="lxy_attr">.lxy_ico</span> {
+    <span class="lxy_attr">font-size</span>: <span class="lxy_val">clamp(22px, 6vw, 27px)</span>;  <span style="color:#9aa4b8">/* 图标随屏宽缩放，320~414px 皆合适 */</span>
+    <span class="lxy_attr">width</span>: <span class="lxy_val">1em</span>; <span class="lxy_attr">height</span>: <span class="lxy_val">1em</span>;            <span style="color:#9aa4b8">/* 盒子等于字号，字形刚好填满 */</span>
+}</pre>
+        </div>
+
+        <h2>3. 图标引入：@font-face + 字形编码</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_tag">@font-face</span> {
+    <span class="lxy_attr">font-family</span>: <span class="lxy_val">"lxy_iconfont"</span>;
+    <span class="lxy_attr">src</span>: <span class="lxy_val">url("font/font_5244874_dxs3wbl8ev/iconfont.woff2")</span> format(<span class="lxy_val">"woff2"</span>),
+         <span class="lxy_val">url("font/font_5244874_dxs3wbl8ev/iconfont.woff")</span>  format(<span class="lxy_val">"woff"</span>),
+         <span class="lxy_val">url("font/font_5244874_dxs3wbl8ev/iconfont.ttf")</span>   format(<span class="lxy_val">"truetype"</span>);
+}
+
+<span class="lxy_attr">.lxy_if</span> { <span class="lxy_attr">font-family</span>: <span class="lxy_val">"lxy_iconfont"</span> !important; }
+<span class="lxy_attr">.lxy_if-home::before</span> { <span class="lxy_attr">content</span>: <span class="lxy_val">"\e64f"</span>; }   <span style="color:#9aa4b8">/* 首页 shouye */</span>
+<span class="lxy_attr">.lxy_if-cat::before</span>  { <span class="lxy_attr">content</span>: <span class="lxy_val">"\e828"</span>; }   <span style="color:#9aa4b8">/* 分类 catalog */</span></pre>
+        </div>
+
+        <h2>4. 同一套导航在不同屏宽下的表现</h2>
+        <div class="lxy_panel">
+            <div class="lxy_frames">
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-sm" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>320px · 小屏手机</figcaption>
+                </figure>
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-md" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>375px · 常见手机</figcaption>
+                </figure>
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-lg" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>414px · 大屏手机</figcaption>
+                </figure>
+            </div>
+            <p class="lxy_tip" style="margin-top:14px">
+                上图为同一段导航代码克隆到 320 / 375 / 414 宽的“屏幕”中：宽度 100% + flex 等分，
+                无论屏宽如何变化，4 项始终平分整条导航；真正使用时它是页面底部固定定位的那一条。
+            </p>
+        </div>
+
+        <h2>5. 导航用到的字形对照</h2>
+        <div class="lxy_panel">
+            <div class="lxy_glyphs">
+                <div class="lxy_glyph"><i class="lxy_if lxy_if-home"></i><b>首页</b><span>icon-shouye · \e64f</span></div>
+                <div class="lxy_glyph"><i class="lxy_if lxy_if-cat"></i><b>分类</b><span>icon-catalog · \e828</span></div>
+                <div class="lxy_glyph"><i class="lxy_if lxy_if-cart"></i><b>购物车</b><span>icon-cart-full · \e827</span></div>
+                <div class="lxy_glyph"><i class="lxy_if lxy_if-me"></i><b>我的</b><span>icon-customer-interests · \e82d</span></div>
+            </div>
+        </div>
+
+        <h2>6. 徽章与红点</h2>
+        <div class="lxy_panel">
+            <p class="lxy_tip">
+                <code>.lxy_num</code> 是绝对定位在图标盒子上的圆角胶囊（红底白字 + 白描边），
+                用 <code>clamp()</code> 控制高度与字号，数字过长时自动加宽；
+                <code>.lxy_dot</code> 是 9px 的红色圆点，定位在图标盒子的右上角外侧。
+                两者都加了与导航同色的描边，压在图标边缘上时轮廓依然清晰。
+                点击任意导航项即可切换选中态（脚本用事件委托，克隆到演示屏里的导航同样可点）。
+            </p>
+        </div>
+
+        <a class="lxy_back" href="index.html">返回作品集首页</a>
+    </main>
+
+    <nav class="lxy_tabbar" aria-label="底部导航">
+        <a class="lxy_tab lxy_active" href="#">
+            <span class="lxy_ico">
+                <i class="lxy_if lxy_if-home"></i>
+                <span class="lxy_num">8</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">首页</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <i class="lxy_if lxy_if-cat"></i>
+                <span class="lxy_num">3</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">分类</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <i class="lxy_if lxy_if-cart"></i>
+                <span class="lxy_num">12</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">购物车</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <i class="lxy_if lxy_if-me"></i>
+                <span class="lxy_num">99+</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">我的</span>
+        </a>
+    </nav>
+
+    <script>
+        (function () {
+            var lxy_src = document.querySelector(".lxy_tabbar");
+            var lxy_slots = document.querySelectorAll("[data-lxy-slot]");
+            var i;
+            for (i = 0; i < lxy_slots.length; i++) {
+                var lxy_clone = lxy_src.cloneNode(true);
+                lxy_clone.classList.add("lxy_static");
+                lxy_clone.setAttribute("aria-hidden", "true");
+                lxy_slots[i].appendChild(lxy_clone);
+            }
+
+            document.addEventListener("click", function (e) {
+                var lxy_tab = e.target.closest ? e.target.closest(".lxy_tab") : null;
+                if (!lxy_tab) {
+                    return;
+                }
+                e.preventDefault();
+                var lxy_bar = lxy_tab.parentNode;
+                var lxy_tabs = lxy_bar.querySelectorAll(".lxy_tab");
+                for (var j = 0; j < lxy_tabs.length; j++) {
+                    lxy_tabs[j].classList.remove("lxy_active");
+                }
+                lxy_tab.classList.add("lxy_active");
+            });
+        })();
+    </script>
+</body>
+</html>

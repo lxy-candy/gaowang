@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SVG 雪碧图移动端底部导航</title>
+    <style>
+        :root {
+            --lxy-primary: #0f766e;
+            --lxy-primary-soft: rgba(15, 118, 110, 0.12);
+            --lxy-red: #f43f5e;
+            --lxy-bg: #f3f7f6;
+            --lxy-card: #ffffff;
+            --lxy-text: #1c2b2a;
+            --lxy-muted: #6a7a78;
+            --lxy-line: #dfe8e6;
+            --lxy-radius: 10px;
+            --lxy-shadow: 0 2px 10px rgba(28, 43, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px 20px calc(120px + env(safe-area-inset-bottom));
+            background: var(--lxy-bg);
+            color: var(--lxy-text);
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .lxy_wrap {
+            max-width: 1020px;
+            margin: 0 auto;
+        }
+
+        .lxy_head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.7rem;
+        }
+
+        .lxy_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--lxy-primary-soft);
+            color: var(--lxy-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .lxy_note {
+            margin: 0 0 26px;
+            color: var(--lxy-muted);
+            font-size: 0.9rem;
+        }
+
+        .lxy_note code,
+        .lxy_panel code {
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #e3ecea;
+            font-family: Consolas, monospace;
+            font-size: 0.85em;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 34px 0 12px;
+            font-size: 1.15rem;
+        }
+
+        h2::after {
+            flex: 1;
+            height: 1px;
+            content: "";
+            background: var(--lxy-line);
+        }
+
+        .lxy_panel {
+            padding: 20px;
+            border: 1px solid var(--lxy-line);
+            border-radius: var(--lxy-radius);
+            background: var(--lxy-card);
+            box-shadow: var(--lxy-shadow);
+        }
+
+        .lxy_code {
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            background: #22302e;
+            color: #d3e3e0;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.83rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .lxy_code .lxy_tag {
+            color: #7dd3fc;
+        }
+
+        .lxy_code .lxy_attr {
+            color: #fbbf24;
+        }
+
+        .lxy_code .lxy_val {
+            color: #86efac;
+        }
+
+        .lxy_back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+            color: var(--lxy-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .lxy_back::before {
+            content: "\2190";
+        }
+
+        .lxy_back:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ SVG 雪碧图（隐藏的 symbol 集合） ============ */
+        .lxy_sprite {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .lxy_svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        /* ============ 全屏固体底部导航 ============ */
+        .lxy_tabbar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            background: var(--lxy-card);
+            border-top: 1px solid var(--lxy-line);
+            box-shadow: 0 -6px 18px rgba(28, 43, 42, 0.08);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .lxy_tab {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 9px 2px 8px;
+            color: var(--lxy-muted);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.2s ease;
+        }
+
+        .lxy_tab:active {
+            opacity: 0.7;
+        }
+
+        .lxy_tab.lxy_active {
+            color: var(--lxy-primary);
+        }
+
+        .lxy_ico {
+            position: relative;
+            display: block;
+            width: clamp(22px, 6vw, 27px);
+            height: clamp(22px, 6vw, 27px);
+        }
+
+        .lxy_tab_text {
+            font-size: clamp(11px, 3.2vw, 13px);
+            line-height: 1;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lxy_tab.lxy_active .lxy_tab_text {
+            font-weight: 700;
+        }
+
+        /* 右上角红点 */
+        .lxy_dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            z-index: 2;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--lxy-red);
+            border: 1.5px solid var(--lxy-card);
+        }
+
+        /* 数字徽章 */
+        .lxy_num {
+            position: absolute;
+            top: clamp(7px, 2vw, 8px);
+            right: calc(-1 * clamp(8px, 3vw, 13px));
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: clamp(15px, 4.4vw, 18px);
+            height: clamp(15px, 4.4vw, 18px);
+            padding: 0 clamp(3px, 1vw, 5px);
+            border-radius: 999px;
+            background: var(--lxy-red);
+            border: 1.5px solid var(--lxy-card);
+            color: #fff;
+            font-size: clamp(9px, 2.6vw, 11px);
+            font-weight: 700;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ============ 不同屏宽演示 ============ */
+        .lxy_frames {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .lxy_frame {
+            margin: 0;
+        }
+
+        .lxy_frame figcaption {
+            margin-top: 8px;
+            color: var(--lxy-muted);
+            font-size: 0.78rem;
+            text-align: center;
+        }
+
+        .lxy_screen {
+            position: relative;
+            height: 170px;
+            max-width: 100%;
+            margin: 0 auto;
+            border: 1px solid var(--lxy-line);
+            border-radius: 14px;
+            background: #f8fbfa;
+            overflow: hidden;
+        }
+
+        .lxy_screen-sm {
+            width: 320px;
+        }
+
+        .lxy_screen-md {
+            width: 375px;
+        }
+
+        .lxy_screen-lg {
+            width: 414px;
+        }
+
+        .lxy_ph {
+            display: block;
+            width: 58%;
+            height: 10px;
+            margin: 16px 16px 0;
+            border-radius: 999px;
+            background: #e6efed;
+        }
+
+        .lxy_ph + .lxy_ph {
+            width: 34%;
+            margin-top: 10px;
+        }
+
+        .lxy_tabbar.lxy_static {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            box-shadow: 0 -4px 12px rgba(28, 43, 42, 0.06);
+        }
+
+        /* ============ 符号对照 ============ */
+        .lxy_glyphs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .lxy_glyph {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 8px;
+            border: 1px solid var(--lxy-line);
+            border-radius: 8px;
+            background: #f8fbfa;
+        }
+
+        .lxy_glyph .lxy_svg {
+            width: 38px;
+            height: 38px;
+            color: var(--lxy-primary);
+        }
+
+        .lxy_glyph b {
+            font-size: 0.9rem;
+        }
+
+        .lxy_glyph span {
+            color: var(--lxy-muted);
+            font-size: 0.74rem;
+            font-family: Consolas, monospace;
+        }
+
+        .lxy_tip {
+            margin: 0;
+            color: var(--lxy-muted);
+            font-size: 0.88rem;
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            h1 {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg class="lxy_sprite" aria-hidden="true" focusable="false">
+        <symbol id="lxy_icon_home" viewBox="0 0 1024 1024">
+            <path d="M969.6 502.4l-118.4-112-323.2-300.8c-9.6-9.6-22.4-9.6-32 0l-313.6 297.6c-3.2 3.2-6.4 6.4-9.6 9.6l-118.4 112c-9.6 9.6-9.6 22.4 0 32s22.4 9.6 32 0l83.2-80 0 393.6c0 48 41.6 89.6 92.8 89.6l83.2 0c38.4 0 70.4-28.8 70.4-67.2l0-217.6 99.2 0 99.2 0 0 217.6c0 35.2 32 67.2 70.4 67.2l83.2 0c51.2 0 92.8-38.4 92.8-89.6l0-396.8 80 73.6c9.6 9.6 22.4 9.6 32 0C979.2 524.8 979.2 512 969.6 502.4zM809.6 857.6c0 25.6-19.2 44.8-44.8 44.8l-83.2 0c-12.8 0-22.4-9.6-22.4-22.4L659.2 640c0-12.8-9.6-22.4-22.4-22.4l-121.6 0-121.6 0c-12.8 0-22.4 9.6-22.4 22.4l0 240c0 12.8-9.6 22.4-22.4 22.4l-83.2 0c-25.6 0-44.8-19.2-44.8-44.8l0-438.4 294.4-281.6 294.4 281.6L809.6 857.6z" />
+        </symbol>
+        <symbol id="lxy_icon_cat" viewBox="0 0 1024 1024">
+            <path d="M408.551619 97.52381a73.142857 73.142857 0 0 1 51.736381 21.430857L539.306667 197.973333A73.142857 73.142857 0 0 0 591.067429 219.428571H804.571429a73.142857 73.142857 0 0 1 73.142857 73.142858v560.761904a73.142857 73.142857 0 0 1-73.142857 73.142857H219.428571a73.142857 73.142857 0 0 1-73.142857-73.142857V170.666667a73.142857 73.142857 0 0 1 73.142857-73.142857h189.123048z m0 73.142857H219.428571v682.666666h585.142858V292.571429h-213.504a146.285714 146.285714 0 0 1-98.499048-38.13181L487.619048 249.734095 408.551619 170.666667zM365.714286 633.904762v73.142857h-73.142857v-73.142857h73.142857z m365.714285 0v73.142857H414.47619v-73.142857h316.952381z m-365.714285-195.047619v73.142857h-73.142857v-73.142857h73.142857z m365.714285 0v73.142857H414.47619v-73.142857h316.952381z" />
+        </symbol>
+        <symbol id="lxy_icon_cart" viewBox="0 0 1024 1024">
+            <path d="M97.718857 109.714286a109.714286 109.714286 0 0 1 107.349333 87.064381L220.16 268.190476h0.24381l49.005714 234.666667L306.541714 682.666667h459.678476l70.460953-341.333334H285.500952l-15.286857-73.142857h566.491429a73.142857 73.142857 0 0 1 71.631238 87.942095l-70.460952 341.333334A73.142857 73.142857 0 0 1 766.22019 755.809524H306.541714a73.142857 73.142857 0 0 1-71.631238-58.343619l-69.241905-335.335619-0.463238 0.097524-31.695238-150.357334A36.571429 36.571429 0 0 0 97.718857 182.857143H35.157333v-73.142857h62.561524zM707.047619 463.238095v73.142857H365.714286v-73.142857h341.333333zM304.761905 926.47619a60.952381 60.952381 0 1 0 0-121.904761 60.952381 60.952381 0 0 0 0 121.904761z m438.857143 0a60.952381 60.952381 0 1 0 0-121.904761 60.952381 60.952381 0 0 0 0 121.904761z" />
+        </symbol>
+        <symbol id="lxy_icon_me" viewBox="0 0 1024 1024">
+            <path d="M703.75619 640.828952l11.410286 11.215238 3.510857 3.364572 9.752381-9.435429c1.901714-1.877333 3.657143-3.584 5.168762-5.144381a104.569905 104.569905 0 0 1 149.211429 0 107.861333 107.861333 0 0 1 1.145905 149.967238L718.677333 950.857143l-165.302857-160.036572a107.885714 107.885714 0 0 1 1.170286-149.991619 104.569905 104.569905 0 0 1 149.211428 0zM331.434667 610.255238c21.333333 13.360762 44.373333 24.234667 68.754285 32.231619L219.428571 853.333333h328.582096v73.142857H219.428571a73.142857 73.142857 0 0 1-55.539809-120.734476l167.545905-195.486476z m275.163428 81.968762a34.742857 34.742857 0 0 0-1.048381 47.274667l113.127619 109.543619 113.127619-109.568 2.267429-2.755048a34.791619 34.791619 0 0 0-3.291429-44.495238 31.427048 31.427048 0 0 0-45.104762 0l-9.118476 9.020952-57.880381 55.271619-57.856-55.271619-9.118476-9.020952a31.427048 31.427048 0 0 0-45.104762 0zM499.248762 97.52381c134.656 0 243.809524 109.153524 243.809524 243.809523s-109.153524 243.809524-243.809524 243.809524-243.809524-109.153524-243.809524-243.809524 109.153524-243.809524 243.809524-243.809523z m0 73.142857a170.666667 170.666667 0 1 0 0 341.333333 170.666667 170.666667 0 0 0 0-341.333333z" />
+        </symbol>
+    </svg>
+
+    <main class="lxy_wrap">
+        <div class="lxy_head">
+            <h1>13-4 · SVG 雪碧图底部导航</h1>
+            <span class="lxy_badge">SVG · symbol + use</span>
+        </div>
+        <p class="lxy_note">
+            与 13-3 是同一条底部导航，只是图标改用 <strong>SVG 方案</strong>：把 iconfont 项目导出的
+            <code>iconfont.js</code> 里的 4 个 <code>&lt;symbol&gt;</code> 内联到页面，组成 SVG 雪碧图，
+            导航项里用 <code>&lt;svg&gt;&lt;use href="#lxy_icon_home"&gt;&lt;/use&gt;&lt;/svg&gt;</code> 引用。
+            路径没有写死颜色，外层 <code>fill: currentColor</code> 让图标跟随导航项的文字颜色变化。
+            底部导航同样是<strong>全屏宽度、固定定位、纯色实体背景</strong>，flex 等分 4 项，
+            带数字徽章与右上角红点，尺寸随屏宽自适应。
+        </p>
+
+        <h2>1. 导航结构</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_tag">&lt;nav</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tabbar"</span> <span class="lxy_attr">aria-label</span>=<span class="lxy_val">"底部导航"</span><span class="lxy_tag">&gt;</span>
+    <span class="lxy_tag">&lt;a</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tab lxy_active"</span> <span class="lxy_attr">href</span>=<span class="lxy_val">"#"</span><span class="lxy_tag">&gt;</span>
+        <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_ico"</span><span class="lxy_tag">&gt;</span>
+            <span class="lxy_tag">&lt;svg</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_svg"</span><span class="lxy_tag">&gt;&lt;use</span> <span class="lxy_attr">href</span>=<span class="lxy_val">"#lxy_icon_home"</span><span class="lxy_tag">&gt;&lt;/use&gt;&lt;/svg&gt;</span>
+            <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_num"</span><span class="lxy_tag">&gt;</span>8<span class="lxy_tag">&lt;/span&gt;</span>       <span style="color:#9aa4b8">/* 数字徽章 */</span>
+            <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_dot"</span><span class="lxy_tag">&gt;&lt;/span&gt;</span>        <span style="color:#9aa4b8">/* 右上角红点 */</span>
+        <span class="lxy_tag">&lt;/span&gt;</span>
+        <span class="lxy_tag">&lt;span</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_tab_text"</span><span class="lxy_tag">&gt;</span>首页<span class="lxy_tag">&lt;/span&gt;</span>
+    <span class="lxy_tag">&lt;/a&gt;</span>
+    <span style="color:#9aa4b8">/* 其余 3 项：#lxy_icon_cat / #lxy_icon_cart / #lxy_icon_me */</span>
+<span class="lxy_tag">&lt;/nav&gt;</span></pre>
+        </div>
+
+        <h2>2. 关键样式：全屏固定 + flex 等分 + 响应式尺寸</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span class="lxy_attr">.lxy_tabbar</span> {
+    <span class="lxy_attr">position</span>: <span class="lxy_val">fixed</span>;            <span style="color:#9aa4b8">/* 固定在视口底部，始终可见 */</span>
+    <span class="lxy_attr">left</span>: <span class="lxy_val">0</span>; <span class="lxy_attr">right</span>: <span class="lxy_val">0</span>; <span class="lxy_attr">bottom</span>: <span class="lxy_val">0</span>;
+    <span class="lxy_attr">width</span>: <span class="lxy_val">100%</span>;                <span style="color:#9aa4b8">/* 全屏宽度 */</span>
+    <span class="lxy_attr">display</span>: <span class="lxy_val">flex</span>;              <span style="color:#9aa4b8">/* 4 项水平排列 */</span>
+    <span class="lxy_attr">background</span>: <span class="lxy_val">#fff</span>;           <span style="color:#9aa4b8">/* 固体（不透明）背景 */</span>
+    <span class="lxy_attr">border-top</span>: <span class="lxy_val">1px</span> solid <span class="lxy_val">var(--lxy-line)</span>;
+    <span class="lxy_attr">padding-bottom</span>: <span class="lxy_val">env(safe-area-inset-bottom)</span>;
+}
+
+<span class="lxy_attr">.lxy_tab</span> { <span class="lxy_attr">flex</span>: <span class="lxy_val">1 1 0</span>; <span class="lxy_attr">min-width</span>: <span class="lxy_val">0</span>; }   <span style="color:#9aa4b8">/* 等分剩余宽度，自适应任意屏宽 */</span>
+
+<span class="lxy_attr">.lxy_ico</span>  { <span class="lxy_attr">width</span>: <span class="lxy_val">clamp(22px, 6vw, 27px)</span>; <span class="lxy_attr">height</span>: <span class="lxy_val">clamp(22px, 6vw, 27px)</span>; }
+<span class="lxy_attr">.lxy_svg</span>  { <span class="lxy_attr">width</span>: <span class="lxy_val">100%</span>; <span class="lxy_attr">height</span>: <span class="lxy_val">100%</span>; <span class="lxy_attr">fill</span>: <span class="lxy_val">currentColor</span>; }</pre>
+        </div>
+
+        <h2>3. SVG 雪碧图：symbol 定义 + use 引用</h2>
+        <div class="lxy_panel">
+            <pre class="lxy_code"><span style="color:#9aa4b8">&lt;!-- 隐藏在页面顶部的 symbol 集合（路径取自 iconfont.js） --&gt;</span>
+<span class="lxy_tag">&lt;svg</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_sprite"</span> <span class="lxy_attr">aria-hidden</span>=<span class="lxy_val">"true"</span><span class="lxy_tag">&gt;</span>
+    <span class="lxy_tag">&lt;symbol</span> <span class="lxy_attr">id</span>=<span class="lxy_val">"lxy_icon_home"</span> <span class="lxy_attr">viewBox</span>=<span class="lxy_val">"0 0 1024 1024"</span><span class="lxy_tag">&gt;</span>
+        <span class="lxy_tag">&lt;path</span> <span class="lxy_attr">d</span>=<span class="lxy_val">"M969.6 502.4l-118.4-112-323.2-300.8c-9.6-9.6..."</span><span class="lxy_tag">/&gt;</span>
+    <span class="lxy_tag">&lt;/symbol&gt;</span>
+    <span style="color:#9aa4b8">/* 另有 lxy_icon_cat / lxy_icon_cart / lxy_icon_me */</span>
+<span class="lxy_tag">&lt;/svg&gt;</span>
+
+<span style="color:#9aa4b8">&lt;!-- 导航项中只需一行即可复用符号 --&gt;</span>
+<span class="lxy_tag">&lt;svg</span> <span class="lxy_attr">class</span>=<span class="lxy_val">"lxy_svg"</span><span class="lxy_tag">&gt;&lt;use</span> <span class="lxy_attr">href</span>=<span class="lxy_val">"#lxy_icon_home"</span><span class="lxy_tag">&gt;&lt;/use&gt;&lt;/svg&gt;</span></pre>
+        </div>
+
+        <h2>4. 同一套导航在不同屏宽下的表现</h2>
+        <div class="lxy_panel">
+            <div class="lxy_frames">
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-sm" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>320px · 小屏手机</figcaption>
+                </figure>
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-md" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>375px · 常见手机</figcaption>
+                </figure>
+                <figure class="lxy_frame">
+                    <div class="lxy_screen lxy_screen-lg" data-lxy-slot>
+                        <span class="lxy_ph"></span><span class="lxy_ph"></span><span class="lxy_ph"></span>
+                    </div>
+                    <figcaption>414px · 大屏手机</figcaption>
+                </figure>
+            </div>
+            <p class="lxy_tip" style="margin-top:14px">
+                同一段导航代码克隆到 320 / 375 / 414 宽的“屏幕”中：宽度 100% + flex 等分，
+                屏宽变化时 4 项始终平分整条导航；真正使用时它是页面底部固定定位的那一条。
+            </p>
+        </div>
+
+        <h2>5. 导航用到的符号对照</h2>
+        <div class="lxy_panel">
+            <div class="lxy_glyphs">
+                <div class="lxy_glyph"><svg class="lxy_svg"><use href="#lxy_icon_home"></use></svg><b>首页</b><span>#lxy_icon_home · shouye</span></div>
+                <div class="lxy_glyph"><svg class="lxy_svg"><use href="#lxy_icon_cat"></use></svg><b>分类</b><span>#lxy_icon_cat · catalog</span></div>
+                <div class="lxy_glyph"><svg class="lxy_svg"><use href="#lxy_icon_cart"></use></svg><b>购物车</b><span>#lxy_icon_cart · cart-full</span></div>
+                <div class="lxy_glyph"><svg class="lxy_svg"><use href="#lxy_icon_me"></use></svg><b>我的</b><span>#lxy_icon_me · interests</span></div>
+            </div>
+        </div>
+
+        <h2>6. 徽章、红点与两种方案对比</h2>
+        <div class="lxy_panel">
+            <p class="lxy_tip">
+                <code>.lxy_num</code> 数字徽章与 <code>.lxy_dot</code> 右上角红点的写法与 13-3 完全相同：
+                绝对定位挂在图标盒子上，红底白字、白色描边，尺寸同样用 <code>clamp()</code> 自适应。
+                点击导航项可切换选中态，图标颜色由 <code>color</code> 经 <code>fill: currentColor</code> 联动。
+            </p>
+            <p class="lxy_tip" style="margin-top:10px">
+                两种方案对比：<strong>字体图标（13-3）</strong>像文字一样用 <code>content</code> 输出，
+                字号即可控制大小；<strong>SVG（本页）</strong>是真正的矢量元素，用
+                <code>width / height / fill</code> 控制，无需加载字体文件，也不会出现字体闪烁。
+            </p>
+        </div>
+
+        <a class="lxy_back" href="index.html">返回作品集首页</a>
+    </main>
+
+    <nav class="lxy_tabbar" aria-label="底部导航">
+        <a class="lxy_tab lxy_active" href="#">
+            <span class="lxy_ico">
+                <svg class="lxy_svg"><use href="#lxy_icon_home"></use></svg>
+                <span class="lxy_num">8</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">首页</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <svg class="lxy_svg"><use href="#lxy_icon_cat"></use></svg>
+                <span class="lxy_num">3</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">分类</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <svg class="lxy_svg"><use href="#lxy_icon_cart"></use></svg>
+                <span class="lxy_num">12</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">购物车</span>
+        </a>
+        <a class="lxy_tab" href="#">
+            <span class="lxy_ico">
+                <svg class="lxy_svg"><use href="#lxy_icon_me"></use></svg>
+                <span class="lxy_num">99+</span>
+                <span class="lxy_dot"></span>
+            </span>
+            <span class="lxy_tab_text">我的</span>
+        </a>
+    </nav>
+
+    <script>
+        (function () {
+            var lxy_src = document.querySelector(".lxy_tabbar");
+            var lxy_slots = document.querySelectorAll("[data-lxy-slot]");
+            var i;
+            for (i = 0; i < lxy_slots.length; i++) {
+                var lxy_clone = lxy_src.cloneNode(true);
+                lxy_clone.classList.add("lxy_static");
+                lxy_clone.setAttribute("aria-hidden", "true");
+                lxy_slots[i].appendChild(lxy_clone);
+            }
+
+            document.addEventListener("click", function (e) {
+                var lxy_tab = e.target.closest ? e.target.closest(".lxy_tab") : null;
+                if (!lxy_tab) {
+                    return;
+                }
+                e.preventDefault();
+                var lxy_bar = lxy_tab.parentNode;
+                var lxy_tabs = lxy_bar.querySelectorAll(".lxy_tab");
+                for (var j = 0; j < lxy_tabs.length; j++) {
+                    lxy_tabs[j].classList.remove("lxy_active");
+                }
+                lxy_tab.classList.add("lxy_active");
+            });
+        })();
+    </script>
+</body>
+</html>
