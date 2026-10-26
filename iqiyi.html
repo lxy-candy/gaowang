@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="爱奇艺视频网页版 - 高级网页设计I 图像解决方案项目：SVG 图标自适应宽度固定下导航">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-25
+    功能：爱奇艺视频网页版——深色影视内容展示页，侧边导航移至底部，底部导航图标取自 font/font_5244874_dxs3wbl8ev 的 iconfont 矢量图标（SVG 雪碧图 + use 引用），实现自适应宽度的固定下导航
+    -->
+    <title>爱奇艺 · iQIYI 视频网页版</title>
+    <style>
+        /* ========== 全局样式（CSS 变量 + 重置 + 共享组件） ========== */
+        :root {
+            --Lxy_bg: #0d1016;
+            --Lxy_bg2: #12161e;
+            --Lxy_panel: rgba(255, 255, 255, 0.04);
+            --Lxy_panel_hover: rgba(255, 255, 255, 0.08);
+            --Lxy_line: rgba(255, 255, 255, 0.08);
+            --Lxy_text: #f2f4f7;
+            --Lxy_sub: #9aa3b0;
+            --Lxy_muted: #6b7481;
+            --Lxy_green: #0acf52;
+            --Lxy_green_dark: #07a843;
+            --Lxy_gold: #e8b64c;
+            --Lxy_red: #ff5a5a;
+            --Lxy_radius: 14px;
+            --Lxy_radius_s: 9px;
+            --Lxy_shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 500px at 80% -10%, rgba(10, 207, 82, 0.07), transparent 60%),
+                var(--Lxy_bg);
+            color: var(--Lxy_text);
+            font-family: "PingFang SC", "Microsoft YaHei", "HarmonyOS Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.55;
+            padding-top: 66px;
+            padding-bottom: 132px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        ::selection {
+            background: rgba(10, 207, 82, 0.35);
+        }
+
+        /* —— iconfont 矢量图标：隐藏雪碧图 + 底部导航图标填充色跟随文字 —— */
+        .Lxy_sprite {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .Lxy_bottomnav svg {
+            fill: currentColor;
+            stroke: none;
+        }
+
+        .Lxy_container {
+            width: min(1480px, calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        /* ========== 顶部栏 ========== */
+        .Lxy_topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 100%;
+            height: 66px;
+            border-bottom: 1px solid var(--Lxy_line);
+            background: rgba(13, 16, 22, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .Lxy_topbar_inner {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            height: 100%;
+        }
+
+        .Lxy_logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .Lxy_logo_mark {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--Lxy_green), var(--Lxy_green_dark));
+            color: #07120a;
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: -0.5px;
+            box-shadow: 0 6px 18px rgba(10, 207, 82, 0.35);
+        }
+
+        .Lxy_logo_name {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .Lxy_logo_name em {
+            font-style: normal;
+            color: var(--Lxy_green);
+        }
+
+        .Lxy_mode {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px;
+            border: 1px solid var(--Lxy_line);
+            border-radius: 999px;
+            background: var(--Lxy_panel);
+            flex-shrink: 0;
+        }
+
+        .Lxy_mode_btn {
+            padding: 4px 12px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--Lxy_sub);
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .Lxy_mode_btn.Lxy_active {
+            background: rgba(10, 207, 82, 0.16);
+            color: var(--Lxy_green);
+            font-weight: 600;
+        }
+
+        .Lxy_search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            max-width: 520px;
+            height: 38px;
+            margin-left: auto;
+            padding: 0 12px;
+            border: 1px solid var(--Lxy_line);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .Lxy_search:focus-within {
+            border-color: rgba(10, 207, 82, 0.55);
+            box-shadow: 0 0 0 3px rgba(10, 207, 82, 0.12);
+        }
+
+        .Lxy_search input {
+            flex: 1;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--Lxy_text);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .Lxy_search input::placeholder {
+            color: var(--Lxy_muted);
+        }
+
+        .Lxy_search_hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--Lxy_sub);
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .Lxy_top_actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .Lxy_top_btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            height: 36px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--Lxy_sub);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .Lxy_top_btn:hover {
+            background: var(--Lxy_panel_hover);
+            color: var(--Lxy_text);
+        }
+
+        .Lxy_top_btn.Lxy_vip {
+            border: 1px solid rgba(232, 182, 76, 0.35);
+            background: rgba(232, 182, 76, 0.08);
+            color: var(--Lxy_gold);
+            font-weight: 600;
+        }
+
+        .Lxy_top_btn.Lxy_vip:hover {
+            background: rgba(232, 182, 76, 0.16);
+        }
+
+        .Lxy_badge_dot {
+            position: absolute;
+            top: 6px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--Lxy_red);
+            box-shadow: 0 0 0 3px rgba(13, 16, 22, 0.9);
+        }
+
+        .Lxy_win {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .Lxy_win_btn {
+            display: grid;
+            width: 34px;
+            height: 30px;
+            place-items: center;
+            border-radius: 6px;
+            color: var(--Lxy_sub);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .Lxy_win_btn:hover {
+            background: var(--Lxy_panel_hover);
+            color: var(--Lxy_text);
+        }
+
+        .Lxy_win_btn.Lxy_close:hover {
+            background: #e81123;
+            color: #fff;
+        }
+
+        /* ========== 主内容 ========== */
+        .Lxy_main {
+            padding: 26px 0 40px;
+        }
+
+        /* —— 焦点大图 —— */
+        .Lxy_hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(360px, 0.85fr);
+            align-items: end;
+            min-height: 560px;
+            padding: 54px 58px;
+            overflow: hidden;
+            border-radius: 20px;
+            border: 1px solid var(--Lxy_line);
+            background:
+                linear-gradient(90deg, rgba(13, 16, 22, 0.97) 0%, rgba(13, 16, 22, 0.82) 42%, rgba(13, 16, 22, 0.15) 72%, rgba(13, 16, 22, 0.3) 100%),
+                url("img/iqiyi/hero_xiaocheng_liangfang.jpg") no-repeat 74% center / cover;
+            box-shadow: var(--Lxy_shadow);
+        }
+
+        .Lxy_hero_content {
+            position: relative;
+            z-index: 2;
+            max-width: 640px;
+        }
+
+        .Lxy_hero_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(10, 207, 82, 0.14);
+            border: 1px solid rgba(10, 207, 82, 0.4);
+            color: var(--Lxy_green);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .Lxy_hero_badge b {
+            font-size: 16px;
+        }
+
+        .Lxy_hero_title {
+            margin: 18px 0 10px;
+            font-size: clamp(34px, 4.4vw, 60px);
+            font-weight: 900;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .Lxy_hero_tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .Lxy_tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 11px;
+            border: 1px solid var(--Lxy_line);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--Lxy_sub);
+            font-size: 12px;
+        }
+
+        .Lxy_tag.Lxy_tag_gold {
+            border-color: rgba(232, 182, 76, 0.4);
+            color: var(--Lxy_gold);
+        }
+
+        .Lxy_hero_desc {
+            max-width: 560px;
+            margin-bottom: 12px;
+            color: rgba(242, 244, 247, 0.78);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .Lxy_hero_cast {
+            margin-bottom: 26px;
+            color: var(--Lxy_sub);
+            font-size: 13px;
+        }
+
+        .Lxy_hero_cast b {
+            color: var(--Lxy_text);
+            font-weight: 600;
+        }
+
+        .Lxy_hero_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .Lxy_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            height: 44px;
+            padding: 0 24px;
+            border: 0;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .Lxy_btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .Lxy_btn_primary {
+            background: var(--Lxy_green);
+            color: #06130a;
+            box-shadow: 0 10px 26px rgba(10, 207, 82, 0.32);
+        }
+
+        .Lxy_btn_primary:hover {
+            background: #18dc62;
+            box-shadow: 0 14px 32px rgba(10, 207, 82, 0.4);
+        }
+
+        .Lxy_btn_ghost {
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--Lxy_text);
+        }
+
+        .Lxy_btn_ghost:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* —— 大图下方的迷你横条 —— */
+        .Lxy_hero_strip {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .Lxy_mini {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--Lxy_line);
+            background: var(--Lxy_panel);
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .Lxy_mini:hover {
+            transform: translateY(-3px);
+            border-color: rgba(10, 207, 82, 0.5);
+        }
+
+        .Lxy_mini img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            transition: transform 0.35s ease;
+        }
+
+        .Lxy_mini:hover img {
+            transform: scale(1.06);
+        }
+
+        .Lxy_mini_label {
+            position: absolute;
+            right: 6px;
+            bottom: 6px;
+            padding: 2px 7px;
+            border-radius: 5px;
+            background: rgba(6, 9, 12, 0.78);
+            color: #dfe6ee;
+            font-size: 11px;
+        }
+
+        .Lxy_mini_name {
+            padding: 7px 8px;
+            font-size: 12px;
+            color: var(--Lxy_sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* —— 板块标题 —— */
+        .Lxy_section {
+            margin-top: 52px;
+        }
+
+        .Lxy_section_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .Lxy_section_title {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .Lxy_section_title h2 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .Lxy_section_title span {
+            color: var(--Lxy_muted);
+            font-size: 12px;
+            letter-spacing: 1.5px;
+        }
+
+        .Lxy_tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 999px;
+            background: var(--Lxy_panel);
+            border: 1px solid var(--Lxy_line);
+        }
+
+        .Lxy_tab {
+            padding: 6px 16px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--Lxy_sub);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .Lxy_tab.Lxy_active {
+            background: rgba(10, 207, 82, 0.16);
+            color: var(--Lxy_green);
+            font-weight: 700;
+        }
+
+        .Lxy_more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--Lxy_sub);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .Lxy_more:hover {
+            color: var(--Lxy_green);
+        }
+
+        /* —— 正在热播：卡片网格 —— */
+        .Lxy_hot {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 26px;
+        }
+
+        .Lxy_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 22px 20px;
+        }
+
+        .Lxy_card {
+            position: relative;
+            min-width: 0;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .Lxy_card.Lxy_hidden {
+            display: none;
+        }
+
+        .Lxy_card_media {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            border-radius: var(--Lxy_radius_s);
+            border: 1px solid var(--Lxy_line);
+            background: var(--Lxy_panel);
+            cursor: pointer;
+        }
+
+        .Lxy_card_media img {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+
+        .Lxy_card:hover .Lxy_card_media img {
+            transform: scale(1.06);
+            filter: brightness(1.08);
+        }
+
+        .Lxy_card_media::after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            background: linear-gradient(180deg, rgba(8, 11, 15, 0) 55%, rgba(8, 11, 15, 0.62) 100%);
+            pointer-events: none;
+        }
+
+        .Lxy_card_badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .Lxy_card_badge.Lxy_b_watch {
+            background: rgba(10, 207, 82, 0.92);
+            color: #06130a;
+        }
+
+        .Lxy_card_badge.Lxy_b_vip {
+            background: rgba(232, 182, 76, 0.92);
+            color: #241503;
+        }
+
+        .Lxy_card_badge.Lxy_b_excl {
+            background: rgba(255, 90, 90, 0.92);
+            color: #fff;
+        }
+
+        .Lxy_card_badge.Lxy_b_theater {
+            background: linear-gradient(135deg, #1b2a4a, #2a3f6e);
+            border: 1px solid rgba(120, 160, 255, 0.4);
+            color: #cfe0ff;
+        }
+
+        .Lxy_card_ep {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            z-index: 2;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: rgba(6, 9, 12, 0.72);
+            backdrop-filter: blur(4px);
+            color: #e6ebf2;
+            font-size: 11px;
+        }
+
+        .Lxy_card_play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 2;
+            display: grid;
+            width: 46px;
+            height: 46px;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(10, 207, 82, 0.9);
+            color: #06130a;
+            opacity: 0;
+            transform: translate(-50%, -46%) scale(0.8);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            box-shadow: 0 10px 30px rgba(10, 207, 82, 0.4);
+        }
+
+        .Lxy_card:hover .Lxy_card_play {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .Lxy_card h3 {
+            margin: 12px 2px 3px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .Lxy_card h3 a {
+            transition: color 0.2s ease;
+        }
+
+        .Lxy_card:hover h3 a {
+            color: var(--Lxy_green);
+        }
+
+        .Lxy_card_desc {
+            margin: 0 2px;
+            color: var(--Lxy_muted);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* —— 学习时刻 —— */
+        .Lxy_study {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: var(--Lxy_radius);
+            border: 1px solid var(--Lxy_line);
+            background: var(--Lxy_panel);
+        }
+
+        .Lxy_study_media {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .Lxy_study_media img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .Lxy_study:hover .Lxy_study_media img {
+            transform: scale(1.05);
+        }
+
+        .Lxy_study_media::after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            background: linear-gradient(180deg, rgba(8, 11, 15, 0.15) 40%, rgba(8, 11, 15, 0.7) 100%);
+        }
+
+        .Lxy_study_label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(6, 9, 12, 0.7);
+            color: var(--Lxy_gold);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .Lxy_study_title {
+            position: absolute;
+            bottom: 12px;
+            left: 14px;
+            right: 14px;
+            z-index: 2;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .Lxy_study_body {
+            padding: 18px;
+        }
+
+        .Lxy_study_body p {
+            margin-bottom: 12px;
+            color: var(--Lxy_sub);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .Lxy_progress {
+            height: 5px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .Lxy_progress i {
+            display: block;
+            width: 62%;
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--Lxy_green), #3fe584);
+        }
+
+        .Lxy_study_btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .Lxy_study_btns .Lxy_btn {
+            flex: 1;
+            height: 38px;
+            padding: 0 10px;
+            font-size: 13px;
+            justify-content: center;
+        }
+
+        /* —— 电影货架 —— */
+        .Lxy_film_grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .Lxy_film .Lxy_card_media img {
+            aspect-ratio: 3 / 4;
+        }
+
+        .Lxy_film_badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: rgba(232, 182, 76, 0.92);
+            color: #241503;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .Lxy_film_meta {
+            margin: 0 2px;
+            color: var(--Lxy_muted);
+            font-size: 12px;
+        }
+
+        /* —— 页脚说明 —— */
+        .Lxy_foot {
+            margin-top: 54px;
+            padding-top: 20px;
+            border-top: 1px solid var(--Lxy_line);
+            color: var(--Lxy_muted);
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== 底部导航（侧边导航移至底部 · 自适应宽度 · 固定） ========== */
+        .Lxy_bottomnav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 90;
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(11, 14, 19, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .Lxy_bottomnav_inner {
+            display: flex;
+            align-items: stretch;
+            gap: 4px;
+            padding: 8px 14px 10px;
+        }
+
+        .Lxy_nav_primary {
+            display: flex;
+            align-items: center;
+            flex: 1 1 auto;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .Lxy_nav_item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex: 1 1 0;
+            min-width: 64px;
+            height: 62px;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--Lxy_sub);
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .Lxy_nav_item:hover {
+            color: var(--Lxy_text);
+            background: var(--Lxy_panel_hover);
+        }
+
+        .Lxy_nav_item.Lxy_active {
+            color: var(--Lxy_green);
+            font-weight: 700;
+        }
+
+        .Lxy_nav_item.Lxy_active::after {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            width: 22px;
+            height: 3px;
+            content: "";
+            border-radius: 999px;
+            background: var(--Lxy_green);
+            transform: translateX(-50%);
+            box-shadow: 0 0 12px rgba(10, 207, 82, 0.8);
+        }
+
+        .Lxy_nav_item svg {
+            width: 23px;
+            height: 23px;
+        }
+
+        .Lxy_nav_divider {
+            width: 1px;
+            margin: 12px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .Lxy_nav_channels {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 4px 2px;
+            flex: 1.6 1 auto;
+            min-width: 0;
+        }
+
+        .Lxy_channel {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            height: 34px;
+            padding: 0 11px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--Lxy_muted);
+            font-size: 12.5px;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .Lxy_channel svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .Lxy_channel:hover {
+            color: var(--Lxy_text);
+            background: var(--Lxy_panel_hover);
+        }
+
+        .Lxy_channel.Lxy_active {
+            color: var(--Lxy_green);
+            background: rgba(10, 207, 82, 0.1);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 1180px) {
+            .Lxy_hot {
+                grid-template-columns: 1fr;
+            }
+
+            .Lxy_study {
+                flex-direction: row;
+            }
+
+            .Lxy_study_media {
+                width: 46%;
+                flex-shrink: 0;
+            }
+
+            .Lxy_film_grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .Lxy_hero_strip {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .Lxy_nav_channels .Lxy_channel:nth-child(n + 7) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding-bottom: 118px;
+            }
+
+            .Lxy_topbar_inner {
+                gap: 10px;
+            }
+
+            .Lxy_mode {
+                display: none;
+            }
+
+            .Lxy_search {
+                max-width: none;
+            }
+
+            .Lxy_hero {
+                grid-template-columns: 1fr;
+                min-height: 0;
+                padding: 40px 26px;
+            }
+
+            .Lxy_hero_strip {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .Lxy_win {
+                display: none;
+            }
+
+            .Lxy_film_grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .Lxy_bottomnav_inner {
+                flex-wrap: wrap;
+            }
+
+            .Lxy_nav_primary {
+                width: 100%;
+            }
+
+            .Lxy_nav_divider {
+                display: none;
+            }
+
+            .Lxy_nav_channels {
+                width: 100%;
+                border-top: 1px solid rgba(255, 255, 255, 0.07);
+                padding-top: 6px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .Lxy_container {
+                width: calc(100% - 24px);
+            }
+
+            .Lxy_top_actions .Lxy_top_btn span {
+                display: none;
+            }
+
+            .Lxy_top_btn {
+                padding: 0 10px;
+            }
+
+            .Lxy_hero_strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .Lxy_nav_item {
+                min-width: 52px;
+                font-size: 11px;
+            }
+
+            .Lxy_channel {
+                padding: 0 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ iconfont 矢量图标雪碧图（symbol 取自 font/font_5244874_dxs3wbl8ev/iconfont.js） ============ -->
+    <svg class="Lxy_sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="Lxy_icon_shouye" viewBox="0 0 1024 1024"><path d="M969.6 502.4l-118.4-112-323.2-300.8c-9.6-9.6-22.4-9.6-32 0l-313.6 297.6c-3.2 3.2-6.4 6.4-9.6 9.6l-118.4 112c-9.6 9.6-9.6 22.4 0 32s22.4 9.6 32 0l83.2-80 0 393.6c0 48 41.6 89.6 92.8 89.6l83.2 0c38.4 0 70.4-28.8 70.4-67.2l0-217.6 99.2 0 99.2 0 0 217.6c0 35.2 32 67.2 70.4 67.2l83.2 0c51.2 0 92.8-38.4 92.8-89.6l0-396.8 80 73.6c9.6 9.6 22.4 9.6 32 0C979.2 524.8 979.2 512 969.6 502.4zM809.6 857.6c0 25.6-19.2 44.8-44.8 44.8l-83.2 0c-12.8 0-22.4-9.6-22.4-22.4L659.2 640c0-12.8-9.6-22.4-22.4-22.4l-121.6 0-121.6 0c-12.8 0-22.4 9.6-22.4 22.4l0 240c0 12.8-9.6 22.4-22.4 22.4l-83.2 0c-25.6 0-44.8-19.2-44.8-44.8l0-438.4 294.4-281.6 294.4 281.6L809.6 857.6z"></path></symbol>
+        <symbol id="Lxy_icon_follow" viewBox="0 0 1024 1024"><path d="M480.304762 237.738667l7.582476 7.68c6.826667 6.826667 14.872381 14.677333 24.112762 23.576381l10.50819-10.191238c8.289524-8.045714 15.36-15.067429 21.211429-21.065143a220.891429 220.891429 0 0 1 317.074286 0c86.747429 88.600381 87.576381 231.765333 2.438095 321.365333L512 902.095238 160.768 559.128381c-85.113905-89.624381-84.309333-232.789333 2.438095-321.389714a220.891429 220.891429 0 0 1 317.074286 0z"></path></symbol>
+        <symbol id="Lxy_icon_short" viewBox="0 0 1024 1024"><path d="M170.666667 219.428571h682.666666V146.285714H170.666667v73.142857z m97.523809 219.428572h487.619048v-73.142857H268.190476v73.142857z m97.52381 219.428571h292.571428v-73.142857H365.714286v73.142857z m-195.047619 219.428572h682.666666v-73.142857H170.666667v73.142857z"></path></symbol>
+        <symbol id="Lxy_icon_free" viewBox="0 0 1024 1024"><path d="M590.701714 85.74781L843.093333 112.956952a73.142857 73.142857 0 0 1 64.877715 64.877715l27.209142 252.391619a73.142857 73.142857 0 0 1-21.01638 59.538285L489.764571 914.16381a73.142857 73.142857 0 0 1-103.424 0L106.76419 634.587429a73.142857 73.142857 0 0 1 0-103.424L531.163429 106.76419a73.142857 73.142857 0 0 1 59.538285-21.01638zM582.875429 158.47619L158.47619 582.875429l279.576381 279.576381 424.399239-424.399239-27.209143-252.367238L582.875429 158.47619z m68.486095 90.258286a109.714286 109.714286 0 1 1 0 219.428572 109.714286 109.714286 0 0 1 0-219.428572z m0 73.142857a36.571429 36.571429 0 1 0 0 73.142857 36.571429 36.571429 0 0 0 0-73.142857z"></path></symbol>
+        <symbol id="Lxy_icon_vip" viewBox="0 0 1024 1024"><path d="M512 97.52381c228.912762 0 414.47619 185.563429 414.47619 414.47619s-185.563429 414.47619-414.47619 414.47619S97.52381 740.912762 97.52381 512 283.087238 97.52381 512 97.52381z m96.060952 193.584761L512 387.120762l-96.060952-96.060952-51.687619 51.73638 96.036571 96.012191L329.142857 438.857143v73.142857h146.285714v60.952381h-146.285714v73.142857h146.285714v97.52381h73.142858v-97.52381h146.285714v-73.142857h-146.285714V512h146.285714v-73.142857h-131.145143l96.060952-96.060953-51.736381-51.687619z"></path></symbol>
+        <symbol id="Lxy_icon_mine" viewBox="0 0 1024 1024"><path d="M667.087238 610.255238l27.745524 32.377905L694.857143 707.047619h-98.084572v170.666667H694.857143l-0.170667 48.761904H219.428571a73.142857 73.142857 0 0 1-55.539809-120.734476l167.545905-195.486476A315.489524 315.489524 0 0 0 499.248762 658.285714a315.489524 315.489524 0 0 0 167.838476-48.030476zM816.201143 658.285714v97.52381h97.523809v73.142857h-97.523809v97.523809h-73.142857v-97.523809h-97.52381v-73.142857h97.52381v-97.52381h73.142857z m-316.952381-560.761904c134.656 0 243.809524 109.153524 243.809524 243.809523s-109.153524 243.809524-243.809524 243.809524-243.809524-109.153524-243.809524-243.809523 109.153524-243.809524 243.809524-243.809523z"></path></symbol>
+        <symbol id="Lxy_icon_tv" viewBox="0 0 1024 1024"><path d="M853.333333 146.285714a73.142857 73.142857 0 0 1 73.142857 73.142857v463.238096a73.142857 73.142857 0 0 1-73.142857 73.142857H170.666667a73.142857 73.142857 0 0 1-73.142857-73.142857V219.428571a73.142857 73.142857 0 0 1 73.142857-73.142857h682.666666z m0 73.142857H170.666667v463.238096h682.666666V219.428571z m-170.666666 195.047619v73.142858H341.333333v-73.142858h341.333334zM341.333333 804.571429h341.333334v73.142857H341.333333z"></path></symbol>
+        <symbol id="Lxy_icon_movie" viewBox="0 0 1024 1024"><path d="M831.024762 634.368v195.608381l52.370286-52.419048 51.736381 51.736381-85.820953 85.820953 0.316953 0.365714-51.687619 51.712-0.365715-0.341333-0.365714 0.341333-51.736381-51.687619 0.390095-0.365714-85.869714-85.845334 51.736381-51.736381 46.153143 46.177524v-189.366857h73.142857zM544.402286 110.689524l295.253333 131.120762a73.142857 73.142857 0 0 1 43.471238 66.852571V585.142857h-73.142857v-207.603809L562.785524 487.375238v393.020952l-0.097524 24.746667-18.285714 8.118857a73.142857 73.142857 0 0 1-59.367619 0L189.732571 782.165333A73.142857 73.142857 0 0 1 146.285714 715.312762V308.687238a73.142857 73.142857 0 0 1 43.446857-66.852571l295.302096-131.120762a73.142857 73.142857 0 0 1 59.367619 0zM219.428571 374.101333v341.211429l270.214096 120.003048V485.888L219.428571 374.101333z m295.277715-196.534857L235.446857 301.568l292.815238 121.173333 269.141334-119.637333-282.697143-125.561905z"></path></symbol>
+        <symbol id="Lxy_icon_variety" viewBox="0 0 1024 1024"><path d="M632.246857 121.904762c130.56 0 236.422095 105.837714 236.422095 236.422095 0 82.895238-42.666667 155.794286-107.203047 198.022095l192.853333 225.01181A73.142857 73.142857 0 0 1 898.779429 902.095238l-116.443429 0.024381c12.824381-22.186667 16.335238-48.566857 9.99619-73.142857L898.779429 828.952381 651.702857 540.696381l69.705143-45.568a163.279238 163.279238 0 0 0-86.381714-300.056381 287.158857 287.158857 0 0 0-63.341715-65.340952A236.544 236.544 0 0 1 632.246857 121.904762z m-69.90019 471.722667l160.914285 187.733333A73.142857 73.142857 0 0 1 667.672381 902.095238H134.656a73.142857 73.142857 0 0 1-55.53981-120.734476l160.914286-187.733333a283.867429 283.867429 0 0 0 161.158095 49.883428c59.806476 0 115.321905-18.407619 161.158096-49.883428zM401.188571 121.904762c130.56 0 236.422095 105.837714 236.422096 236.422095 0 130.56-105.862095 236.422095-236.422096 236.422095-130.584381 0-236.422095-105.862095-236.422095-236.422095C164.766476 227.742476 270.60419 121.904762 401.188571 121.904762z"></path></symbol>
+        <symbol id="Lxy_icon_anime" viewBox="0 0 1024 1024"><path d="M703.75619 640.828952l11.410286 11.215238 3.510857 3.364572 9.752381-9.435429c1.901714-1.877333 3.657143-3.584 5.168762-5.144381a104.569905 104.569905 0 0 1 149.211429 0 107.861333 107.861333 0 0 1 1.145905 149.967238L718.677333 950.857143l-165.302857-160.036572a107.885714 107.885714 0 0 1 1.170286-149.991619 104.569905 104.569905 0 0 1 149.211428 0zM331.434667 610.255238c21.333333 13.360762 44.373333 24.234667 68.754285 32.231619L219.428571 853.333333h328.582096v73.142857H219.428571a73.142857 73.142857 0 0 1-55.539809-120.734476l167.545905-195.486476z m275.163428 81.968762a34.742857 34.742857 0 0 0-1.048381 47.274667l113.127619 109.543619 113.127619-109.568 2.267429-2.755048a34.791619 34.791619 0 0 0-3.291429-44.495238 31.427048 31.427048 0 0 0-45.104762 0l-9.118476 9.020952-57.880381 55.271619-57.856-55.271619-9.118476-9.020952a31.427048 31.427048 0 0 0-45.104762 0zM499.248762 97.52381c134.656 0 243.809524 109.153524 243.809524 243.809523s-109.153524 243.809524-243.809524 243.809524-243.809524-109.153524-243.809524-243.809523 109.153524-243.809524 243.809524-243.809523z m0 73.142857a170.666667 170.666667 0 1 0 0 341.333333 170.666667 170.666667 0 0 0 0-341.333333z"></path></symbol>
+        <symbol id="Lxy_icon_kids" viewBox="0 0 1024 1024"><path d="M512 97.52381c228.912762 0 414.47619 185.563429 414.47619 414.47619s-185.563429 414.47619-414.47619 414.47619S97.52381 740.912762 97.52381 512 283.087238 97.52381 512 97.52381z m0 73.142857C323.486476 170.666667 170.666667 323.486476 170.666667 512s152.81981 341.333333 341.333333 341.333333 341.333333-152.81981 341.333333-341.333333S700.513524 170.666667 512 170.666667z m36.571429 89.697523v229.86362h160.865523v73.142857H512a36.571429 36.571429 0 0 1-36.571429-36.571429V260.388571h73.142858z"></path></symbol>
+        <symbol id="Lxy_icon_doc" viewBox="0 0 1024 1024"><path d="M512 229.034667c188.513524 0 341.333333 152.81981 341.333333 341.333333s-152.81981 341.333333-341.333333 341.333333-341.333333-152.81981-341.333333-341.333333 152.81981-341.333333 341.333333-341.333333z m0 73.142857c-148.114286 0-268.190476 120.07619-268.190476 268.190476s120.07619 268.190476 268.190476 268.190476 268.190476-120.07619 268.190476-268.190476-120.07619-268.190476-268.190476-268.190476z m31.402667 67.608381v144.432762l79.798857-79.798857 51.687619 51.712-142.189714 142.238476c-23.04 23.04-62.439619 6.704762-62.439619-25.84381v-232.740571h73.142857zM636.099048 109.714286v77.58019H377.539048V109.714286H636.099048z"></path></symbol>
+        <symbol id="Lxy_icon_cloud" viewBox="0 0 1024 1024"><path d="M186.587429 97.52381c3.876571 0.048762 6.851048 0.487619 10.386285 1.511619l4.534857 1.072761c27.306667 7.070476 80.213333 30.45181 111.762286 52.175239a415.719619 415.719619 0 0 1 198.460953-50.809905c228.693333 0 414.744381 185.051429 414.74438 412.525714C926.47619 741.424762 740.425143 926.47619 511.75619 926.47619 279.478857 926.47619 97.52381 740.864 97.52381 503.929905c0-17.310476 8.606476-93.744762 16.213333-115.175619 2.072381-9.898667 14.360381-58.758095 61.391238-118.296381 1.706667-23.088762 4.144762-82.041905-16.237714-124.196572a43.471238 43.471238 0 0 1-3.096381-14.726095l-0.341334-3.047619a28.964571 28.964571 0 0 1 5.510096-17.993143 31.207619 31.207619 0 0 1 20.48-12.702476 15.043048 15.043048 0 0 1 2.755047-0.195048L186.587429 97.52381zM512 170.666667c-75.897905 0-146.041905 24.771048-202.678857 66.633143-10.678857-7.631238-21.455238-14.969905-32.304762-22.040381-13.531429-8.777143-23.893333-14.945524-31.085714-18.505143 2.511238 14.531048 3.754667 26.502095 3.754666 35.937524 0 6.92419-0.682667 20.821333-2.023619 41.691428l-0.78019 12.044191-0.463238 6.558476-0.341334 4.998095A339.894857 339.894857 0 0 0 170.666667 512c0 188.513524 152.81981 341.333333 341.333333 341.333333s341.333333-152.81981 341.333333-341.333333S700.513524 170.666667 512 170.666667z m-12.190476 195.047619a36.571429 36.571429 0 0 1 36.571428 36.571428v73.142857a36.571429 36.571429 0 0 1-73.142857 0v-73.142857a36.571429 36.571429 0 0 1 36.571429-36.571428z m195.047619 0a36.571429 36.571429 0 0 1 36.571428 36.571428v73.142857a36.571429 36.571429 0 0 1-73.142857 0v-73.142857a36.571429 36.571429 0 0 1 36.571429-36.571428z"></path></symbol>
+        <symbol id="Lxy_icon_drama" viewBox="0 0 1024 1024"><path d="M304.761905 804.571429a60.952381 60.952381 0 1 1 0 121.904761 60.952381 60.952381 0 0 1 0-121.904761z m438.857143 0a60.952381 60.952381 0 1 1 0 121.904761 60.952381 60.952381 0 0 1 0-121.904761zM97.718857 109.714286a109.714286 109.714286 0 0 1 107.349333 87.064381L220.16 268.190476 836.681143 268.190476a73.142857 73.142857 0 0 1 71.631238 87.942095l-70.460952 341.333334A73.142857 73.142857 0 0 1 766.22019 755.809524H306.541714a73.142857 73.142857 0 0 1-71.631238-58.343619l-69.241905-335.335619-0.463238 0.097524-31.695238-150.357334A36.571429 36.571429 0 0 0 97.718857 182.857143H35.157333v-73.142857h62.561524zM572.952381 390.095238h-73.142857v85.333333H414.47619v73.142858h85.333334V633.904762h73.142857v-85.333333H658.285714v-73.142858h-85.333333V390.095238z"></path></symbol>
+        <symbol id="Lxy_icon_know" viewBox="0 0 1024 1024"><path d="M408.551619 97.52381a73.142857 73.142857 0 0 1 51.736381 21.430857L539.306667 197.973333A73.142857 73.142857 0 0 0 591.067429 219.428571H804.571429a73.142857 73.142857 0 0 1 73.142857 73.142858v560.761904a73.142857 73.142857 0 0 1-73.142857 73.142857H219.428571a73.142857 73.142857 0 0 1-73.142857-73.142857V170.666667a73.142857 73.142857 0 0 1 73.142857-73.142857h189.123048z m0 73.142857H219.428571v682.666666h585.142858V292.571429h-213.504a146.285714 146.285714 0 0 1-98.499048-38.13181L487.619048 249.734095 408.551619 170.666667zM365.714286 633.904762v73.142857h-73.142857v-73.142857h73.142857z m365.714285 0v73.142857H414.47619v-73.142857h316.952381z m-365.714285-195.047619v73.142857h-73.142857v-73.142857h73.142857z m365.714285 0v73.142857H414.47619v-73.142857h316.952381z"></path></symbol>
+        <symbol id="Lxy_icon_all" viewBox="0 0 1024 1024"><path d="M408.551619 97.52381a73.142857 73.142857 0 0 1 51.736381 21.430857L539.306667 197.973333A73.142857 73.142857 0 0 0 591.067429 219.428571H804.571429a73.142857 73.142857 0 0 1 73.142857 73.142858v560.761904a73.142857 73.142857 0 0 1-73.142857 73.142857H219.428571a73.142857 73.142857 0 0 1-73.142857-73.142857V170.666667a73.142857 73.142857 0 0 1 73.142857-73.142857h189.123048zM341.333333 633.904762h-73.142857v73.142857h73.142857v-73.142857z m414.476191 0H390.095238v73.142857h365.714286v-73.142857z m-414.476191-195.047619h-73.142857v73.142857h73.142857v-73.142857z m414.476191 0H390.095238v73.142857h365.714286v-73.142857z"></path></symbol>
+    </svg>
+
+    <!-- ============ 顶部栏 ============ -->
+    <header class="Lxy_topbar">
+        <div class="Lxy_container Lxy_topbar_inner">
+            <a class="Lxy_logo" href="#">
+                <span class="Lxy_logo_mark">iQ</span>
+                <span class="Lxy_logo_name">爱奇艺 <em>iQIYI</em></span>
+            </a>
+
+            <div class="Lxy_mode">
+                <button class="Lxy_mode_btn Lxy_active" type="button">标准模式</button>
+                <button class="Lxy_mode_btn" type="button">少儿模式</button>
+            </div>
+
+            <div class="Lxy_search">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="M16 16l5 5"></path>
+                </svg>
+                <input type="search" placeholder="搜索影视、明星、综艺…" aria-label="搜索">
+                <span class="Lxy_search_hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <path d="M3 6h7M14 6h7M10 3v6M3 12h7M14 12h7M10 9v6M3 18h7M14 18h7M10 15v6"></path>
+                    </svg>
+                    筛选
+                </span>
+            </div>
+
+            <div class="Lxy_top_actions">
+                <button class="Lxy_top_btn Lxy_vip" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 8.5l3.4 2.6L12 4.5l5.6 6.6L21 8.5l-1.6 9.5H4.6z"></path>
+                        <path d="M5 18h14"></path>
+                    </svg>
+                    <span>续费会员</span>
+                </button>
+                <button class="Lxy_top_btn" type="button">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path>
+                        <path d="M10 19.5a2 2 0 0 0 4 0"></path>
+                    </svg>
+                    <span>消息</span>
+                    <i class="Lxy_badge_dot"></i>
+                </button>
+                <button class="Lxy_top_btn" type="button">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="8.5"></circle>
+                        <path d="M12 7.5V12l3 2"></path>
+                    </svg>
+                    <span>历史</span>
+                </button>
+            </div>
+
+            <div class="Lxy_win" aria-hidden="true">
+                <span class="Lxy_win_btn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg>
+                </span>
+                <span class="Lxy_win_btn">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5.5" y="5.5" width="13" height="13" rx="1.5"></rect></svg>
+                </span>
+                <span class="Lxy_win_btn Lxy_close">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============ 主内容 ============ -->
+    <main class="Lxy_main">
+        <div class="Lxy_container">
+
+            <!-- ===== 焦点大图：热播总榜 No.1 ===== -->
+            <section class="Lxy_hero" aria-label="焦点推荐">
+                <div class="Lxy_hero_content">
+                    <span class="Lxy_hero_badge"><b>1</b> 热播总榜 No.1</span>
+                    <h1 class="Lxy_hero_title">小城良方</h1>
+                    <div class="Lxy_hero_tags">
+                        <span class="Lxy_tag">帧绮映画</span>
+                        <span class="Lxy_tag">最高热度破 9000</span>
+                        <span class="Lxy_tag">都市 · 生活</span>
+                        <span class="Lxy_tag Lxy_tag_gold">独播</span>
+                    </div>
+                    <p class="Lxy_hero_desc">
+                        天才医生刘铮亮遭遇人生滑铁卢，被迫返回家乡从零开始。他就地集结一群「不靠谱」的人，
+                        热血操刀着「最靠谱」的事，开出一剂剂疗愈心灵的人生处方。
+                    </p>
+                    <p class="Lxy_hero_cast">主演：<b>肖战</b> 倪大红 姜妍 张国强 陈瑾 · 导演：张晓波</p>
+                    <div class="Lxy_hero_btns">
+                        <button class="Lxy_btn Lxy_btn_primary" type="button">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                            立即播放
+                        </button>
+                        <button class="Lxy_btn Lxy_btn_ghost" type="button">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                            加入片单
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== 大图下方迷你横条 ===== -->
+            <div class="Lxy_hero_strip" aria-label="相关推荐">
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/xiaocheng_liangfang_poster.jpg" alt="小城良方">
+                    <span class="Lxy_mini_label">更新至10集</span>
+                    <span class="Lxy_mini_name">小城良方</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/weida_changzheng.jpg" alt="伟大的长征">
+                    <span class="Lxy_mini_label">更新至25集</span>
+                    <span class="Lxy_mini_name">伟大的长征</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/zhanyou1942.jpg" alt="战邮1942">
+                    <span class="Lxy_mini_label">全片上线</span>
+                    <span class="Lxy_mini_name">战邮1942</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/kongqiang.jpg" alt="空枪">
+                    <span class="Lxy_mini_label">热映中</span>
+                    <span class="Lxy_mini_name">空枪</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/caishen_douzanlong.jpg" alt="财神窦占龙">
+                    <span class="Lxy_mini_label">更新至6集</span>
+                    <span class="Lxy_mini_name">财神窦占龙</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/dage2026.jpg" alt="打歌2026">
+                    <span class="Lxy_mini_label">更新至10期</span>
+                    <span class="Lxy_mini_name">打歌2026</span>
+                </a>
+                <a class="Lxy_mini" href="#">
+                    <img src="img/iqiyi/zhenzhan.jpg" alt="侦战">
+                    <span class="Lxy_mini_label">10.1 上映</span>
+                    <span class="Lxy_mini_name">侦战</span>
+                </a>
+            </div>
+
+            <!-- ===== 正在热播 ===== -->
+            <section class="Lxy_section" aria-label="正在热播">
+                <div class="Lxy_section_head">
+                    <div class="Lxy_section_title">
+                        <h2>正在热播</h2>
+                        <span>NOW ON AIR</span>
+                    </div>
+                    <div class="Lxy_tabs" role="tablist" aria-label="热播筛选">
+                        <button class="Lxy_tab Lxy_active" type="button" data-lxy-tab="all">推荐</button>
+                        <button class="Lxy_tab" type="button" data-lxy-tab="hot">最热</button>
+                        <button class="Lxy_tab" type="button" data-lxy-tab="new">最新</button>
+                    </div>
+                    <a class="Lxy_more" href="#">
+                        查看全部
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+
+                <div class="Lxy_hot">
+                    <div class="Lxy_grid" id="Lxy_hot_grid">
+
+                        <article class="Lxy_card" data-lxy-tabs="all hot">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/xiaocheng_liangfang_poster.jpg" alt="小城良方海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_watch">你正在追</span>
+                                <span class="Lxy_card_ep">观看至第3集</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">小城良方</a></h3>
+                            <p class="Lxy_card_desc">肖战 · 更新至10集 · 都市生活</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all new">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/weida_changzheng.jpg" alt="伟大的长征海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_watch">你正在追</span>
+                                <span class="Lxy_card_ep">观看至第1集</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">伟大的长征</a></h3>
+                            <p class="Lxy_card_desc">纪念长征胜利90周年 · 更新至25集</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all hot">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/zuoye_jiangzhi.jpg" alt="昨夜将至海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_theater">迷雾剧场</span>
+                                <span class="Lxy_card_ep">12集全</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">昨夜将至</a></h3>
+                            <p class="Lxy_card_desc">佟大为 · 夫妻隐瞒二十年悬案</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all new">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/dage_xiaozhuli.jpg" alt="大哥小助理海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_excl">独播</span>
+                                <span class="Lxy_card_ep">10-23期</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">大哥小助理</a></h3>
+                            <p class="Lxy_card_desc">胡军 李乃文 · 颁奖现场变KTV</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all new">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/yilu_qianxing3.jpg" alt="一路前行第三季海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_vip">VIP</span>
+                                <span class="Lxy_card_ep">更新至1集</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">一路前行 第三季</a></h3>
+                            <p class="Lxy_card_desc">胡歌 · 升级生态共建者</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all hot">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/zhanyou1942.jpg" alt="战邮1942海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_excl">爱奇艺出品</span>
+                                <span class="Lxy_card_ep">全片上线</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">战邮1942</a></h3>
+                            <p class="Lxy_card_desc">国内首部战邮题材 · 谍战</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/caishen_douzanlong.jpg" alt="财神窦占龙海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_theater">国漫</span>
+                                <span class="Lxy_card_ep">更新至6集</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">财神窦占龙</a></h3>
+                            <p class="Lxy_card_desc">津门憋宝传奇 · 爱奇艺×B站</p>
+                        </article>
+
+                        <article class="Lxy_card" data-lxy-tabs="all new">
+                            <a class="Lxy_card_media" href="#">
+                                <img src="img/iqiyi/dage2026.jpg" alt="打歌2026海报" loading="lazy">
+                                <span class="Lxy_card_badge Lxy_b_vip">VIP</span>
+                                <span class="Lxy_card_ep">更新至10期</span>
+                                <span class="Lxy_card_play">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                </span>
+                            </a>
+                            <h3><a href="#">打歌2026</a></h3>
+                            <p class="Lxy_card_desc">王俊凯召集 · 全真唱无修音</p>
+                        </article>
+                    </div>
+
+                    <!-- 学习时刻 -->
+                    <aside class="Lxy_study" aria-label="学习时刻">
+                        <div class="Lxy_study_media">
+                            <img src="img/iqiyi/weida_changzheng.jpg" alt="学习时刻 伟大的长征" loading="lazy">
+                            <span class="Lxy_study_label">学习时刻</span>
+                            <p class="Lxy_study_title">《伟大的长征》正在热播</p>
+                        </div>
+                        <div class="Lxy_study_body">
+                            <p>全景式展现多路红军长征全过程，追寻红色足迹，重温不朽丰碑。</p>
+                            <div class="Lxy_progress" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="观看进度">
+                                <i></i>
+                            </div>
+                            <div class="Lxy_study_btns">
+                                <button class="Lxy_btn Lxy_btn_primary" type="button">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                                    立即观看
+                                </button>
+                                <button class="Lxy_btn Lxy_btn_ghost" type="button">加入片单</button>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- ===== 近期电影 ===== -->
+            <section class="Lxy_section" aria-label="近期电影">
+                <div class="Lxy_section_head">
+                    <div class="Lxy_section_title">
+                        <h2>影院上新</h2>
+                        <span>RECENT MOVIES</span>
+                    </div>
+                    <a class="Lxy_more" href="#">
+                        更多电影
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
+
+                <div class="Lxy_film_grid">
+                    <article class="Lxy_card Lxy_film">
+                        <a class="Lxy_card_media" href="#">
+                            <img src="img/iqiyi/jingangchuan.jpg" alt="金刚川海报" loading="lazy">
+                            <span class="Lxy_film_badge">10.23 上映</span>
+                            <span class="Lxy_card_play">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                            </span>
+                        </a>
+                        <h3><a href="#">金刚川</a></h3>
+                        <p class="Lxy_film_meta">管虎 郭帆 路阳 · 一战到底</p>
+                    </article>
+
+                    <article class="Lxy_card Lxy_film">
+                        <a class="Lxy_card_media" href="#">
+                            <img src="img/iqiyi/zhenzhan.jpg" alt="侦战海报" loading="lazy">
+                            <span class="Lxy_film_badge">10.1 上映</span>
+                            <span class="Lxy_card_play">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                            </span>
+                        </a>
+                        <h3><a href="#">侦战</a></h3>
+                        <p class="Lxy_film_meta">古天乐 此沙 · 破局见真相</p>
+                    </article>
+
+                    <article class="Lxy_card Lxy_film">
+                        <a class="Lxy_card_media" href="#">
+                            <img src="img/iqiyi/shentan_henji.jpg" alt="神探之痕迹海报" loading="lazy">
+                            <span class="Lxy_film_badge">10.1 上映</span>
+                            <span class="Lxy_card_play">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                            </span>
+                        </a>
+                        <h3><a href="#">神探之痕迹</a></h3>
+                        <p class="Lxy_film_meta">悬疑刑侦 · 重磅献映</p>
+                    </article>
+
+                    <article class="Lxy_card Lxy_film">
+                        <a class="Lxy_card_media" href="#">
+                            <img src="img/iqiyi/kongqiang.jpg" alt="空枪海报" loading="lazy">
+                            <span class="Lxy_film_badge">热映中</span>
+                            <span class="Lxy_card_play">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5l12 7.5-12 7.5z"></path></svg>
+                            </span>
+                        </a>
+                        <h3><a href="#">空枪</a></h3>
+                        <p class="Lxy_film_meta">韩延导演 · 朱一龙领衔</p>
+                    </article>
+                </div>
+            </section>
+
+            <p class="Lxy_foot">本站为《高级网页设计I · 图像解决方案》课程实践页面 · 图片与信息仅作课堂学习展示</p>
+        </div>
+    </main>
+
+    <!-- ============ 底部导航（自适应宽度 · 固定） ============ -->
+    <nav class="Lxy_bottomnav" aria-label="全站导航">
+        <div class="Lxy_bottomnav_inner">
+
+            <div class="Lxy_nav_primary">
+                <button class="Lxy_nav_item Lxy_active" type="button" data-lxy-nav="home">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_shouye"></use></svg>
+                    首页
+                </button>
+                <button class="Lxy_nav_item" type="button" data-lxy-nav="follow">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_follow"></use></svg>
+                    关注
+                </button>
+                <button class="Lxy_nav_item" type="button" data-lxy-nav="short">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_short"></use></svg>
+                    短视频
+                </button>
+                <button class="Lxy_nav_item" type="button" data-lxy-nav="free">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_free"></use></svg>
+                    免费
+                </button>
+                <button class="Lxy_nav_item" type="button" data-lxy-nav="vip">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_vip"></use></svg>
+                    会员中心
+                </button>
+                <button class="Lxy_nav_item" type="button" data-lxy-nav="mine">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_mine"></use></svg>
+                    我的
+                </button>
+            </div>
+
+            <span class="Lxy_nav_divider" aria-hidden="true"></span>
+
+            <div class="Lxy_nav_channels">
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_tv"></use></svg>
+                    电视剧
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_movie"></use></svg>
+                    电影
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_variety"></use></svg>
+                    综艺
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_anime"></use></svg>
+                    动漫
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_kids"></use></svg>
+                    少儿
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_doc"></use></svg>
+                    纪录片
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_cloud"></use></svg>
+                    云影院
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_drama"></use></svg>
+                    短剧
+                </button>
+                <button class="Lxy_channel" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_know"></use></svg>
+                    知识
+                </button>
+                <button class="Lxy_channel Lxy_active" type="button">
+                    <svg class="Lxy_svg" aria-hidden="true"><use href="#Lxy_icon_all"></use></svg>
+                    全部频道
+                </button>
+            </div>
+
+        </div>
+    </nav>
+
+    <script>
+        /* ========== 交互脚本：标签页筛选 + 底部导航切换（原生 JS） ========== */
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* —— 正在热播：推荐 / 最热 / 最新 —— */
+            var Lxy_tabs = document.querySelectorAll(".Lxy_tab");
+            var Lxy_cards = document.querySelectorAll("#Lxy_hot_grid .Lxy_card");
+
+            Lxy_tabs.forEach(function (Lxy_tab) {
+                Lxy_tab.addEventListener("click", function () {
+                    var Lxy_key = Lxy_tab.getAttribute("data-lxy-tab");
+
+                    Lxy_tabs.forEach(function (Lxy_t) {
+                        Lxy_t.classList.remove("Lxy_active");
+                    });
+                    Lxy_tab.classList.add("Lxy_active");
+
+                    Lxy_cards.forEach(function (Lxy_card) {
+                        var Lxy_tags = (Lxy_card.getAttribute("data-lxy-tabs") || "").split(" ");
+                        if (Lxy_key === "all" || Lxy_tags.indexOf(Lxy_key) !== -1) {
+                            Lxy_card.classList.remove("Lxy_hidden");
+                        } else {
+                            Lxy_card.classList.add("Lxy_hidden");
+                        }
+                    });
+                });
+            });
+
+            /* —— 底部导航：点击高亮当前项 —— */
+            var Lxy_navItems = document.querySelectorAll(".Lxy_nav_item");
+            var Lxy_channels = document.querySelectorAll(".Lxy_channel");
+
+            function Lxy_setActive(Lxy_list, Lxy_el) {
+                Lxy_list.forEach(function (Lxy_item) {
+                    Lxy_item.classList.remove("Lxy_active");
+                });
+                Lxy_el.classList.add("Lxy_active");
+            }
+
+            Lxy_navItems.forEach(function (Lxy_item) {
+                Lxy_item.addEventListener("click", function () {
+                    Lxy_setActive(Lxy_navItems, Lxy_item);
+                });
+            });
+
+            Lxy_channels.forEach(function (Lxy_channel) {
+                Lxy_channel.addEventListener("click", function () {
+                    Lxy_setActive(Lxy_channels, Lxy_channel);
+                });
+            });
+
+            /* —— 顶部模式切换 —— */
+            var Lxy_modes = document.querySelectorAll(".Lxy_mode_btn");
+            Lxy_modes.forEach(function (Lxy_btn) {
+                Lxy_btn.addEventListener("click", function () {
+                    Lxy_modes.forEach(function (Lxy_m) {
+                        Lxy_m.classList.remove("Lxy_active");
+                    });
+                    Lxy_btn.classList.add("Lxy_active");
+                });
+            });
+        });
+    </script>
+</body>
+</html>

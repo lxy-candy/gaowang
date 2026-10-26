@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-26
+    功能：数7规则演示页面，100个盒子按规则显示空盒子或数字
+    -->
+    <title>数7规则 · 刘馨月</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+
+        .Lxy_container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+            padding: 40px 30px;
+        }
+
+        .Lxy_header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px dashed #e0e0e0;
+            padding-bottom: 25px;
+        }
+
+        .Lxy_title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .Lxy_subtitle {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .Lxy_author {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .Lxy_rules {
+            background: #f9f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .Lxy_rules h3 {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .Lxy_rules p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .Lxy_box-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 12px;
+        }
+
+        .Lxy_box {
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+        }
+
+        .Lxy_box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .Lxy_box--filled {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #444;
+            border: 2px solid #dfe4ea;
+        }
+
+        .Lxy_box--empty {
+            background: transparent;
+            border: 2px dashed #ff6b6b;
+            color: transparent;
+        }
+
+        .Lxy_box--empty::after {
+            content: "✕";
+            color: #ff6b6b;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .Lxy_legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+        }
+
+        .Lxy_legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .Lxy_legend-sample {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .Lxy_legend-sample--filled {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 2px solid #dfe4ea;
+            color: #444;
+        }
+
+        .Lxy_legend-sample--empty {
+            border: 2px dashed #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_container">
+        <div class="Lxy_header">
+            <h1 class="Lxy_title">数 7 规则演示</h1>
+            <p class="Lxy_subtitle">1 ~ 100 的数字方阵</p>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <div class="Lxy_rules">
+            <h3>📋 规则说明</h3>
+            <p>
+                满足以下<strong>任一</strong>条件的盒子显示为<span style="color:#ff6b6b">虚线红框（空）</span>：<br>
+                ① 是 7 的倍数 &nbsp;&nbsp; ② 个位数是 7<br>
+                其余盒子显示对应<strong>数字</strong>。
+            </p>
+        </div>
+
+        <div class="Lxy_box-grid" id="Lxy_boxGrid"></div>
+
+        <div class="Lxy_legend">
+            <div class="Lxy_legend-item">
+                <span class="Lxy_legend-sample Lxy_legend-sample--filled">1</span>
+                <span>普通数字</span>
+            </div>
+            <div class="Lxy_legend-item">
+                <span class="Lxy_legend-sample Lxy_legend-sample--empty"></span>
+                <span>命中规则（空）</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var grid = document.getElementById('Lxy_boxGrid');
+
+            // 判断是否命中"数7"规则：7 的倍数 或 个位是 7
+            function Lxy_isRule(n) {
+                return n % 7 === 0 || n % 10 === 7;
+            }
+
+            var html = '';
+            for (var i = 1; i <= 100; i++) {
+                if (Lxy_isRule(i)) {
+                    html += '<div class="Lxy_box Lxy_box--empty"></div>';
+                } else {
+                    html += '<div class="Lxy_box Lxy_box--filled">' + i + '</div>';
+                }
+            }
+            grid.innerHTML = html;
+        })();
+    </script>
+</body>
+</html>
