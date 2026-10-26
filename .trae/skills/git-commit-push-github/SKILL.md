@@ -13,6 +13,17 @@ Commit all changes in the current workspace and push them to the GitHub reposito
 - SSH address: `git@github.com:lxy-candy/gaowang.git`
 - Branch: default (usually `main` or `master` — preserve existing branch name, never force-rename)
 
+## 🔧 Mandatory SSH workaround (port 22 blocked)
+
+本网络环境 **22 端口被阻断**，必须走 GitHub 官方的 SSH-over-443。**所有** `git push`、`ssh -T`、`git fetch/pull github` 命令都要带上如下 env 变量（PowerShell）：
+
+```powershell
+$keyPath = "$env:USERPROFILE\.ssh\id_ed25519"
+$env:GIT_SSH_COMMAND = "ssh -o HostName=ssh.github.com -o Port=443 -o IdentityFile=`"$keyPath`" -o IdentitiesOnly=yes"
+```
+
+然后再执行正常的 `git push -u github HEAD` 等命令。**不要**尝试改 `~/.ssh/config`（sandbox 不允许，且用户本机可能也被 Gitee/其他用途占住），统一用 `$env:GIT_SSH_COMMAND` inline 注入。
+
 ## Pre-flight checks
 
 Run these checks **before** modifying anything. Report blockers to the user immediately.
@@ -76,7 +87,7 @@ Run these checks **before** modifying anything. Report blockers to the user imme
    ```
    如果 working tree 为空（没有任何改动），告知用户"无需要提交的内容"并停止，不要产生空 commit。
 
-4. **Push to GitHub remote**：
+4. **Push to GitHub remote**（**必须先设置上一节的 443 端口 workaround**）：
    - 首次推送需要建立 upstream 关联：
      ```powershell
      git push -u github HEAD
@@ -86,11 +97,11 @@ Run these checks **before** modifying anything. Report blockers to the user imme
      git push github
      ```
 
-5. **Test SSH connectivity first**（可选但推荐，避免 push 卡住后才发现公钥没配对）:
+5. **Test SSH connectivity first**（可选但推荐，避免 push 卡住后才发现公钥没配对；**同样用 443 参数**）:
    ```powershell
-   ssh -T git@github.com -o StrictHostKeyChecking=accept-new
+   ssh -T -o HostName=ssh.github.com -o Port=443 -o IdentityFile="$env:USERPROFILE\.ssh\id_ed25519" -o IdentitiesOnly=yes github.com
    ```
-   看到 `Hi lxy-candy! You've successfully authenticated...` 就说明公钥已生效。如果提示 Permission denied (publickey)，立即停止并提醒用户先去 GitHub 页面添加公钥。
+   看到 `Hi lxy-candy! You've successfully authenticated...` 就说明公钥已生效（exit code 1 是正常的，GitHub 不提供 shell）。如果提示 Permission denied (publickey)，立即停止并提醒用户先去 GitHub 页面添加公钥。
 
 ## Verification
 

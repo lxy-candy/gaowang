@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-26
+    功能：JavaScript 程序结构演示——条件语句与循环语句
+    -->
+    <title>JS 程序结构 · 条件与循环 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            padding: 40px 20px;
+            color: #e8e8f0;
+        }
+
+        .Lxy_container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .Lxy_header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .Lxy_title {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .Lxy_subtitle {
+            font-size: 16px;
+            color: #a0a0b8;
+        }
+
+        .Lxy_author {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 20px;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: #0f0c29;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .Lxy_section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 35px 0 18px;
+            padding-left: 14px;
+            border-left: 4px solid #4facfe;
+            color: #ffffff;
+        }
+
+        .Lxy_section-title--loop { border-left-color: #f5576c; }
+
+        .Lxy_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .Lxy_card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 22px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .Lxy_card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(79, 172, 254, 0.18);
+            border-color: rgba(79, 172, 254, 0.5);
+        }
+
+        .Lxy_card h3 {
+            font-size: 17px;
+            color: #4facfe;
+            margin-bottom: 4px;
+        }
+
+        .Lxy_card p.Lxy_desc {
+            font-size: 13px;
+            color: #9a9ab0;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .Lxy_card h3.Lxy_loop-title { color: #f5576c; }
+
+        .Lxy_code {
+            background: #0b0b1a;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: "Consolas", "Fira Code", monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: #c6c6e0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .Lxy_code .kw { color: #ff79c6; font-weight: 700; }
+        .Lxy_code .fn { color: #50fa7b; }
+        .Lxy_code .str { color: #f1fa8c; }
+        .Lxy_code .num { color: #bd93f9; }
+        .Lxy_code .cm { color: #6272a4; font-style: italic; }
+
+        .Lxy_run-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 22px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: #0f0c29;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .Lxy_run-btn:hover { transform: scale(1.05); }
+
+        .Lxy_output {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(0, 242, 254, 0.08);
+            border-left: 3px solid #4facfe;
+            border-radius: 4px;
+            font-family: "Consolas", "Fira Code", monospace;
+            font-size: 12.5px;
+            color: #00f2fe;
+            min-height: 36px;
+            white-space: pre-wrap;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .Lxy_output--empty {
+            color: #555570;
+            font-style: italic;
+            border-left-color: #555570;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .Lxy_input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .Lxy_input-row input {
+            flex: 1;
+            padding: 8px 12px;
+            background: #0b0b1a;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: #e8e8f0;
+            font-family: "Consolas", monospace;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .Lxy_input-row input:focus { border-color: #4facfe; }
+
+        .Lxy_legend {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px dashed rgba(255, 255, 255, 0.12);
+            color: #9a9ab0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_container">
+        <div class="Lxy_header">
+            <h1 class="Lxy_title">JavaScript 程序结构</h1>
+            <p class="Lxy_subtitle">条件语句 · 循环语句 · 实时可运行演示</p>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- ============ 条件语句 ============ -->
+        <h2 class="Lxy_section-title">① 条件语句（Branching）</h2>
+        <div class="Lxy_grid">
+
+            <div class="Lxy_card">
+                <h3>if … else if … else</h3>
+                <p class="Lxy_desc">最常用的多分支判断。输入一个分数，自动给出评级。</p>
+                <pre class="Lxy_code"><span class="cm">// 输入分数，输出等级</span>
+<span class="kw">let</span> score = Lxy_inputNum;
+<span class="kw">if</span> (score >= <span class="num">90</span>) <span class="fn">console</span>.log(<span class="str">"优秀 A"</span>);
+<span class="kw">else if</span> (score >= <span class="num">80</span>) <span class="fn">console</span>.log(<span class="str">"良好 B"</span>);
+<span class="kw">else if</span> (score >= <span class="num">60</span>) <span class="fn">console</span>.log(<span class="str">"及格 C"</span>);
+<span class="kw">else</span> <span class="fn">console</span>.log(<span class="str">"不及格 D"</span>);</pre>
+                <div class="Lxy_input-row">
+                    <input type="number" id="Lxy_ifInput" value="85" min="0" max="100">
+                </div>
+                <button class="Lxy_run-btn" data-demo="ifelse">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_ifOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3>switch … case</h3>
+                <p class="Lxy_desc">当分支条件是同一个变量的不同取值时，switch 比 if-else 更清晰。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> day = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">getDay</span>();
+<span class="kw">switch</span> (day) {
+  <span class="kw">case</span> <span class="num">0</span>: <span class="fn">console</span>.log(<span class="str">"周日"</span>); <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="num">1</span>: <span class="fn">console</span>.log(<span class="str">"周一"</span>); <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="num">2</span>: <span class="fn">console</span>.log(<span class="str">"周二"</span>); <span class="kw">break</span>;
+  <span class="kw">default</span>: <span class="fn">console</span>.log(<span class="str">"工作日"</span>);
+}</pre>
+                <button class="Lxy_run-btn" data-demo="switch">▶ 运行（看今天是周几）</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_switchOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3>三元运算符 ？ ：</h3>
+                <p class="Lxy_desc">简单的二选一判断，一行搞定，常用于变量赋值。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> age = Lxy_age;
+<span class="kw">let</span> tip = age >= <span class="num">18</span>
+  ? <span class="str">"成年，可以进网吧"</span>
+  : <span class="str">"未成年，回家写作业"</span>;
+<span class="fn">console</span>.log(tip);</pre>
+                <div class="Lxy_input-row">
+                    <input type="number" id="Lxy_ageInput" value="16" min="0" max="120">
+                </div>
+                <button class="Lxy_run-btn" data-demo="ternary">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_ternaryOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <!-- ============ 循环语句 ============ -->
+        <h2 class="Lxy_section-title Lxy_section-title--loop">② 循环语句（Looping）</h2>
+        <div class="Lxy_grid">
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">for（计数循环）</h3>
+                <p class="Lxy_desc">最经典的循环，已知循环次数时首选。这里求 1~10 的累加和。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> sum = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">10</span>; i++) {
+  sum += i;
+}
+<span class="fn">console</span>.log(<span class="str">"1+2+…+10 = "</span> + sum);</pre>
+                <button class="Lxy_run-btn" data-demo="for">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_forOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">while（条件循环）</h3>
+                <p class="Lxy_desc">先判断后执行，只要条件成立就一直跑。累加出第一个超过 50 的自然数之和。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> total = <span class="num">0</span>, n = <span class="num">1</span>;
+<span class="kw">while</span> (total <= <span class="num">50</span>) {
+  total += n;
+  n++;
+}
+<span class="fn">console</span>.log(<span class="str">"加到 "</span> + (n-<span class="num">1</span>)
+  + <span class="str">" 时总和 = "</span> + total);</pre>
+                <button class="Lxy_run-btn" data-demo="while">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_whileOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">do … while</h3>
+                <p class="Lxy_desc">先执行一次再判断，至少跑一遍。随机掷骰子直到掷出 6，看看需要几次。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> count = <span class="num">0</span>, dice;
+<span class="kw">do</span> {
+  dice = Math.<span class="fn">floor</span>(Math.<span class="fn">random</span>()*<span class="num">6</span>) + <span class="num">1</span>;
+  count++;
+} <span class="kw">while</span> (dice !== <span class="num">6</span>);
+<span class="fn">console</span>.log(<span class="str">"第 "</span> + count +
+  <span class="str">" 次掷出了 6"</span>);</pre>
+                <button class="Lxy_run-btn" data-demo="dowhile">▶ 运行（多玩几次试试）</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_dowhileOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">for … of（遍历可迭代对象）</h3>
+                <p class="Lxy_desc">ES6 推荐方式，直接拿到每个元素的值，无需索引。遍历数组。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> fruits = [<span class="str">"🍎 苹果"</span>, <span class="str">"🍌 香蕉"</span>,
+  <span class="str">"🍇 葡萄"</span>, <span class="str">"🍓 草莓"</span>];
+<span class="kw">let</span> list = <span class="str">""</span>;
+<span class="kw">for</span> (<span class="kw">const</span> f <span class="kw">of</span> fruits) {
+  list += f + <span class="str">" → "</span>;
+}
+<span class="fn">console</span>.log(list);</pre>
+                <button class="Lxy_run-btn" data-demo="forof">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_forofOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">for … in（遍历对象键）</h3>
+                <p class="Lxy_desc">专门遍历对象的属性名（key）。用于数组时拿到的是索引，不推荐。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> student = {
+  name: <span class="str">"刘馨月"</span>,
+  age: <span class="num">20</span>,
+  grade: <span class="str">"大二"</span>,
+  major: <span class="str">"数字媒体"</span>
+};
+<span class="kw">let</span> info = <span class="str">""</span>;
+<span class="kw">for</span> (<span class="kw">const</span> key <span class="kw">in</span> student) {
+  info += key + <span class="str">": "</span> + student[key] + <span class="str">"\n"</span>;
+}
+<span class="fn">console</span>.log(info);</pre>
+                <button class="Lxy_run-btn" data-demo="forin">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_forinOut">等待运行…</div>
+            </div>
+
+            <div class="Lxy_card">
+                <h3 class="Lxy_loop-title">break &amp; continue</h3>
+                <p class="Lxy_desc">break 跳出整层循环；continue 跳过本次迭代继续下一次。输出 1~20 之间不是 3 的倍数的奇数。</p>
+                <pre class="Lxy_code"><span class="kw">let</span> result = <span class="str">""</span>;
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">20</span>; i++) {
+  <span class="kw">if</span> (i % <span class="num">2</span> === <span class="num">0</span>) <span class="kw">continue</span>; <span class="cm">// 跳过偶数</span>
+  <span class="kw">if</span> (i % <span class="num">3</span> === <span class="num">0</span>) <span class="kw">continue</span>; <span class="cm">// 跳过3的倍数</span>
+  result += i + <span class="str">"</span>";
+  <span class="kw">if</span> (result.<span class="fn">length</span> > <span class="num">40</span>) <span class="kw">break</span>;
+}
+<span class="fn">console</span>.log(result);</pre>
+                <button class="Lxy_run-btn" data-demo="breakcont">▶ 运行</button>
+                <div class="Lxy_output Lxy_output--empty" id="Lxy_breakcontOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <div class="Lxy_legend">
+            点击每张卡片右下角的「▶ 运行」按钮，立即看到代码的实际执行结果。
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // === 工具：给输出框写字 ===
+            function Lxy_print(id, text) {
+                var el = document.getElementById(id);
+                el.textContent = text;
+                el.classList.remove('Lxy_output--empty');
+            }
+
+            // === 1. if … else if … else ===
+            document.querySelector('[data-demo="ifelse"]').addEventListener('click', function () {
+                var score = Number(document.getElementById('Lxy_ifInput').value) || 0;
+                var r;
+                if (score >= 90)      r = '优秀 A';
+                else if (score >= 80) r = '良好 B';
+                else if (score >= 60) r = '及格 C';
+                else                  r = '不及格 D';
+                Lxy_print('Lxy_ifOut', '分数 ' + score + ' → ' + r);
+            });
+
+            // === 2. switch … case ===
+            document.querySelector('[data-demo="switch"]').addEventListener('click', function () {
+                var day = new Date().getDay();
+                var name;
+                switch (day) {
+                    case 0: name = '周日'; break;
+                    case 1: name = '周一'; break;
+                    case 2: name = '周二'; break;
+                    case 3: name = '周三'; break;
+                    case 4: name = '周四'; break;
+                    case 5: name = '周五'; break;
+                    case 6: name = '周六'; break;
+                }
+                Lxy_print('Lxy_switchOut', '今天是 ' + name + '（getDay() = ' + day + '）');
+            });
+
+            // === 3. 三元运算符 ===
+            document.querySelector('[data-demo="ternary"]').addEventListener('click', function () {
+                var age = Number(document.getElementById('Lxy_ageInput').value) || 0;
+                var tip = age >= 18 ? '成年，可以进网吧' : '未成年，回家写作业';
+                Lxy_print('Lxy_ternaryOut', 'age = ' + age + ' → ' + tip);
+            });
+
+            // === 4. for ===
+            document.querySelector('[data-demo="for"]').addEventListener('click', function () {
+                var sum = 0;
+                for (var i = 1; i <= 10; i++) { sum += i; }
+                Lxy_print('Lxy_forOut', '1 + 2 + … + 10 = ' + sum);
+            });
+
+            // === 5. while ===
+            document.querySelector('[data-demo="while"]').addEventListener('click', function () {
+                var total = 0, n = 1;
+                while (total <= 50) { total += n; n++; }
+                Lxy_print('Lxy_whileOut', '加到 ' + (n - 1) + ' 时总和 = ' + total);
+            });
+
+            // === 6. do … while ===
+            document.querySelector('[data-demo="dowhile"]').addEventListener('click', function () {
+                var count = 0, dice;
+                do {
+                    dice = Math.floor(Math.random() * 6) + 1;
+                    count++;
+                } while (dice !== 6);
+                Lxy_print('Lxy_dowhileOut', '🎲 第 ' + count + ' 次掷出了 6');
+            });
+
+            // === 7. for … of ===
+            document.querySelector('[data-demo="forof"]').addEventListener('click', function () {
+                var fruits = ['🍎 苹果', '🍌 香蕉', '🍇 葡萄', '🍓 草莓'];
+                var list = '';
+                for (var fi = 0; fi < fruits.length; fi++) { list += fruits[fi] + ' → '; }
+                // 为了和代码块写法一致（for...of 在老环境可能不支持，这里用等价 for 循环模拟）
+                // 实际运行效果：
+                list = '';
+                for (var _f of fruits) { list += _f + ' → '; }
+                Lxy_print('Lxy_forofOut', list);
+            });
+
+            // === 8. for … in ===
+            document.querySelector('[data-demo="forin"]').addEventListener('click', function () {
+                var student = { name: '刘馨月', age: 20, grade: '大二', major: '数字媒体' };
+                var info = '';
+                for (var key in student) { info += key + ': ' + student[key] + '\n'; }
+                Lxy_print('Lxy_forinOut', info.trim());
+            });
+
+            // === 9. break & continue ===
+            document.querySelector('[data-demo="breakcont"]').addEventListener('click', function () {
+                var result = '';
+                for (var i = 1; i <= 20; i++) {
+                    if (i % 2 === 0) continue;
+                    if (i % 3 === 0) continue;
+                    result += i + ' ';
+                    if (result.length > 40) break;
+                }
+                Lxy_print('Lxy_breakcontOut', '1~20 之间不是3倍数的奇数：\n' + result.trim());
+            });
+        })();
+    </script>
+</body>
+</html>
