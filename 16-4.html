@@ -3,165 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="font/font_5244874_dxs3wbl8ev/iconfont.css">
     <!--
     姓名：刘馨月
     日期：2026-10-29
-    功能：汽车导购多 Tab 筛选页面（滑动指示器 + 文章缩略图）
+    功能：汽车导购多 Tab 筛选页面（严格还原参考图格式和内容）
     -->
     <title>汽车导购 · 多 Tab 筛选 · 刘馨月</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-            background: #f5f6f8; min-height: 100vh; padding: 30px 20px;
-            color: #333;
+            background: #f4f4f4; min-height: 100vh; padding: 40px 20px; color: #333;
         }
 
-        .Lxy_wrap { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 28px rgba(0,0,0,0.08); overflow: hidden; }
-
-        /* ====== Header ====== */
-        .Lxy_header {
-            padding: 22px 28px 0; border-bottom: 1px solid #eee;
-        }
-        .Lxy_brand {
-            font-size: 22px; font-weight: 800; color: #1a3a7a;
-            letter-spacing: 2px; display: flex; align-items: center; gap: 12px;
-        }
-        .Lxy_brand .Lxy_logo-dot {
-            width: 8px; height: 26px; background: linear-gradient(180deg, #1a3a7a, #4a7dd6); border-radius: 4px;
-        }
-        .Lxy_header-sub { font-size: 12px; color: #999; margin-top: 4px; letter-spacing: 2px; }
-        .Lxy_author-tag {
-            float: right; margin-top: -28px;
-            padding: 3px 12px; background: #1a3a7a; color: #fff;
-            font-size: 12px; border-radius: 12px; font-weight: 600; letter-spacing: 1px;
+        .Lxy_wrap {
+            max-width: 800px; margin: 0 auto; background: #fff;
+            border: 1px solid #e0e0e0; border-radius: 3px;
         }
 
-        /* ====== Tab 栏（带滑动指示器）====== */
-        .Lxy_tabs-wrap { position: relative; padding: 0 28px; background: #fafbfc; border-bottom: 1px solid #e8e8e8; }
-        .Lxy_tabs { display: flex; position: relative; z-index: 2; }
+        /* ====== Tab 栏 ====== */
+        .Lxy_tabs {
+            display: flex; border-bottom: 2px solid #e5e5e5;
+            background: #fff;
+        }
         .Lxy_tab {
-            padding: 14px 22px; cursor: pointer; font-size: 15px; color: #888;
-            transition: color 0.25s, transform 0.2s; font-weight: 500;
-            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+            flex: 1; text-align: center; padding: 14px 0;
+            font-size: 15px; color: #999; font-weight: 400;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            margin-bottom: -2px; transition: color 0.2s, border-color 0.2s;
         }
-        .Lxy_tab:hover { color: #1a3a7a; }
-        .Lxy_tab .iconfont { font-size: 17px; transition: transform 0.2s; }
-        .Lxy_tab:hover .iconfont { transform: scale(1.15); }
-
-        .Lxy_tab--active { color: #1a3a7a; font-weight: 700; }
-
-        /* 滑动指示器（在 Tab 下方横向滑动） */
-        .Lxy_tab-indicator {
-            position: absolute; bottom: 0; height: 3px;
-            background: linear-gradient(90deg, #1a3a7a, #4a7dd6);
-            border-radius: 2px;
-            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1;
-            box-shadow: 0 0 10px rgba(26, 58, 122, 0.4);
+        .Lxy_tab:hover { color: #333; }
+        .Lxy_tab--active {
+            color: #333; font-weight: 700; border-bottom-color: #333;
         }
 
-        /* ====== Hero ====== */
-        .Lxy_hero {
-            padding: 26px 28px 20px;
-            background: linear-gradient(135deg, #1a3a7a 0%, #4a7dd6 100%);
-            color: #fff;
-        }
-        .Lxy_hero-tag {
-            display: inline-block; padding: 3px 10px; font-size: 11px;
-            background: rgba(255,255,255,0.2); border-radius: 3px;
-            margin-bottom: 10px; letter-spacing: 2px;
-        }
-        .Lxy_hero-title {
-            font-size: 24px; font-weight: 800; color: #fff;
-            line-height: 1.4; letter-spacing: 1px;
-        }
-        .Lxy_hero-meta {
-            margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.75);
-        }
+        /* ====== 内容区 ====== */
+        .Lxy_content { padding: 28px 32px 10px; }
 
-        /* ====== 文章列表（带缩略图）====== */
-        .Lxy_list { padding: 4px 28px 10px; }
-        .Lxy_item {
-            display: flex; align-items: stretch; gap: 14px;
-            padding: 14px 0; border-bottom: 1px solid #f0f0f0;
-            cursor: pointer; transition: transform 0.15s;
-            text-decoration: none; color: inherit;
-        }
-        .Lxy_item:hover { transform: translateX(4px); }
-        .Lxy_item:hover .Lxy_thumb img { transform: scale(1.1); }
-        .Lxy_item:hover .Lxy_item-title { color: #1a3a7a; }
-
-        .Lxy_thumb {
-            width: 120px; height: 80px; border-radius: 6px; overflow: hidden;
-            flex-shrink: 0; position: relative;
-            background: #eee;
-        }
-        .Lxy_thumb img {
-            width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.35s ease-out; display: block;
-        }
-        .Lxy_thumb .Lxy_thumb-tag {
-            position: absolute; top: 4px; left: 4px;
-            padding: 2px 7px; font-size: 10px; font-weight: 600;
-            background: rgba(26,58,122,0.85); color: #fff; border-radius: 3px;
-            letter-spacing: 1px;
-        }
-
-        .Lxy_item-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
-
-        .Lxy_top-row { display: flex; gap: 8px; align-items: center; }
+        /* 左侧小标签 */
         .Lxy_tag {
-            flex-shrink: 0; padding: 2px 9px; font-size: 11px; font-weight: 600;
-            background: #eef2fa; color: #1a3a7a; border-radius: 3px; letter-spacing: 1px;
-        }
-        .Lxy_item-source {
-            font-size: 11px; color: #aaa;
+            display: inline-block; padding: 2px 8px; font-size: 12px;
+            color: #666; border: 1px solid #ccc; border-radius: 2px;
+            margin-bottom: 14px;
         }
 
-        .Lxy_item-title {
-            font-size: 15px; color: #222; font-weight: 500;
-            line-height: 1.5; margin: 6px 0 4px;
-            display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; transition: color 0.15s;
+        /* 大标题 */
+        .Lxy_title {
+            font-size: 20px; font-weight: 700; color: #222;
+            line-height: 1.5; margin-bottom: 22px;
         }
 
-        .Lxy_item-desc {
-            font-size: 12.5px; color: #888; line-height: 1.5;
-            display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical;
-            overflow: hidden; margin-top: auto;
+        /* ====== 文章列表 ====== */
+        .Lxy_item {
+            display: flex; justify-content: space-between;
+            padding: 13px 0; border-bottom: 1px dashed #e8e8e8;
+            cursor: pointer; text-decoration: none; color: inherit;
+            transition: color 0.15s;
+        }
+        .Lxy_item:hover .Lxy_title-text { color: #2a5db0; }
+
+        .Lxy_title-text {
+            font-size: 14.5px; color: #333; flex: 1;
+            padding-right: 20px; transition: color 0.15s;
+        }
+        .Lxy_date {
+            font-size: 13px; color: #bbb; flex-shrink: 0;
+            font-family: "Consolas", "Courier New", monospace;
         }
 
-        .Lxy_bottom-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 6px; font-size: 12px; color: #aaa;
-        }
-        .Lxy_bottom-row .Lxy_date { font-family: "Consolas", monospace; }
-        .Lxy_bottom-row .iconfont { font-size: 11px; margin-right: 4px; }
-
-        /* ====== 底部分隔 + 返回首页 ====== */
-        .Lxy_list-end {
-            text-align: center; padding: 24px 0; color: #bbb; font-size: 12px;
-        }
-        .Lxy_back {
-            display: inline-block; padding: 8px 24px; margin-top: 14px;
-            background: #1a3a7a; color: #fff !important; border-radius: 20px;
-            text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 2px;
-            transition: transform 0.2s;
-        }
-        .Lxy_back:hover { transform: scale(1.05); }
-
+        /* ====== 底部 ====== */
         .Lxy_footer {
-            text-align: center; padding: 18px; color: #aaa; font-size: 11px;
-            border-top: 1px solid #eee; letter-spacing: 2px;
+            text-align: center; padding: 14px; font-size: 11px;
+            color: #bbb; border-top: 1px solid #eee; letter-spacing: 2px;
         }
 
-        /* ====== 动画 ====== */
-        .Lxy_fade-in { animation: Lxy-fade 0.35s ease-out; }
+        /* 切换动画 */
+        .Lxy_fade { animation: Lxy-fade 0.25s ease-out; }
         @keyframes Lxy-fade {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -169,230 +88,129 @@
 <body>
     <div class="Lxy_wrap">
 
-        <!-- Header -->
-        <div class="Lxy_header">
-            <div class="Lxy_brand">
-                <span class="Lxy_logo-dot"></span>
-                汽 车 导 购
-            </div>
-            <div class="Lxy_header-sub">AUTO · GUIDE · RECOMMEND</div>
-            <span class="Lxy_author-tag">刘馨月</span>
+        <!-- Tab 栏 -->
+        <div class="Lxy_tabs" id="Lxy_tabs">
+            <div class="Lxy_tab Lxy_tab--active" data-tab="daogou">导购</div>
+            <div class="Lxy_tab" data-tab="t3-9">3-9万</div>
+            <div class="Lxy_tab" data-tab="t9-17">9-17万</div>
+            <div class="Lxy_tab" data-tab="t17-42">17-42万</div>
+            <div class="Lxy_tab" data-tab="suv">SUV</div>
         </div>
 
-        <!-- Tabs（带滑动指示器）-->
-        <div class="Lxy_tabs-wrap">
-            <div class="Lxy_tabs" id="Lxy_tabs">
-                <div class="Lxy_tab Lxy_tab--active" data-tab="home">
-                    <i class="iconfont icon-shouye"></i> 首页
-                </div>
-                <div class="Lxy_tab" data-tab="t3-9">
-                    <i class="iconfont icon-money-rmb-fill"></i> 3-9万
-                </div>
-                <div class="Lxy_tab" data-tab="t9-17">
-                    <i class="iconfont icon-money-funds"></i> 9-17万
-                </div>
-                <div class="Lxy_tab" data-tab="t17-42">
-                    <i class="iconfont icon-money-finance-seller-fill"></i> 17-42万
-                </div>
-                <div class="Lxy_tab" data-tab="suv">
-                    <i class="iconfont icon-time-task"></i> SUV
-                </div>
-            </div>
-            <div class="Lxy_tab-indicator" id="Lxy_indicator"></div>
-        </div>
+        <!-- 内容 -->
+        <div class="Lxy_content" id="Lxy_content"></div>
 
-        <!-- Hero -->
-        <div class="Lxy_hero" id="Lxy_hero">
-            <div class="Lxy_hero-tag" id="Lxy_heroTag">导购</div>
-            <div class="Lxy_hero-title" id="Lxy_heroTitle"></div>
-            <div class="Lxy_hero-meta" id="Lxy_heroMeta"></div>
-        </div>
-
-        <!-- 文章列表 -->
-        <div class="Lxy_list" id="Lxy_list"></div>
-
-        <div class="Lxy_list-end">
-            · 翻页加载更多 ·
-            <br>
-            <a href="index.html" class="Lxy_back">← 返回首页</a>
-        </div>
-
-        <div class="Lxy_footer">© AUTO GUIDE PAGE · BY 刘馨月 · 2026</div>
+        <div class="Lxy_footer">AUTO GUIDE · BY 刘馨月 · 2026</div>
     </div>
 
     <script>
-        // 图片降级：加载失败时生成一个纯 SVG 占位
-        function Lxy_imgFallback(img) {
-            var tag = img.getAttribute('data-tag') || 'IMG';
-            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80">' +
-                      '<rect width="120" height="80" fill="#1a3a7a"/>' +
-                      '<text x="50%" y="55%" text-anchor="middle" fill="white" ' +
-                      'font-size="14" font-family="sans-serif">' + tag + '</text>' +
-                      '</svg>';
-            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-            img.onerror = null; // 防止死循环
-        }
-
         (function () {
-            // 图片生成 URL 工厂
-            function Lxy_img(prompt) {
-                var base = "https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?image_size=landscape_4_3&prompt=";
-                return base + encodeURIComponent(prompt);
-            }
-
-            // ========== 数据 ==========
+            // ========== 数据（严格按 5 张参考图文字提取）==========
             var DATA = {
-                home: {
-                    heroTag: "导购精选",
-                    hero: "改变品牌的未来 认识豪华品牌最便宜车型",
-                    meta: "导购 · 首页精选 · 2026-12-16",
-                    articles: [
-                        { tag: "导购", source: "汽车之家", title: "推荐：X1等城市四驱Style+经济省油的SUV", desc: "四驱+低油耗，城市通勤利器，豪华品牌入门首选。", date: "12/16", thumb: Lxy_img("black BMW X1 SUV car in city street daylight, 4x3") },
-                        { tag: "导购", source: "易车", title: "全景天窗/保养便利 30万齐四驱SUV推荐", desc: "六款带全景天窗的四驱SUV盘点，保养成本一览。", date: "12/16", thumb: Lxy_img("modern SUV with panoramic sunroof, blue sky background, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点", desc: "年末购车季，豪华品牌 SUV 折扣汇总。", date: "12/16", thumb: Lxy_img("white Audi Q5 luxury SUV studio shot, 4x3") },
-                        { tag: "导购", source: "汽车评测", title: "比拼硬实力 8款低配四驱紧凑型SUV性能点评", desc: "加速、刹车、麋鹿测试全维度横评。", date: "12/16", thumb: Lxy_img("two SUV racing on test track side by side, 4x3") },
-                        { tag: "导购", source: "车托之家", title: "花小钱也能养SUV 翼博等入门SUV使用手册", desc: "养车成本、油耗、保养全攻略。", date: "12/16", thumb: Lxy_img("small budget SUV Ford EcoSport on city road, 4x3") },
-                        { tag: "导购", source: "汽车导购", title: "最高优惠4.3万 十款15万SUV年末购买推荐", desc: "15万级SUV限时优惠信息一网打尽。", date: "12/16", thumb: Lxy_img("group of SUV cars in dealership showroom, 4x3") }
+                // 图 1：导购
+                daogou: {
+                    tag: "导购",
+                    title: "改变品牌的未来 认识豪华品牌最便宜车型",
+                    items: [
+                        { title: "推荐：X1等城市四驱Style+经济省油的SUV",   date: "12/16" },
+                        { title: "全景天窗/保养便利 30万齐四驱SUV推荐",     date: "12/16" },
+                        { title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点",   date: "12/16" },
+                        { title: "比拼硬实力 8款低配四驱紧凑型SUV性能点评", date: "12/16" },
+                        { title: "花小钱也能养SUV 翼博等入门SUV使用手册",   date: "12/16" },
+                        { title: "最高优惠4.3万 十款15万SUV年末购买推荐",   date: "12/16" }
                     ]
                 },
+                // 图 5：3-9万
                 "t3-9": {
-                    heroTag: "3-9万 · 亲民家轿",
-                    hero: "B级品质满足A级需求 路盛E70亮点详解析",
-                    meta: "导购 · 3-9万价位 · 2026-12-20",
-                    articles: [
-                        { tag: "导购", source: "汽车之家", title: "购车必看 凯迪拉克XTS领先型28T深度体验", desc: "美式豪华轿车在国内市场的挣扎与坚守。", date: "12/20", thumb: Lxy_img("Cadillac XTS luxury sedan studio, white background, 4x3") },
-                        { tag: "导购", source: "亲子出行", title: "爸爸去哪？亲子出游适合车型和注意事项", desc: "空间、安全、舒适——家庭购车三要素。", date: "12/20", thumb: Lxy_img("family on road trip with SUV, scenic mountain view, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "推荐：X1等城市四驱Style+经济省油的SUV", desc: "3-9万区间四驱SUV性价比榜。", date: "12/19", thumb: Lxy_img("red compact SUV driving through tunnel, 4x3") },
-                        { tag: "导购", source: "易车", title: "全景天窗/保养便利 30万齐四驱SUV推荐", desc: "降维打击之选。", date: "12/19", thumb: Lxy_img("SUV with roof open under blue sky, 4x3") },
-                        { tag: "导购", source: "摇号助手", title: "全民摇号时代？六款低价占号必备车型推荐", desc: "最低仅4万，先占号再说。", date: "12/19", thumb: Lxy_img("row of small economic cars parking lot, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点", desc: "年末折扣季，豪礼送不停。", date: "12/18", thumb: Lxy_img("Audi Q5 black SUV front three quarter, 4x3") }
+                    tag: "3-9万",
+                    title: "B级品质满足A级需求 路盛E70亮点详解析",
+                    items: [
+                        { title: "购车必看 凯迪拉克XTS领先型28T深度体验",     date: "12/20" },
+                        { title: "爸爸去哪？亲子出游适合车型和注意事项",       date: "12/20" },
+                        { title: "推荐：X1等城市四驱Style+经济省油的SUV",     date: "12/19" },
+                        { title: "全景天窗/保养便利 30万齐四驱SUV推荐",       date: "12/19" },
+                        { title: "全民摇号时代？六款低价占号必备车型推荐",     date: "12/19" },
+                        { title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点",     date: "12/18" }
                     ]
                 },
+                // 图 2：9-17万
                 "t9-17": {
-                    heroTag: "9-17万 · 黄金价位",
-                    hero: "改变品牌的未来 认识豪华品牌最便宜车型",
-                    meta: "导购 · 9-17万价位 · 2026-12-20",
-                    articles: [
-                        { tag: "导购", source: "亲子出行", title: "爸爸去哪？亲子出游适合车型和注意事项", desc: "9-17万家庭用车首选。", date: "12/20", thumb: Lxy_img("family SUV packed for vacation, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "推荐：X1等城市四驱Style+经济省油的SUV", desc: "这个价位的明星车型。", date: "12/19", thumb: Lxy_img("BMW X1 white SUV city driving, 4x3") },
-                        { tag: "导购", source: "易车", title: "全景天窗/保养便利 30万齐四驱SUV推荐", desc: "加钱上一级？", date: "12/19", thumb: Lxy_img("SUV sunroof open on sunny day, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点", desc: "豪华品牌下探。", date: "12/18", thumb: Lxy_img("Audi Q5 silver luxury SUV, 4x3") },
-                        { tag: "导购", source: "汽车评测", title: "比拼硬实力 8款低配四驱紧凑型SUV性能点评", desc: "同价位硬碰硬。", date: "12/17", thumb: Lxy_img("compact SUV comparison test side by side, 4x3") },
-                        { tag: "导购", source: "中级车", title: "新迪欧/帕萨特等！盘点2013中级大更车", desc: "经典中级车今昔对比。", date: "12/17", thumb: Lxy_img("Passat sedan dark blue on road, 4x3") }
+                    tag: "9-17万",
+                    title: "改变品牌的未来 认识豪华品牌最便宜车型",
+                    items: [
+                        { title: "爸爸去哪？亲子出游适合车型和注意事项",       date: "12/20" },
+                        { title: "推荐：X1等城市四驱Style+经济省油的SUV",     date: "12/19" },
+                        { title: "全景天窗/保养便利 30万齐四驱SUV推荐",       date: "12/19" },
+                        { title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点",     date: "12/18" },
+                        { title: "比拼硬实力 8款低配四驱紧凑型SUV性能点评",   date: "12/17" },
+                        { title: "新迪欧/帕萨特等！盘点2013中级大更车",       date: "12/17" }
                     ]
                 },
+                // 图 3：17-42万
                 "t17-42": {
-                    heroTag: "17-42万 · 进阶座驾",
-                    hero: "15万级降价谁更值 预算/油耗/空间较量",
-                    meta: "导购 · 17-42万价位 · 2026-12-20",
-                    articles: [
-                        { tag: "导购", source: "亲子出行", title: "爸爸去哪？亲子出游适合车型和注意事项", desc: "豪华品牌入门款。", date: "12/20", thumb: Lxy_img("family driving luxury SUV on vacation, 4x3") },
-                        { tag: "导购", source: "汽车之家", title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点", desc: "大折扣！", date: "12/18", thumb: Lxy_img("Audi Q5 white luxury SUV studio, 4x3") },
-                        { tag: "导购", source: "碰撞网", title: "颜值气质得肯定！传祺GA3S碰撞试验图解", desc: "安全性一目了然。", date: "12/16", thumb: Lxy_img("car crash test safety chamber, 4x3") },
-                        { tag: "导购", source: "汽车评测", title: "高尔夫r≠两厢版途观 配置/动力差异解读", desc: "钢炮 vs SUV 取向对比。", date: "12/17", thumb: Lxy_img("Volkswagen Golf R hot hatch red, 4x3") },
-                        { tag: "导购", source: "车托之家", title: "花小钱也能养SUV 翼博等入门SUV使用手册", desc: "豪华车养车成本科普。", date: "12/17", thumb: Lxy_img("service center with SUV being maintained, 4x3") },
-                        { tag: "导购", source: "汽车导购", title: "最高优惠4.3万 十款15万SUV年末购买推荐", desc: "抄底时刻。", date: "12/16", thumb: Lxy_img("dealership lot with price signs, 4x3") }
+                    tag: "17-42万",
+                    title: "15万级降价谁更值 预算/油耗/空间较量",
+                    items: [
+                        { title: "爸爸去哪？亲子出游适合车型和注意事项",       date: "12/20" },
+                        { title: "最高降幅20万！奥迪Q5等年底特惠SUV盘点",     date: "12/18" },
+                        { title: "颜值气质得肯定！传祺GA3S碰撞试验图解",       date: "12/16" },
+                        { title: "高尔夫r≠两厢版途观 配置/动力差异解读",      date: "12/17" },
+                        { title: "花小钱也能养SUV 翼博等入门SUV使用手册",     date: "12/17" },
+                        { title: "最高优惠4.3万 十款15万SUV年末购买推荐",     date: "12/16" }
                     ]
                 },
+                // 图 4：SUV
                 suv: {
-                    heroTag: "SUV 专题",
-                    hero: "最低仅4.6万元起 超低价SUV购买价值点评",
-                    meta: "导购 · SUV专题 · 2026-12-19",
-                    articles: [
-                        { tag: "导购", source: "摇号助手", title: "全民摇号时代？六款低价占号必备车型推荐", desc: "占号神器 SUV 版。", date: "12/19", thumb: Lxy_img("group of tiny cheap SUV cars parking, 4x3") },
-                        { tag: "导购", source: "新车推荐", title: "凌派/观致等 2013全新家用备车盘点", desc: "家轿也有 SUV 的心。", date: "12/09", thumb: Lxy_img("Honda Crider sedan showroom, 4x3") },
-                        { tag: "导购", source: "静态评测", title: "坚持高配路线！静态评测华泰路盛E70", desc: "国产 SUV 黑马。", date: "12/09", thumb: Lxy_img("Luxgen S5 SUV front three quarter view, 4x3") },
-                        { tag: "导购", source: "销量榜", title: "买车先销量 10月份销量前十轿车盘点", desc: "看看大家都买什么。", date: "11/29", thumb: Lxy_img("crowded car dealership showroom, 4x3") },
-                        { tag: "导购", source: "车展报道", title: "抄底正当时 车展后清库存优惠车型推荐", desc: "车展余热继续。", date: "11/28", thumb: Lxy_img("car exhibition hall crowd, colorful banners, 4x3") },
-                        { tag: "导购", source: "车展趣闻", title: "土家气质 细数车展那些低价车上的神器", desc: "盘点那些叫不出名字的狠角色。", date: "11/27", thumb: Lxy_img("weird concept SUV at auto show, 4x3") }
+                    tag: "SUV",
+                    title: "最低仅4.6万元起 超低价SUV购买价值点评",
+                    items: [
+                        { title: "全民摇号时代？六款低价占号必备车型推荐",     date: "12/19" },
+                        { title: "凌派/观致等 2013全新家用备车盘点",          date: "12/09" },
+                        { title: "坚持高配路线！静态评测华泰路盛E70",          date: "12/09" },
+                        { title: "买车先销量 10月份销量前十轿车盘点",          date: "11/29" },
+                        { title: "抄底正当时 车展后清库存优惠车型推荐",        date: "11/28" },
+                        { title: "土家气质 细数车展那些低价车上的\"神器\"",   date: "11/27" }
                     ]
                 }
             };
 
-            // ========== 滑动指示器定位 ==========
-            function Lxy_moveIndicator(tab) {
-                var ind = document.getElementById('Lxy_indicator');
-                var wrap = document.getElementById('Lxy_tabs-wrap');
-                var tabs = document.querySelectorAll('.Lxy_tab');
-                // 计算 offset 相对于 tabs-wrap
-                var parentRect = wrap.getBoundingClientRect();
-                var tabRect = tab.getBoundingClientRect();
-                ind.style.width = tabRect.width + 'px';
-                ind.style.left = (tabRect.left - parentRect.left) + 'px';
-            }
-
             // ========== 渲染 ==========
-            var currentTab = "home";
+            var current = "daogou";
 
-            function Lxy_render(tabKey) {
-                currentTab = tabKey;
-                var data = DATA[tabKey];
+            function Lxy_render(key) {
+                current = key;
+                var d = DATA[key];
 
-                // Tab 高亮 + 滑动指示器
-                var tabs = document.querySelectorAll('.Lxy_tab');
-                var activeTab = null;
-                tabs.forEach(function (t) {
-                    var isActive = t.dataset.tab === tabKey;
-                    t.classList.toggle('Lxy_tab--active', isActive);
-                    if (isActive) activeTab = t;
-                });
-                // 下一帧移动，确保宽度正确
-                requestAnimationFrame(function () {
-                    if (activeTab) Lxy_moveIndicator(activeTab);
+                // Tab 高亮
+                document.querySelectorAll('.Lxy_tab').forEach(function (t) {
+                    t.classList.toggle('Lxy_tab--active', t.dataset.tab === key);
                 });
 
-                // Hero
-                var hero = document.getElementById('Lxy_hero');
-                hero.classList.remove('Lxy_fade-in'); void hero.offsetWidth; hero.classList.add('Lxy_fade-in');
-                document.getElementById('Lxy_heroTag').textContent = data.heroTag;
-                document.getElementById('Lxy_heroTitle').textContent = data.hero;
-                document.getElementById('Lxy_heroMeta').textContent = data.meta;
+                // 内容（带淡入动画）
+                var box = document.getElementById('Lxy_content');
+                box.classList.remove('Lxy_fade'); void box.offsetWidth; box.classList.add('Lxy_fade');
 
-                // 文章列表（带缩略图）
-                var list = document.getElementById('Lxy_list');
-                list.innerHTML = '';
-                data.articles.forEach(function (item, idx) {
-                    var row = document.createElement('a');
-                    row.className = 'Lxy_item Lxy_fade-in';
-                    row.href = 'index.html';
-                    row.target = '_blank';
-                    row.style.animationDelay = (idx * 50) + 'ms';
-                    row.innerHTML =
-                        '<div class="Lxy_thumb">' +
-                            '<img src="' + item.thumb + '" alt="" loading="lazy" data-tag="' + item.tag + '" onerror="Lxy_imgFallback(this)">' +
-                            '<span class="Lxy_thumb-tag">' + item.tag + '</span>' +
-                        '</div>' +
-                        '<div class="Lxy_item-body">' +
-                            '<div class="Lxy_top-row">' +
-                                '<span class="Lxy_tag">' + item.tag + '</span>' +
-                                '<span class="Lxy_item-source">' + item.source + '</span>' +
-                            '</div>' +
-                            '<div class="Lxy_item-title">' + item.title + '</div>' +
-                            '<div class="Lxy_item-desc">' + item.desc + '</div>' +
-                            '<div class="Lxy_bottom-row">' +
-                                '<span><i class="iconfont icon-time"></i>' + item.source + ' · 阅读需3分钟</span>' +
-                                '<span class="Lxy_date">' + item.date + '</span>' +
-                            '</div>' +
-                        '</div>';
-                    list.appendChild(row);
+                var html = '<span class="Lxy_tag">' + d.tag + '</span>' +
+                           '<h2 class="Lxy_title">' + d.title + '</h2>' +
+                           '<div class="Lxy_list">';
+                d.items.forEach(function (it) {
+                    html += '<a class="Lxy_item" href="index.html" target="_blank">' +
+                            '<span class="Lxy_title-text">' + it.title + '</span>' +
+                            '<span class="Lxy_date">' + it.date + '</span>' +
+                            '</a>';
                 });
+                html += '</div>';
+                box.innerHTML = html;
             }
 
             // Tab 点击
             document.querySelectorAll('.Lxy_tab').forEach(function (t) {
                 t.addEventListener('click', function () {
-                    if (t.dataset.tab !== currentTab) Lxy_render(t.dataset.tab);
+                    if (t.dataset.tab !== current) Lxy_render(t.dataset.tab);
                 });
             });
 
-            // 窗口尺寸变化时指示器重定位
-            window.addEventListener('resize', function () {
-                var active = document.querySelector('.Lxy_tab--active');
-                if (active) Lxy_moveIndicator(active);
-            });
-
-            // 初始
-            Lxy_render('home');
+            Lxy_render('daogou');
         })();
     </script>
 </body>
