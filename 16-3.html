@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="font/font_5244874_dxs3wbl8ev/iconfont.css">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-29
+    功能：麦当劳品牌形象页还原（banner + 侧栏菜单）
+    -->
+    <title>麦当劳 · 麦送 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #fff; min-height: 100vh; padding: 30px 20px;
+        }
+
+        .Lxy_wrap { max-width: 1200px; margin: 0 auto; }
+
+        /* ====== 顶部 Banner + 品牌三列 ====== */
+        .Lxy_banner {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 28px 40px; background: #fff;
+            border-radius: 0; margin-bottom: 0;
+            gap: 40px;
+        }
+
+        .Lxy_banner-left {
+            display: flex; align-items: center; gap: 16px; flex: 0 0 auto;
+        }
+
+        /* 纯 CSS 手绘 —— 麦当劳金拱门 M */
+        .Lxy_mcDonald-M {
+            position: relative; width: 72px; height: 58px;
+        }
+        .Lxy_mcDonald-M::before,
+        .Lxy_mcDonald-M::after {
+            content: ""; position: absolute; bottom: 0;
+            width: 26px; height: 58px; background: #FFC72C;
+            border-top-left-radius: 26px; border-top-right-radius: 26px;
+            box-shadow: inset 0 -10px 0 #E5B423;
+        }
+        .Lxy_mcDonald-M::before { left: 6px; }
+        .Lxy_mcDonald-M::after  { left: 40px; }
+        /* M 中间的"拱间"连接 */
+        .Lxy_mcDonald-M span {
+            position: absolute; left: 28px; bottom: 0;
+            width: 16px; height: 22px; background: #FFC72C;
+        }
+
+        .Lxy_mcDonald-text {
+            font-size: 34px; font-weight: 900; letter-spacing: 2px;
+            color: #FFC72C; line-height: 1;
+            text-shadow: 1px 1px 0 #E5B423;
+        }
+        .Lxy_mcDonald-text small {
+            display: block; font-size: 13px; font-weight: 400;
+            color: #DA291C; letter-spacing: 6px; margin-top: 4px;
+            text-shadow: none;
+        }
+
+        /* 右侧三列标语 */
+        .Lxy_brand-cols {
+            display: flex; gap: 50px; flex: 1; justify-content: center;
+            align-items: center;
+        }
+        .Lxy_brand-item {
+            display: flex; align-items: center; gap: 12px; cursor: default;
+            transition: transform 0.25s;
+        }
+        .Lxy_brand-item:hover { transform: translateY(-3px); }
+
+        /* 圆形图标容器 */
+        .Lxy_brand-ico {
+            width: 58px; height: 58px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        /* 热爱美味 —— 汉堡 */
+        .Lxy_brand-ico--love { background: #DA291C; color: #fff; }
+        .Lxy_brand-ico--love .Lxy_burger {
+            position: relative; width: 30px; height: 22px;
+        }
+        .Lxy_burger::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            width: 30px; height: 10px; background: #FFC72C;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
+        }
+        .Lxy_burger::after {
+            content: ""; position: absolute; bottom: 0; left: 0;
+            width: 30px; height: 6px; background: #FFC72C;
+            border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;
+        }
+        .Lxy_burger span {
+            position: absolute; top: 8px; left: 2px;
+            width: 26px; height: 6px; background: #fff;
+            border-radius: 3px;
+        }
+        .Lxy_burger span::before {
+            content: ""; position: absolute; left: 3px; top: 1px;
+            width: 3px; height: 3px; background: #DA291C; border-radius: 50%;
+            box-shadow: 6px 0 0 #DA291C, 12px 0 0 #DA291C, 18px 0 0 #DA291C;
+        }
+
+        /* 随时随地 —— 爱心小人 iconfont */
+        .Lxy_brand-ico--time { background: #FFC72C; color: #DA291C; }
+        .Lxy_brand-ico--time .iconfont { font-size: 30px; }
+
+        /* 美好未来 —— 爱心树苗（iconfont follow-fill + 小装饰） */
+        .Lxy_brand-ico--future { background: #DA291C; color: #FFC72C; }
+        .Lxy_brand-ico--future .iconfont { font-size: 28px; }
+        .Lxy_brand-ico--future::after {
+            content: ""; position: absolute; bottom: 6px; right: 6px;
+            width: 8px; height: 8px; background: #fff;
+            border-radius: 50%; box-shadow: -10px -6px 0 #FFC72C;
+        }
+
+        .Lxy_brand-text {
+            font-size: 16px; font-weight: 700; color: #333;
+            line-height: 1.3;
+        }
+        .Lxy_brand-text small {
+            display: block; font-size: 11px; font-weight: 400;
+            color: #888; margin-top: 4px; letter-spacing: 2px;
+        }
+
+        /* ====== 分隔线 ====== */
+        .Lxy_divider {
+            height: 1px; background: #eee; margin: 20px 0;
+        }
+
+        /* ====== 主体：侧栏菜单 + 内容区 ====== */
+        .Lxy_main {
+            display: flex; gap: 30px; align-items: flex-start;
+        }
+
+        /* 左侧内容区（空/占位） */
+        .Lxy_content {
+            flex: 1; padding: 40px;
+            background: linear-gradient(135deg, #fff9f0, #fff);
+            border: 2px dashed #FFC72C; border-radius: 14px;
+            min-height: 480px; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .Lxy_content-inner {
+            text-align: center; color: #DA291C;
+        }
+        .Lxy_content-inner h2 {
+            font-size: 28px; margin-bottom: 10px; letter-spacing: 3px;
+        }
+        .Lxy_content-inner p { color: #888; font-size: 14px; }
+        .Lxy_content-inner .iconfont { font-size: 60px; color: #FFC72C; margin-bottom: 10px; }
+
+        /* 右侧侧栏菜单 */
+        .Lxy_sidebar {
+            width: 130px; background: #fff;
+            border-radius: 14px; padding: 18px 0;
+            box-shadow: 0 4px 20px rgba(218, 41, 28, 0.12);
+            border: 1px solid #f7e9e7;
+            flex-shrink: 0;
+        }
+
+        .Lxy_side-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 8px; padding: 14px 8px; cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .Lxy_side-item:hover {
+            background: #fff9f0; transform: translateY(-2px);
+        }
+
+        /* 圆形菜单项 */
+        .Lxy_side-ico {
+            width: 54px; height: 54px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: #fff; position: relative;
+        }
+        .Lxy_side-ico .iconfont { font-size: 22px; }
+
+        .Lxy_side-label {
+            font-size: 13px; color: #333; font-weight: 600;
+        }
+
+        /* 1. 麦送 — 黄色背景 + 小 M */
+        .Lxy_side-ico--delivery {
+            background: #FFC72C; color: #fff;
+        }
+        .Lxy_side-ico--delivery::before {
+            content: "M"; font-family: Georgia, serif; font-weight: 900;
+            font-size: 24px; color: #fff; line-height: 1;
+        }
+
+        /* 2. 新优惠 — 红色票券 + ¥ */
+        .Lxy_side-ico--offer {
+            background: #DA291C; color: #FFC72C;
+        }
+        .Lxy_side-ico--offer .iconfont {
+            font-size: 26px; color: #FFC72C;
+        }
+
+        /* 3. 找餐厅 — 放大镜 + M（红底） */
+        .Lxy_side-ico--find {
+            background: #DA291C; color: #fff;
+        }
+        .Lxy_side-ico--find .iconfont {
+            font-size: 26px; color: #fff;
+        }
+
+        /* 4. Q&A — 灯泡（红底 + 黄灯泡） */
+        .Lxy_side-ico--qa {
+            background: #FFC72C; color: #DA291C;
+        }
+        .Lxy_side-ico--qa .iconfont {
+            font-size: 26px; color: #DA291C;
+        }
+
+        /* 5. 回首页 — 红色左箭头 */
+        .Lxy_side-ico--home {
+            background: #DA291C; color: #fff;
+        }
+        .Lxy_side-ico--home .iconfont {
+            font-size: 24px; color: #fff;
+            transform: rotate(180deg);
+        }
+
+        /* ====== 底部 ====== */
+        .Lxy_footer {
+            text-align: center; margin-top: 36px;
+            color: #aaa; font-size: 12px; letter-spacing: 1px;
+        }
+        .Lxy_footer .iconfont { color: #DA291C; margin: 0 4px; font-size: 14px; }
+
+        /* ====== 响应式 ====== */
+        @media (max-width: 900px) {
+            .Lxy_banner { flex-direction: column; gap: 24px; padding: 20px; }
+            .Lxy_brand-cols { gap: 24px; flex-wrap: wrap; justify-content: flex-start; }
+            .Lxy_main { flex-direction: column; }
+            .Lxy_sidebar {
+                width: 100%; display: flex; justify-content: space-around;
+                padding: 14px;
+            }
+            .Lxy_side-item { flex: 1; padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <!-- ====== Banner ====== -->
+        <div class="Lxy_banner">
+            <!-- 左：金拱门 Logo -->
+            <div class="Lxy_banner-left">
+                <div class="Lxy_mcDonald-M" aria-hidden="true">
+                    <span></span>
+                </div>
+                <div class="Lxy_mcDonald-text">
+                    麦当劳
+                    <small>I'M LOVIN' IT</small>
+                </div>
+            </div>
+
+            <!-- 右：品牌三列 -->
+            <div class="Lxy_brand-cols">
+
+                <div class="Lxy_brand-item">
+                    <div class="Lxy_brand-ico Lxy_brand-ico--love">
+                        <div class="Lxy_burger"><span></span></div>
+                    </div>
+                    <div class="Lxy_brand-text">
+                        热爱美味
+                        <small>LOVE</small>
+                    </div>
+                </div>
+
+                <div class="Lxy_brand-item">
+                    <div class="Lxy_brand-ico Lxy_brand-ico--time">
+                        <i class="iconfont icon-customer-interests"></i>
+                    </div>
+                    <div class="Lxy_brand-text">
+                        随时随地
+                        <small>ANYWHERE</small>
+                    </div>
+                </div>
+
+                <div class="Lxy_brand-item">
+                    <div class="Lxy_brand-ico Lxy_brand-ico--future">
+                        <i class="iconfont icon-follow-fill"></i>
+                    </div>
+                    <div class="Lxy_brand-text">
+                        美好未来
+                        <small>FUTURE</small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="Lxy_divider"></div>
+
+        <!-- ====== 主区 ====== -->
+        <div class="Lxy_main">
+
+            <!-- 左：内容区占位 -->
+            <div class="Lxy_content">
+                <div class="Lxy_content-inner">
+                    <i class="iconfont icon-catalog-fill"></i>
+                    <h2>麦送 · MCDelivery</h2>
+                    <p>右侧菜单选择入口，开始你的麦当劳之旅 🍟</p>
+                </div>
+            </div>
+
+            <!-- 右：侧栏菜单 -->
+            <aside class="Lxy_sidebar">
+
+                <div class="Lxy_side-item" data-action="delivery">
+                    <div class="Lxy_side-ico Lxy_side-ico--delivery"></div>
+                    <div class="Lxy_side-label">麦送</div>
+                </div>
+
+                <div class="Lxy_side-item" data-action="offer">
+                    <div class="Lxy_side-ico Lxy_side-ico--offer">
+                        <i class="iconfont icon-money-rmb-fill"></i>
+                    </div>
+                    <div class="Lxy_side-label">新优惠</div>
+                </div>
+
+                <div class="Lxy_side-item" data-action="find">
+                    <div class="Lxy_side-ico Lxy_side-ico--find">
+                        <i class="iconfont icon-product-get-catalog"></i>
+                    </div>
+                    <div class="Lxy_side-label">找餐厅</div>
+                </div>
+
+                <div class="Lxy_side-item" data-action="qa">
+                    <div class="Lxy_side-ico Lxy_side-ico--qa">
+                        <i class="iconfont icon-time-task"></i>
+                    </div>
+                    <div class="Lxy_side-label">Q &amp; A</div>
+                </div>
+
+                <div class="Lxy_side-item" data-action="home">
+                    <div class="Lxy_side-ico Lxy_side-ico--home">
+                        <i class="iconfont icon-shouye"></i>
+                    </div>
+                    <div class="Lxy_side-label">回首页</div>
+                </div>
+
+            </aside>
+        </div>
+
+        <!-- ====== Footer ====== -->
+        <div class="Lxy_footer">
+            <i class="iconfont icon-follow-fill"></i>
+            MCDelivery · Delivery Page Demo · 刘馨月
+            <i class="iconfont icon-follow-fill"></i>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // 菜单项点击交互：高亮当前项 + 切换内容区文字
+            var actions = {
+                delivery: '麦送 MCDelivery\n点餐 + 外卖配送',
+                offer: '🎁 新优惠\n今日特惠 / 限时活动',
+                find: '📍 找餐厅\n查询附近麦当劳门店',
+                qa: '❓ Q & A\n常见问题解答',
+                home: '🏠 回首页\n返回主页面'
+            };
+            document.querySelectorAll('.Lxy_side-item').forEach(function (it) {
+                it.addEventListener('click', function () {
+                    document.querySelectorAll('.Lxy_side-item').forEach(function (x) {
+                        x.style.background = '';
+                    });
+                    it.style.background = '#fff9f0';
+                    var label = it.querySelector('.Lxy_side-label').textContent;
+                    var txt = actions[it.dataset.action] || '';
+                    var h2 = txt.split('\n')[0];
+                    var p = txt.split('\n').slice(1).join(' ');
+                    var c = document.querySelector('.Lxy_content-inner h2');
+                    var pEl = document.querySelector('.Lxy_content-inner p');
+                    if (h2) c.textContent = h2;
+                    if (p) pEl.textContent = p;
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
