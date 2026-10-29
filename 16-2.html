@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-29
+    功能：JavaScript 对象与字符串方法可视化演示
+    -->
+    <title>JS 对象 & 字符串可视化 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh; font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            padding: 28px 20px 60px; color: #e8e8f0;
+        }
+        .Lxy_wrap { max-width: 1120px; margin: 0 auto; }
+
+        /* ===== HEADER ===== */
+        .Lxy_header { text-align: center; margin-bottom: 26px; }
+        .Lxy_title {
+            font-size: 34px; font-weight: 800;
+            background: linear-gradient(90deg, #00f5d4, #00bbf9, #fee440, #f15bb5, #9b5de5);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .Lxy_sub { font-size: 14px; color: #8890a8; margin-top: 6px; }
+        .Lxy_author {
+            display: inline-block; margin-top: 10px; padding: 5px 18px;
+            background: rgba(155, 93, 229, 0.2); border: 1px solid rgba(155, 93, 229, 0.5);
+            color: #d4a1ff; border-radius: 20px; font-size: 13px; font-weight: 600;
+        }
+
+        /* ===== 顶部可视化区 ===== */
+        .Lxy_visual-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 26px; }
+        @media (max-width: 720px) { .Lxy_visual-row { grid-template-columns: 1fr; } }
+        .Lxy_vbox {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px; padding: 18px; backdrop-filter: blur(8px);
+        }
+        .Lxy_vbox h3 {
+            font-size: 14px; margin-bottom: 10px; display: flex; justify-content: space-between;
+            align-items: center; gap: 10px;
+        }
+        .Lxy_vbox--obj h3   { color: #f15bb5; }
+        .Lxy_vbox--str h3   { color: #00bbf9; }
+        .Lxy_reset-btn {
+            padding: 4px 12px; background: transparent; color: #fee440; font-size: 11px;
+            border: 1px solid rgba(254, 228, 64, 0.5); border-radius: 12px; cursor: pointer;
+        }
+        .Lxy_reset-btn:hover { background: rgba(254, 228, 64, 0.15); }
+
+        /* 对象键值卡 */
+        .Lxy_obj { display: flex; flex-direction: column; gap: 6px; font-family: "Consolas", monospace; }
+        .Lxy_kv {
+            display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.04); border-radius: 6px;
+            animation: Lxy-pop 0.3s ease-out;
+        }
+        .Lxy_kv .Lxy_k { color: #f15bb5; font-weight: 700; min-width: 90px; }
+        .Lxy_kv .Lxy_colon { color: #666; }
+        .Lxy_kv .Lxy_v { color: #fee440; }
+        .Lxy_kv .Lxy_v.num   { color: #bd93f9; }
+        .Lxy_kv .Lxy_v.bool  { color: #50fa7b; }
+        .Lxy_kv .Lxy_v.str   { color: #f1fa8c; }
+        .Lxy_kv .Lxy_v.null  { color: #6272a4; font-style: italic; }
+        @keyframes Lxy-pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* 字符串字符条 */
+        .Lxy_str-visual {
+            display: flex; flex-wrap: wrap; gap: 3px; padding: 10px;
+            background: #0b0b1a; border-radius: 8px; min-height: 50px;
+        }
+        .Lxy_ch {
+            display: flex; align-items: center; justify-content: center;
+            min-width: 28px; height: 36px; border-radius: 5px;
+            font-family: "Consolas", monospace; font-size: 14px; font-weight: 700;
+            background: rgba(0, 187, 249, 0.12); color: #00bbf9;
+            border: 1px solid rgba(0, 187, 249, 0.2);
+        }
+        .Lxy_ch--space { background: rgba(255,255,255,0.04); color: #555; }
+        .Lxy_ch--match { background: rgba(241, 91, 181, 0.3); border-color: #f15bb5; color: #f15bb5; }
+        .Lxy_ch--slice { background: rgba(254, 228, 64, 0.3); border-color: #fee440; color: #fee440; }
+
+        /* ===== 分组标题 ===== */
+        .Lxy_group {
+            font-size: 18px; font-weight: 700; margin: 28px 0 14px; padding-left: 12px;
+            border-left: 4px solid #9b5de5; color: #fff; display: flex; gap: 10px; align-items: center;
+        }
+        .Lxy_group--obj { border-left-color: #f15bb5; }
+        .Lxy_group--str { border-left-color: #00bbf9; }
+
+        /* ===== 卡片 ===== */
+        .Lxy_grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+        .Lxy_card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 16px;
+            backdrop-filter: blur(8px); transition: transform 0.2s, border-color 0.2s;
+        }
+        .Lxy_card:hover { transform: translateY(-3px); border-color: rgba(0, 187, 249, 0.5); }
+        .Lxy_head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .Lxy_mname { font-family: "Consolas", monospace; font-size: 16px; font-weight: 700; color: #00bbf9; }
+        .Lxy_mname--obj { color: #f15bb5; }
+        .Lxy_tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.1); color: #aaa; }
+        .Lxy_tag--obj { background: rgba(241,91,181,0.2); color: #f15bb5; }
+        .Lxy_tag--str { background: rgba(0,187,249,0.2); color: #00bbf9; }
+        .Lxy_desc { font-size: 13px; color: #9a9ab0; margin-bottom: 10px; line-height: 1.6; }
+        .Lxy_code {
+            background: #0b0b1a; border-radius: 7px; padding: 9px 12px;
+            font-family: "Consolas", monospace; font-size: 12.5px; line-height: 1.7;
+            color: #c6c6e0; white-space: pre-wrap; border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+        }
+        .Lxy_code .kw { color: #ff79c6; font-weight: 700; }
+        .Lxy_code .fn { color: #50fa7b; }
+        .Lxy_code .str { color: #f1fa8c; }
+        .Lxy_code .num { color: #bd93f9; }
+        .Lxy_code .cm { color: #6272a4; font-style: italic; }
+
+        .Lxy_params { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
+        .Lxy_params input {
+            width: 80px; padding: 6px 8px; background: #0b0b1a;
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; color: #e8e8f0;
+            font-family: "Consolas", monospace; font-size: 12px; outline: none;
+        }
+        .Lxy_params input:focus { border-color: #00bbf9; }
+        .Lxy_params label { font-size: 11px; color: #8890a8; }
+
+        .Lxy_run {
+            padding: 7px 20px; border: none; border-radius: 16px; cursor: pointer;
+            background: linear-gradient(90deg, #00bbf9, #00f5d4); color: #1a1a2e;
+            font-weight: 700; font-size: 13px; transition: transform 0.15s;
+        }
+        .Lxy_run:hover { transform: scale(1.05); }
+        .Lxy_run--obj { background: linear-gradient(90deg, #f15bb5, #ee4266); color: #fff; }
+
+        .Lxy_result {
+            margin-top: 10px; padding: 10px 12px; background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px; font-family: "Consolas", monospace; font-size: 12px;
+            color: #00f5d4; min-height: 30px; border-left: 3px solid #00f5d4; line-height: 1.6;
+        }
+        .Lxy_result--empty { color: #555570; font-style: italic; border-left-color: #555570; }
+        .Lxy_result--obj { border-left-color: #f15bb5; color: #ffb3d1; }
+        .Lxy_result--str { border-left-color: #00bbf9; color: #00bbf9; }
+
+        .Lxy_compare {
+            display: flex; flex-direction: column; gap: 3px;
+            padding: 4px 0;
+        }
+        .Lxy_compare .Lxy_line { color: #8890a8; }
+        .Lxy_compare .Lxy_line span {
+            color: #e8e8f0; background: rgba(255,255,255,0.08);
+            padding: 1px 6px; border-radius: 4px; margin-left: 4px;
+        }
+        .Lxy_compare .Lxy_line--ret { color: #fee440; }
+        .Lxy_compare .Lxy_line--new { color: #00f5d4; }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+        <div class="Lxy_header">
+            <h1 class="Lxy_title">JS 对象 &amp; 字符串 可视化</h1>
+            <p class="Lxy_sub">实时看对象键值对 / 字符级高亮 · 两类共 14 个方法</p>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- ===== 双可视化区 ===== -->
+        <div class="Lxy_visual-row">
+            <div class="Lxy_vbox Lxy_vbox--obj">
+                <h3>
+                    <span>📘 对象 student = {…}</span>
+                    <button class="Lxy_reset-btn" id="Lxy_resetObj">↻ 重置</button>
+                </h3>
+                <div class="Lxy_obj" id="Lxy_objBox"></div>
+            </div>
+            <div class="Lxy_vbox Lxy_vbox--str">
+                <h3>
+                    <span>📝 字符串 LXY_STR = "Hello JavaScript"</span>
+                    <button class="Lxy_reset-btn" id="Lxy_resetStr">↻ 重置</button>
+                </h3>
+                <div class="Lxy_str-visual" id="Lxy_strBar"></div>
+            </div>
+        </div>
+
+        <!-- ===== 对象 ===== -->
+        <h2 class="Lxy_group Lxy_group--obj">📘 对象（Object）— 键值对的世界</h2>
+        <div class="Lxy_grid">
+
+            <!-- keys/values/entries -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname Lxy_mname--obj">Object.keys / values / entries</span>
+                    <span class="Lxy_tag Lxy_tag--obj">静态方法</span>
+                </div>
+                <p class="Lxy_desc">分别拿到<strong>所有键</strong>、<strong>所有值</strong>、<strong>[键, 值] 二元组</strong>数组。</p>
+                <pre class="Lxy_code">Object.<span class="fn">keys</span>(obj);
+Object.<span class="fn">values</span>(obj);
+Object.<span class="fn">entries</span>(obj);</pre>
+                <button class="Lxy_run Lxy_run--obj" data-demo="keys">▶ keys</button>
+                <button class="Lxy_run Lxy_run--obj" data-demo="values" style="margin-left:6px;">▶ values</button>
+                <button class="Lxy_run Lxy_run--obj" data-demo="entries" style="margin-left:6px;">▶ entries</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--obj" id="Lxy_keysOut">等待运行…</div>
+            </div>
+
+            <!-- in / hasOwnProperty -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname Lxy_mname--obj">in / hasOwnProperty</span>
+                    <span class="Lxy_tag Lxy_tag--obj">查询</span>
+                </div>
+                <p class="Lxy_desc">`in` 看<strong>原型链</strong>，`hasOwnProperty` 只看<strong>自身</strong>。</p>
+                <pre class="Lxy_code"><span class="str">"name"</span> <span class="kw">in</span> obj;
+obj.<span class="fn">hasOwnProperty</span>(<span class="str">"name"</span>);</pre>
+                <div class="Lxy_params">
+                    <label>查 key</label><input type="text" id="Lxy_hasKey" value="name">
+                </div>
+                <button class="Lxy_run Lxy_run--obj" data-demo="has">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--obj" id="Lxy_hasOut">等待运行…</div>
+            </div>
+
+            <!-- delete -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname Lxy_mname--obj">delete</span>
+                    <span class="Lxy_tag Lxy_tag--obj">修改</span>
+                </div>
+                <p class="Lxy_desc">用 <code>delete obj.key</code> 删除一个属性。对象可视化区会同步消失。</p>
+                <pre class="Lxy_code"><span class="kw">delete</span> obj.age;  <span class="cm">// 返回 true/false</span></pre>
+                <div class="Lxy_params">
+                    <label>删 key</label><input type="text" id="Lxy_delKey" value="age">
+                </div>
+                <button class="Lxy_run Lxy_run--obj" data-demo="del">▶ 删除</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--obj" id="Lxy_delOut">等待运行…</div>
+            </div>
+
+            <!-- assign -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname Lxy_mname--obj">Object.assign</span>
+                    <span class="Lxy_tag Lxy_tag--obj">合并/拷贝</span>
+                </div>
+                <p class="Lxy_desc">把多个源对象的属性<strong>拷贝合并</strong>到目标对象（浅拷贝）。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> newObj = Object.<span class="fn">assign</span>(
+  {}, obj, { hobby: <span class="str">"编程"</span> }
+);</pre>
+                <button class="Lxy_run Lxy_run--obj" data-demo="assign">▶ 加 hobby 属性</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--obj" id="Lxy_asOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <!-- ===== 字符串 ===== -->
+        <h2 class="Lxy_group Lxy_group--str">📝 字符串（String）— 字符的海洋</h2>
+        <div class="Lxy_grid">
+
+            <!-- length + charAt + 索引 -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">length / charAt / 索引</span>
+                    <span class="Lxy_tag Lxy_tag--str">基础</span>
+                </div>
+                <p class="Lxy_desc">字符串可以像数组一样用 <code>[i]</code> 取字符，<code>.length</code> 是长度。</p>
+                <pre class="Lxy_code">str.<span class="fn">length</span>;    <span class="cm">// 长度</span>
+str.<span class="fn">charAt</span>(<span class="num">0</span>); <span class="cm">// 第 0 个字符</span>
+str[<span class="num">7</span>];       <span class="cm">// 索引也可以</span></pre>
+                <div class="Lxy_params">
+                    <label>index</label><input type="number" id="Lxy_idxVal" value="7" style="width:50px;">
+                </div>
+                <button class="Lxy_run" data-demo="charAt">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_idxOut">等待运行…</div>
+            </div>
+
+            <!-- indexOf / includes / startsWith / endsWith -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">indexOf / includes / startsWith / endsWith</span>
+                    <span class="Lxy_tag Lxy_tag--str">查找</span>
+                </div>
+                <p class="Lxy_desc">查找子串位置 / 是否包含 / 是否开头 / 是否结尾。<strong>找不到</strong> indexOf 返回 -1。</p>
+                <pre class="Lxy_code">str.<span class="fn">indexOf</span>(<span class="str">"Java"</span>);
+str.<span class="fn">includes</span>(<span class="str">"script"</span>);
+str.<span class="fn">startsWith</span>(<span class="str">"Hello"</span>);
+str.<span class="fn">endsWith</span>(<span class="str">"Script"</span>);</pre>
+                <div class="Lxy_params">
+                    <label>子串</label><input type="text" id="Lxy_searchStr" value="Java" style="width:100px;">
+                </div>
+                <button class="Lxy_run" data-demo="search">▶ 全部查找</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_searchOut">等待运行…</div>
+            </div>
+
+            <!-- slice / substring / substr -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">slice / substring</span>
+                    <span class="Lxy_tag Lxy_tag--str">截取</span>
+                </div>
+                <p class="Lxy_desc">slice 支持<strong>负数索引</strong>（从末尾数），substring 不支持。字符可视化区会<strong>高亮被截取的部分</strong>。</p>
+                <pre class="Lxy_code">str.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">5</span>);    <span class="cm">// "Hello"</span>
+str.<span class="fn">slice</span>(-<span class="num">6</span>);       <span class="cm">// 末尾 6 个</span></pre>
+                <div class="Lxy_params">
+                    <label>start</label><input type="number" id="Lxy_slStart" value="0" style="width:50px;">
+                    <label>end</label><input type="number" id="Lxy_slEnd" value="5" style="width:50px;">
+                </div>
+                <button class="Lxy_run" data-demo="slice">▶ slice(start, end)</button>
+                <button class="Lxy_run" data-demo="sliceNeg" style="margin-left:6px;background:linear-gradient(90deg,#9b5de5,#5a189a);color:#fff;">▶ slice(-6)</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_sliceOut">等待运行…</div>
+            </div>
+
+            <!-- toUpperCase / toLowerCase -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">toUpperCase / toLowerCase</span>
+                    <span class="Lxy_tag Lxy_tag--str">大小写</span>
+                </div>
+                <p class="Lxy_desc">全部转大写 / 小写。不改变原字符串（字符串是<strong>不可变</strong>的）。</p>
+                <pre class="Lxy_code">str.<span class="fn">toUpperCase</span>();
+str.<span class="fn">toLowerCase</span>();</pre>
+                <button class="Lxy_run" data-demo="upper">▶ 大写</button>
+                <button class="Lxy_run" data-demo="lower" style="margin-left:6px;">▶ 小写</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_caseOut">等待运行…</div>
+            </div>
+
+            <!-- trim -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">trim / trimStart / trimEnd</span>
+                    <span class="Lxy_tag Lxy_tag--str">空白</span>
+                </div>
+                <p class="Lxy_desc">去掉<strong>首尾空格</strong>。常用于表单输入清洗。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> dirty = <span class="str">"  hello  "</span>;
+dirty.<span class="fn">trim</span>(); <span class="cm">// "hello"</span></pre>
+                <button class="Lxy_run" data-demo="trim">▶ trim("  Hello  ")</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_trimOut">等待运行…</div>
+            </div>
+
+            <!-- split / join -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">split / join</span>
+                    <span class="Lxy_tag Lxy_tag--str">数组互转</span>
+                </div>
+                <p class="Lxy_desc">split 把字符串<strong>切成数组</strong>；join 把数组<strong>拼回字符串</strong>（属于 Array 方法）。</p>
+                <pre class="Lxy_code">str.<span class="fn">split</span>(<span class="str">" "</span>);  <span class="cm">// 按空格切开</span>
+arr.<span class="fn">join</span>(<span class="str">"-"</span>);  <span class="cm">// 用 - 拼接</span></pre>
+                <div class="Lxy_params">
+                    <label>分隔符</label><input type="text" id="Lxy_splitSep" value=" " style="width:60px;">
+                </div>
+                <button class="Lxy_run" data-demo="split">▶ split</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_splitOut">等待运行…</div>
+            </div>
+
+            <!-- replace -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">replace / replaceAll</span>
+                    <span class="Lxy_tag Lxy_tag--str">替换</span>
+                </div>
+                <p class="Lxy_desc">replace 默认只替<strong>第一个</strong>匹配，replaceAll 才会全替。也支持正则。</p>
+                <pre class="Lxy_code">str.<span class="fn">replace</span>(<span class="str">"l"</span>, <span class="str">"L"</span>);
+str.<span class="fn">replaceAll</span>(<span class="str">"l"</span>, <span class="str">"L"</span>);</pre>
+                <button class="Lxy_run" data-demo="replace">▶ replace 首 l→L</button>
+                <button class="Lxy_run" data-demo="replaceAll" style="margin-left:6px;background:linear-gradient(90deg,#fee440,#f9a826);color:#1a1a2e;">▶ replaceAll</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_repOut">等待运行…</div>
+            </div>
+
+            <!-- repeat / padStart / padEnd -->
+            <div class="Lxy_card">
+                <div class="Lxy_head">
+                    <span class="Lxy_mname">repeat / padStart / padEnd</span>
+                    <span class="Lxy_tag Lxy_tag--str">填充</span>
+                </div>
+                <p class="Lxy_desc">repeat 复制 N 遍；padStart / padEnd 在<strong>指定长度</strong>内用某字符填充。</p>
+                <pre class="Lxy_code"><span class="str">"ha"</span>.<span class="fn">repeat</span>(<span class="num">3</span>);  <span class="cm">// "hahaha"</span>
+<span class="str">"7"</span>.<span class="fn">padStart</span>(<span class="num">3</span>, <span class="str">"0"</span>); <span class="cm">// "007"</span></pre>
+                <button class="Lxy_run" data-demo="repeat">▶ "ha".repeat(3)</button>
+                <button class="Lxy_run" data-demo="pad" style="margin-left:6px;background:linear-gradient(90deg,#9b5de5,#5a189a);color:#fff;">▶ "7".padStart(3,"0")</button>
+                <div class="Lxy_result Lxy_result--empty Lxy_result--str" id="Lxy_fillOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <p style="text-align:center;color:#555;font-size:12px;margin-top:36px;">
+            💡 顶部可视化区会实时高亮：粉色=查找匹配 / 黄色=slice 截取范围
+        </p>
+    </div>
+
+    <script>
+        (function () {
+            // ==== 状态 ====
+            var LXY_STR_DEFAULT = "Hello JavaScript";
+            var LXY_OBJ_DEFAULT = { name: "刘馨月", age: 20, grade: "大二", grade_level: 95, is_student: true };
+            var Lxy_state = {
+                str: LXY_STR_DEFAULT,
+                obj: JSON.parse(JSON.stringify(LXY_OBJ_DEFAULT))
+            };
+
+            // ==== 对象渲染 ====
+            function Lxy_renderObj() {
+                var box = document.getElementById('Lxy_objBox');
+                box.innerHTML = '';
+                if (Object.keys(Lxy_state.obj).length === 0) {
+                    box.innerHTML = '<div style="color:#555;font-style:italic;">（空对象 {}）</div>';
+                    return;
+                }
+                Object.keys(Lxy_state.obj).forEach(function (k) {
+                    var v = Lxy_state.obj[k];
+                    var el = document.createElement('div');
+                    el.className = 'Lxy_kv';
+                    var t = typeof v;
+                    var valCls = 'Lxy_v';
+                    if (v === null) valCls += ' null';
+                    else if (t === 'number') valCls += ' num';
+                    else if (t === 'boolean') valCls += ' bool';
+                    else valCls += ' str';
+                    el.innerHTML = '<span class="Lxy_k">' + k + '</span>' +
+                        '<span class="Lxy_colon">:</span>' +
+                        '<span class="' + valCls + '">' + (t === 'string' ? '"' + v + '"' : v) + '</span>';
+                    box.appendChild(el);
+                });
+            }
+
+            // ==== 字符串渲染（带高亮） ====
+            function Lxy_renderStr(hlStart, hlEnd, matchStart, matchLen) {
+                var bar = document.getElementById('Lxy_strBar');
+                bar.innerHTML = '';
+                for (var i = 0; i < Lxy_state.str.length; i++) {
+                    var ch = Lxy_state.str[i];
+                    var el = document.createElement('div');
+                    el.className = 'Lxy_ch';
+                    if (ch === ' ') el.className += ' Lxy_ch--space';
+                    if (hlStart !== undefined && i >= hlStart && i < hlEnd) el.className += ' Lxy_ch--slice';
+                    if (matchStart !== undefined && i >= matchStart && i < matchStart + matchLen) el.className += ' Lxy_ch--match';
+                    el.textContent = ch === ' ' ? '·' : ch;
+                    bar.appendChild(el);
+                }
+            }
+
+            // ==== 重置 ====
+            document.getElementById('Lxy_resetObj').onclick = function () {
+                Lxy_state.obj = JSON.parse(JSON.stringify(LXY_OBJ_DEFAULT));
+                Lxy_renderObj();
+            };
+            document.getElementById('Lxy_resetStr').onclick = function () {
+                Lxy_state.str = LXY_STR_DEFAULT;
+                Lxy_renderStr();
+            };
+
+            function Lxy_show(id, html) {
+                var el = document.getElementById(id);
+                el.innerHTML = html;
+                el.classList.remove('Lxy_result--empty');
+            }
+            function Lxy_s(o) { return JSON.stringify(o); }
+            function Lxy_arrStr(a) { return '[' + a.map(function (x) { return typeof x === 'string' ? '"' + x + '"' : Lxy_s(x); }).join(', ') + ']'; }
+
+            // ==== 事件委托 ====
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-demo]');
+                if (!btn) return;
+                var key = btn.dataset.demo;
+                var o = Lxy_state.obj;
+                var s = Lxy_state.str;
+
+                switch (key) {
+                    // ===== 对象 =====
+                    case 'keys': {
+                        var k = Object.keys(o);
+                        Lxy_show('Lxy_keysOut', '<div class="Lxy_compare"><div class="Lxy_line--ret">Object.keys → <span>' + Lxy_arrStr(k) + '</span></div></div>');
+                        break;
+                    }
+                    case 'values': {
+                        var v = Object.values(o);
+                        Lxy_show('Lxy_keysOut', '<div class="Lxy_compare"><div class="Lxy_line--ret">Object.values → <span>' + Lxy_arrStr(v) + '</span></div></div>');
+                        break;
+                    }
+                    case 'entries': {
+                        var en = Object.entries(o).map(function (p) { return p[0] + '=' + p[1]; });
+                        Lxy_show('Lxy_keysOut', '<div class="Lxy_compare"><div class="Lxy_line--ret">Object.entries → <span>[ ' + en.join(' ][ ') + ' ]</span></div></div>');
+                        break;
+                    }
+                    case 'has': {
+                        var hk = document.getElementById('Lxy_hasKey').value.trim();
+                        var inOp = hk in o;
+                        var hop = o.hasOwnProperty(hk);
+                        Lxy_show('Lxy_hasOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">"in" 操作符 <span>' + inOp + '</span></div>' +
+                            '<div class="Lxy_line">.hasOwnProperty <span>' + hop + '</span></div>' +
+                            '<div class="Lxy_line--obj" style="color:#f15bb5;">注意区分原型链 vs 自身属性</div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'del': {
+                        var dk = document.getElementById('Lxy_delKey').value.trim();
+                        if (!(dk in o)) { Lxy_show('Lxy_delOut', '对象里没有这个 key'); return; }
+                        var beforeKeys = Object.keys(o).length;
+                        var ret = delete o[dk];
+                        Lxy_renderObj();
+                        Lxy_show('Lxy_delOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">删除 key：<span>' + dk + '</span></div>' +
+                            '<div class="Lxy_line--ret">delete 返回 <span>' + ret + '</span></div>' +
+                            '<div class="Lxy_line--new">属性数 ' + beforeKeys + ' → ' + Object.keys(o).length + '</div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'assign': {
+                        var merged = Object.assign({}, o, { hobby: "编程", city: "北京" });
+                        Lxy_state.obj = merged;
+                        Lxy_renderObj();
+                        Lxy_show('Lxy_asOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">新增 hobby 和 city 属性</div>' +
+                            '<div class="Lxy_line--new">当前对象键：<span>' + Object.keys(merged).join(', ') + '</span></div>' +
+                            '<div class="Lxy_line--obj" style="color:#f15bb5;">⚠️ 浅拷贝，嵌套对象仍共享引用</div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ===== 字符串 =====
+                    case 'charAt': {
+                        var idx = Number(document.getElementById('Lxy_idxVal').value) || 0;
+                        var ch = s[idx];
+                        Lxy_renderStr(idx, idx + 1);
+                        Lxy_show('Lxy_idxOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">长度 length = <span>' + s.length + '</span></div>' +
+                            '<div class="Lxy_line--ret">str[' + idx + '] = <span>"' + (ch || '越界 undefined') + '"</span></div>' +
+                            '<div class="Lxy_line">str.charAt(' + idx + ') = <span>"' + s.charAt(idx) + '"</span></div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'search': {
+                        var needle = document.getElementById('Lxy_searchStr').value;
+                        var iOf = s.indexOf(needle);
+                        var incl = s.includes(needle);
+                        var sw = s.startsWith(needle);
+                        var ew = s.endsWith(needle);
+                        Lxy_renderStr(iOf >= 0 ? iOf : undefined, iOf >= 0 ? iOf + needle.length : undefined,
+                            iOf >= 0 ? iOf : undefined, incl ? needle.length : 0);
+                        Lxy_show('Lxy_searchOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">查找子串：<span>"' + needle + '"</span></div>' +
+                            '<div class="Lxy_line--ret">indexOf = <span>' + iOf + (iOf === -1 ? '（未找到）' : '') + '</span></div>' +
+                            '<div class="Lxy_line--ret">includes = <span>' + incl + '</span></div>' +
+                            '<div class="Lxy_line">startsWith = <span>' + sw + '</span></div>' +
+                            '<div class="Lxy_line">endsWith = <span>' + ew + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'slice': {
+                        var ss = Number(document.getElementById('Lxy_slStart').value) || 0;
+                        var se = Number(document.getElementById('Lxy_slEnd').value) || s.length;
+                        var r = s.slice(ss, se);
+                        var sIdx = ss < 0 ? s.length + ss : ss;
+                        var eIdx = se < 0 ? s.length + se : se;
+                        Lxy_renderStr(sIdx, eIdx);
+                        Lxy_show('Lxy_sliceOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">slice(' + ss + ', ' + se + ')</div>' +
+                            '<div class="Lxy_line--new">结果 = <span>"' + r + '"</span></div>' +
+                            '<div class="Lxy_line">(字符可视化中黄色 = 被截取范围)</div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'sliceNeg': {
+                        var r2 = s.slice(-6);
+                        var startIdx = Math.max(0, s.length - 6);
+                        Lxy_renderStr(startIdx, s.length);
+                        Lxy_show('Lxy_sliceOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">slice(-6) = 从末尾往前 6 个字符</div>' +
+                            '<div class="Lxy_line--new">结果 = <span>"' + r2 + '"</span></div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'upper':
+                        Lxy_show('Lxy_caseOut', '<div class="Lxy_compare"><div class="Lxy_line--ret">toUpperCase → <span>"' + s.toUpperCase() + '"</span></div></div>'); break;
+                    case 'lower':
+                        Lxy_show('Lxy_caseOut', '<div class="Lxy_compare"><div class="Lxy_line--ret">toLowerCase → <span>"' + s.toLowerCase() + '"</span></div></div>'); break;
+                    case 'trim': {
+                        var dirty = "  Hello  ";
+                        Lxy_show('Lxy_trimOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">原：<span>"' + dirty + '"（' + dirty.length + ' 字符）</span></div>' +
+                            '<div class="Lxy_line--new">trim → <span>"' + dirty.trim() + '"（' + dirty.trim().length + ' 字符）</span></div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'split': {
+                        var sep = document.getElementById('Lxy_splitSep').value;
+                        var parts = s.split(sep);
+                        Lxy_show('Lxy_splitOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">split("' + (sep === ' ' ? ' ' : sep) + '")</div>' +
+                            '<div class="Lxy_line--ret">数组 = <span>' + Lxy_arrStr(parts) + '</span></div>' +
+                            '<div class="Lxy_line">共 ' + parts.length + ' 段</div>' +
+                            '</div>');
+                        break;
+                    }
+                    case 'replace':
+                        Lxy_show('Lxy_repOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">原：<span>"' + s + '"</span></div>' +
+                            '<div class="Lxy_line--new">replace("l","L") → <span>"' + s.replace('l', 'L') + '"</span></div>' +
+                            '<div class="Lxy_line--obj" style="color:#f15bb5;">只替第一个小写 l！</div>' +
+                            '</div>');
+                        break;
+                    case 'replaceAll':
+                        Lxy_show('Lxy_repOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">原：<span>"' + s + '"</span></div>' +
+                            '<div class="Lxy_line--new">replaceAll("l","L") → <span>"' + s.replaceAll('l', 'L') + '"</span></div>' +
+                            '<div class="Lxy_line">全部替换 ✓</div>' +
+                            '</div>');
+                        break;
+                    case 'repeat':
+                        Lxy_show('Lxy_fillOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">"ha".repeat(3) → <span>"' + "ha".repeat(3) + '"</span></div>' +
+                            '</div>');
+                        break;
+                    case 'pad':
+                        Lxy_show('Lxy_fillOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line">"7".padStart(3,"0") → <span>"' + "7".padStart(3, '0') + '"</span></div>' +
+                            '<div class="Lxy_line--new">"42".padEnd(5,"!") → <span>"' + "42".padEnd(5, '!') + '"</span></div>' +
+                            '</div>');
+                        break;
+                }
+            });
+
+            // ==== 初始 ====
+            Lxy_renderObj();
+            Lxy_renderStr();
+        })();
+    </script>
+</body>
+</html>
