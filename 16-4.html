@@ -124,13 +124,13 @@
         .Lxy_item-title {
             font-size: 15px; color: #222; font-weight: 500;
             line-height: 1.5; margin: 6px 0 4px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; transition: color 0.15s;
         }
 
         .Lxy_item-desc {
             font-size: 12.5px; color: #888; line-height: 1.5;
-            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+            display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical;
             overflow: hidden; margin-top: auto;
         }
 
@@ -221,6 +221,18 @@
     </div>
 
     <script>
+        // 图片降级：加载失败时生成一个纯 SVG 占位
+        function Lxy_imgFallback(img) {
+            var tag = img.getAttribute('data-tag') || 'IMG';
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80">' +
+                      '<rect width="120" height="80" fill="#1a3a7a"/>' +
+                      '<text x="50%" y="55%" text-anchor="middle" fill="white" ' +
+                      'font-size="14" font-family="sans-serif">' + tag + '</text>' +
+                      '</svg>';
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            img.onerror = null; // 防止死循环
+        }
+
         (function () {
             // 图片生成 URL 工厂
             function Lxy_img(prompt) {
@@ -347,7 +359,7 @@
                     row.style.animationDelay = (idx * 50) + 'ms';
                     row.innerHTML =
                         '<div class="Lxy_thumb">' +
-                            '<img src="' + item.thumb + '" alt="" loading="lazy" onerror="this.src=\\'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2280%22><rect width=%22120%22 height=%2280%22 fill=%22%231a3a7a%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2214%22 font-family=%22sans-serif%22>' + item.tag + '</text></svg>\\'">' +
+                            '<img src="' + item.thumb + '" alt="" loading="lazy" data-tag="' + item.tag + '" onerror="Lxy_imgFallback(this)">' +
                             '<span class="Lxy_thumb-tag">' + item.tag + '</span>' +
                         '</div>' +
                         '<div class="Lxy_item-body">' +
