@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-10-29
+    功能：JavaScript 数组方法可视化演示页面
+    -->
+    <title>JS 数组方法可视化 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 32px 20px 60px;
+            color: #e8e8f0;
+        }
+
+        .Lxy_wrap { max-width: 1120px; margin: 0 auto; }
+
+        /* ========== HEADER ========== */
+        .Lxy_header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .Lxy_title {
+            font-size: 34px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00f5d4, #00bbf9, #fee440, #f15bb5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .Lxy_sub { font-size: 14px; color: #8890a8; margin-top: 6px; }
+        .Lxy_author {
+            display: inline-block; margin-top: 10px; padding: 5px 18px;
+            background: rgba(0, 187, 249, 0.15); border: 1px solid rgba(0, 187, 249, 0.4);
+            color: #00bbf9; border-radius: 20px; font-size: 13px; font-weight: 600;
+        }
+
+        /* ========== 可视化数组条 ========== */
+        .Lxy_visual {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .Lxy_visual h2 {
+            font-size: 15px; color: #00f5d4; margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .Lxy_reset-btn {
+            padding: 5px 14px; background: transparent; color: #fee440;
+            border: 1px solid rgba(254, 228, 64, 0.5); border-radius: 14px;
+            cursor: pointer; font-size: 12px; transition: all 0.2s;
+        }
+        .Lxy_reset-btn:hover { background: rgba(254, 228, 64, 0.15); }
+        .Lxy_array-bar {
+            display: flex; gap: 8px; flex-wrap: wrap; min-height: 56px;
+            align-items: center; padding: 8px 4px;
+        }
+        .Lxy_array-bar:empty::before {
+            content: "（数组为空，试试 push / unshift 加点元素吧）";
+            color: #555570; font-style: italic; font-size: 13px;
+        }
+        .Lxy_elem {
+            min-width: 44px; height: 44px; padding: 0 10px;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700; color: #1a1a2e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            animation: Lxy-pop-in 0.35s ease-out;
+            position: relative;
+        }
+        .Lxy_elem-num   { background: linear-gradient(135deg, #fee440, #f9a826); }
+        .Lxy_elem-str   { background: linear-gradient(135deg, #00f5d4, #00bbf9); }
+        .Lxy_elem-bool  { background: linear-gradient(135deg, #f15bb5, #ee4266); color: #fff; }
+        .Lxy_elem-obj   { background: linear-gradient(135deg, #9b5de5, #5a189a); color: #fff; font-size: 13px; }
+
+        @keyframes Lxy-pop-in {
+            from { transform: translateY(-20px) scale(0.5); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes Lxy-pop-out {
+            to { transform: translateY(20px) scale(0.3); opacity: 0; }
+        }
+        @keyframes Lxy-flip {
+            0%   { transform: rotateY(0); }
+            50%  { transform: rotateY(90deg); }
+            100% { transform: rotateY(0); }
+        }
+        .Lxy_out { animation: Lxy-pop-out 0.35s ease-in forwards; }
+        .Lxy_flip { animation: Lxy-flip 0.5s ease-in-out; }
+
+        /* ========== 分组标题 ========== */
+        .Lxy_group {
+            font-size: 18px; font-weight: 700;
+            margin: 32px 0 14px; padding-left: 12px;
+            border-left: 4px solid #00f5d4;
+            color: #fff; display: flex; align-items: center; gap: 10px;
+        }
+        .Lxy_group--mut    { border-left-color: #f15bb5; }
+        .Lxy_group--nonmut { border-left-color: #00bbf9; }
+        .Lxy_group--iter   { border-left-color: #fee440; color: #1a1a2e; }
+
+        /* ========== 卡片网格 ========== */
+        .Lxy_grid {
+            display: grid; gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        }
+        .Lxy_card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px; padding: 18px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .Lxy_card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 187, 249, 0.5);
+        }
+        .Lxy_card-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        .Lxy_method-name {
+            font-family: "Consolas", monospace; font-size: 16px;
+            font-weight: 700; color: #00f5d4;
+        }
+        .Lxy_method-name--mut    { color: #f15bb5; }
+        .Lxy_method-name--nonmut { color: #00bbf9; }
+        .Lxy_method-name--iter   { color: #fee440; }
+        .Lxy_tag {
+            font-size: 11px; padding: 2px 8px; border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1); color: #aaa;
+        }
+        .Lxy_tag--mut    { background: rgba(241, 91, 181, 0.2);  color: #f15bb5; }
+        .Lxy_tag--nonmut { background: rgba(0, 187, 249, 0.2);  color: #00bbf9; }
+        .Lxy_desc { font-size: 13px; color: #9a9ab0; margin-bottom: 12px; line-height: 1.6; }
+        .Lxy_code {
+            background: #0b0b1a; border-radius: 8px; padding: 10px 12px;
+            font-family: "Consolas", monospace; font-size: 12.5px;
+            line-height: 1.7; color: #c6c6e0; white-space: pre-wrap;
+            border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 10px;
+        }
+        .Lxy_code .kw { color: #ff79c6; font-weight: 700; }
+        .Lxy_code .fn { color: #50fa7b; }
+        .Lxy_code .str { color: #f1fa8c; }
+        .Lxy_code .num { color: #bd93f9; }
+        .Lxy_code .cm { color: #6272a4; font-style: italic; }
+
+        .Lxy_params {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+        }
+        .Lxy_params input {
+            width: 80px; padding: 6px 8px;
+            background: #0b0b1a; border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 5px; color: #e8e8f0; font-family: "Consolas", monospace;
+            font-size: 12px; outline: none;
+        }
+        .Lxy_params input:focus { border-color: #00bbf9; }
+        .Lxy_params label { font-size: 11px; color: #8890a8; align-self: center; }
+
+        .Lxy_run {
+            padding: 7px 20px; border: none; border-radius: 16px; cursor: pointer;
+            background: linear-gradient(90deg, #00bbf9, #00f5d4); color: #1a1a2e;
+            font-weight: 700; font-size: 13px; transition: transform 0.15s;
+        }
+        .Lxy_run:hover { transform: scale(1.05); }
+
+        .Lxy_result {
+            margin-top: 10px; padding: 10px 12px; background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px; font-family: "Consolas", monospace; font-size: 12px;
+            color: #00f5d4; min-height: 30px; border-left: 3px solid #00f5d4;
+        }
+        .Lxy_result--empty {
+            color: #555570; font-style: italic; border-left-color: #555570;
+        }
+
+        /* ========== 结果对比条 ========== */
+        .Lxy_compare {
+            margin-top: 8px; display: flex; flex-direction: column; gap: 4px;
+            padding: 6px 8px; background: rgba(0, 0, 0, 0.25); border-radius: 6px;
+            font-family: "Consolas", monospace; font-size: 11.5px;
+        }
+        .Lxy_compare .Lxy_line { color: #8890a8; }
+        .Lxy_compare .Lxy_line span {
+            color: #e8e8f0; background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px; border-radius: 4px; margin-left: 4px;
+        }
+        .Lxy_compare .Lxy_line--old { color: #f15bb5; }
+        .Lxy_compare .Lxy_line--ret { color: #fee440; }
+        .Lxy_compare .Lxy_line--new { color: #00f5d4; }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+        <!-- ======== HEADER ======== -->
+        <div class="Lxy_header">
+            <h1 class="Lxy_title">JavaScript 数组方法可视化</h1>
+            <p class="Lxy_sub">实时看见数组怎么变 · 12 个核心方法 · 三类分组</p>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- ======== 可视化数组条 ======== -->
+        <div class="Lxy_visual">
+            <h2>
+                <span>📦 当前数组 <code id="Lxy_arrLen" style="color:#00bbf9;font-size:13px;"></code></span>
+                <button class="Lxy_reset-btn" id="Lxy_resetArr">↻ 重置为 [3, 1, 4, 1, 5, 9, 2, 6]</button>
+            </h2>
+            <div class="Lxy_array-bar" id="Lxy_arrBar"></div>
+        </div>
+
+        <!-- ======== 修改原数组（Mutating） ======== -->
+        <h2 class="Lxy_group Lxy_group--mut">🔴 修改原数组（Mutating）— 直接改数组本身</h2>
+        <div class="Lxy_grid">
+
+            <!-- push -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">push()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">在<strong>末尾</strong>加一个或多个元素，返回新长度。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> len = arr.<span class="fn">push</span>(<span class="num">7</span>);
+<span class="cm">// 末尾多了个 7，len = 新长度</span></pre>
+                <div class="Lxy_params">
+                    <label>添加值</label>
+                    <input type="text" id="Lxy_pushVal" value="7">
+                </div>
+                <button class="Lxy_run" data-demo="push">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_pushOut">等待运行…</div>
+            </div>
+
+            <!-- pop -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">pop()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">弹出<strong>最后一个</strong>元素，原数组变短。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> last = arr.<span class="fn">pop</span>();
+<span class="cm">// last = 最后那个元素</span></pre>
+                <button class="Lxy_run" data-demo="pop">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_popOut">等待运行…</div>
+            </div>
+
+            <!-- shift / unshift -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">shift() / unshift()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">shift 从<strong>头部</strong>弹出；unshift 在<strong>头部</strong>插入。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> first = arr.<span class="fn">shift</span>();
+arr.<span class="fn">unshift</span>(<span class="num">0</span>); <span class="cm">// 头部加 0</span></pre>
+                <div class="Lxy_params">
+                    <button class="Lxy_run" data-demo="shift" style="margin-right:6px;">shift</button>
+                    <input type="text" id="Lxy_usVal" value="0" style="width:50px;">
+                    <button class="Lxy_run" data-demo="unshift">unshift</button>
+                </div>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_shiftOut">等待运行…</div>
+            </div>
+
+            <!-- splice -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">splice()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">万能方法 —— 从 <code>start</code> 开始删 <code>count</code> 个，再插入新元素。</p>
+                <pre class="Lxy_code">arr.<span class="fn">splice</span>(start, count, ...items);
+<span class="cm">// 返回被删除的数组</span></pre>
+                <div class="Lxy_params">
+                    <label>start</label><input type="number" id="Lxy_spStart" value="2" style="width:50px;">
+                    <label>count</label><input type="number" id="Lxy_spCount" value="1" style="width:50px;">
+                    <label>插入</label><input type="text" id="Lxy_spIns" value="99" style="width:60px;">
+                </div>
+                <button class="Lxy_run" data-demo="splice">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_spliceOut">等待运行…</div>
+            </div>
+
+            <!-- reverse -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">reverse()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">原地<strong>翻转</strong>数组顺序。</p>
+                <pre class="Lxy_code">arr.<span class="fn">reverse</span>();
+<span class="cm">// 首尾互换</span></pre>
+                <button class="Lxy_run" data-demo="reverse">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_revOut">等待运行…</div>
+            </div>
+
+            <!-- sort -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--mut">sort()</span>
+                    <span class="Lxy_tag Lxy_tag--mut">Mutating</span>
+                </div>
+                <p class="Lxy_desc">排序 ⚠️ 默认按字符串排！数值要传比较函数。</p>
+                <pre class="Lxy_code"><span class="cm">// 升序排序</span>
+arr.<span class="fn">sort</span>((a, b) => a - b);</pre>
+                <button class="Lxy_run" data-demo="sort">▶ 升序排序</button>
+                <button class="Lxy_run" data-demo="sortDesc" style="margin-left:6px;background:linear-gradient(90deg,#f15bb5,#ee4266);color:#fff;">▶ 降序</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_sortOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <!-- ======== 不修改原数组（Non-mutating） ======== -->
+        <h2 class="Lxy_group Lxy_group--nonmut">🔵 不修改原数组（Non-mutating）— 返回新数组</h2>
+        <div class="Lxy_grid">
+
+            <!-- map -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--nonmut">map()</span>
+                    <span class="Lxy_tag Lxy_tag--nonmut">Non-Mutating</span>
+                </div>
+                <p class="Lxy_desc">对每个元素做变换，返回<strong>新数组</strong>（长度不变）。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> doubled = arr.<span class="fn">map</span>(x => x * <span class="num">2</span>);</pre>
+                <button class="Lxy_run" data-demo="map">▶ 每个元素 ×2</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_mapOut">等待运行…</div>
+            </div>
+
+            <!-- filter -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--nonmut">filter()</span>
+                    <span class="Lxy_tag Lxy_tag--nonmut">Non-Mutating</span>
+                </div>
+                <p class="Lxy_desc">挑出满足条件的元素，返回<strong>新数组</strong>（长度可变）。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> big = arr.<span class="fn">filter</span>(x => x > <span class="num">3</span>);
+<span class="cm">// 只留大于 3 的</span></pre>
+                <div class="Lxy_params">
+                    <label>阈值 ></label><input type="number" id="Lxy_filtTh" value="3" style="width:50px;">
+                </div>
+                <button class="Lxy_run" data-demo="filter">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_filtOut">等待运行…</div>
+            </div>
+
+            <!-- reduce -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--nonmut">reduce()</span>
+                    <span class="Lxy_tag Lxy_tag--nonmut">Non-Mutating</span>
+                </div>
+                <p class="Lxy_desc">把数组<strong>折叠成一个值</strong>（求和、求最大、累加器…）。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> sum = arr.<span class="fn">reduce</span>(
+  (acc, cur) => acc + cur, <span class="num">0</span>
+);</pre>
+                <button class="Lxy_run" data-demo="reduce">▶ 求和</button>
+                <button class="Lxy_run" data-demo="reduceMax" style="margin-left:6px;background:linear-gradient(90deg,#fee440,#f9a826);color:#1a1a2e;">▶ 求最大</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_redOut">等待运行…</div>
+            </div>
+
+            <!-- slice -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--nonmut">slice() / concat()</span>
+                    <span class="Lxy_tag Lxy_tag--nonmut">Non-Mutating</span>
+                </div>
+                <p class="Lxy_desc">slice 切片（左闭右开）；concat 拼接。都不改原数组。</p>
+                <pre class="Lxy_code"><span class="kw">const</span> mid = arr.<span class="fn">slice</span>(<span class="num">2</span>, <span class="num">5</span>);
+<span class="kw">const</span> all = arr.<span class="fn">concat</span>([<span class="num">100</span>, <span class="num">200</span>]);</pre>
+                <div class="Lxy_params">
+                    <button class="Lxy_run" data-demo="slice" style="margin-right:6px;">slice(2,5)</button>
+                    <button class="Lxy_run" data-demo="concat">concat</button>
+                </div>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_sliceOut">等待运行…</div>
+            </div>
+
+            <!-- indexOf / includes -->
+            <div class="Lxy_card">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--nonmut">indexOf() / includes()</span>
+                    <span class="Lxy_tag Lxy_tag--nonmut">Non-Mutating</span>
+                </div>
+                <p class="Lxy_desc">查位置 / 查是否包含。includes 更语义化，返回布尔值。</p>
+                <pre class="Lxy_code">arr.<span class="fn">indexOf</span>(<span class="num">5</span>);     <span class="cm">// 索引 or -1</span>
+arr.<span class="fn">includes</span>(<span class="num">5</span>);  <span class="cm">// true/false</span></pre>
+                <div class="Lxy_params">
+                    <label>查找值</label><input type="text" id="Lxy_findVal" value="5" style="width:60px;">
+                </div>
+                <button class="Lxy_run" data-demo="find">▶ 运行</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_findOut">等待运行…</div>
+            </div>
+
+        </div>
+
+        <!-- ======== 迭代 ======== -->
+        <h2 class="Lxy_group Lxy_group--iter">🟡 迭代（Iteration）— 遍历每个元素</h2>
+        <div class="Lxy_grid">
+
+            <!-- forEach -->
+            <div class="Lxy_card" style="grid-column: 1 / -1;">
+                <div class="Lxy_card-head">
+                    <span class="Lxy_method-name Lxy_method-name--iter">forEach()</span>
+                    <span class="Lxy_tag" style="background:rgba(254,228,64,0.2);color:#fee440;">迭代器</span>
+                </div>
+                <p class="Lxy_desc">对每个元素执行一次回调，<strong>不返回任何东西</strong>（只是副作用）。常用于打印、累加、DOM 操作。</p>
+                <pre class="Lxy_code">arr.<span class="fn">forEach</span>((val, i) => {
+  <span class="fn">console</span>.log(<span class="str">`arr[${i}] = ${val}`</span>);
+});</pre>
+                <button class="Lxy_run" data-demo="forEach">▶ 运行（看下方结果）</button>
+                <div class="Lxy_result Lxy_result--empty" id="Lxy_feOut" style="max-height:120px;overflow-y:auto;white-space:pre-wrap;">等待运行…</div>
+            </div>
+
+        </div>
+
+        <p style="text-align:center;color:#666;font-size:12px;margin-top:40px;">
+            💡 顶部可视化数组条会实时同步修改类方法的操作结果
+        </p>
+    </div>
+
+    <script>
+        (function () {
+            // ==== 状态与渲染 ====
+            var Lxy_state = { arr: [3, 1, 4, 1, 5, 9, 2, 6] };
+            var Lxy_reset = [3, 1, 4, 1, 5, 9, 2, 6];
+
+            function Lxy_render() {
+                var bar = document.getElementById('Lxy_arrBar');
+                bar.innerHTML = '';
+                Lxy_state.arr.forEach(function (v) {
+                    var el = document.createElement('div');
+                    el.className = 'Lxy_elem';
+                    if (typeof v === 'number') el.className += ' Lxy_elem-num';
+                    else if (typeof v === 'string') el.className += ' Lxy_elem-str';
+                    else if (typeof v === 'boolean') el.className += ' Lxy_elem-bool';
+                    else el.className += ' Lxy_elem-obj';
+                    el.textContent = v;
+                    bar.appendChild(el);
+                });
+                document.getElementById('Lxy_arrLen').textContent =
+                    '（长度 ' + Lxy_state.arr.length + '）';
+            }
+
+            function Lxy_restore(v) { Lxy_state.arr = v.slice(); Lxy_render(); }
+            function Lxy_snapshot() { return Lxy_state.arr.slice(); }
+            function Lxy_show(id, lines, cls) {
+                var el = document.getElementById(id);
+                el.className = 'Lxy_result';
+                el.innerHTML = lines;
+                if (cls) el.classList.add(cls);
+            }
+            function Lxy_toStr(a) { return '[' + a.join(', ') + ']'; }
+
+            // ==== 重置 ====
+            document.getElementById('Lxy_resetArr').onclick = function () {
+                Lxy_state.arr = Lxy_reset.slice();
+                Lxy_render();
+                document.querySelectorAll('.Lxy_result').forEach(function (r) {
+                    r.className = 'Lxy_result Lxy_result--empty';
+                    r.textContent = '等待运行…';
+                });
+            };
+
+            // ==== 事件委托：所有按钮 ====
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-demo]');
+                if (!btn) return;
+                var key = btn.dataset.demo;
+                var before, after, ret;
+
+                switch (key) {
+
+                    // ---- push ----
+                    case 'push': {
+                        before = Lxy_snapshot();
+                        var v1 = document.getElementById('Lxy_pushVal').value;
+                        var num1 = Number(v1);
+                        var val = isNaN(num1) || v1 === '' ? v1 : num1;
+                        ret = Lxy_state.arr.push(val);
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_pushOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">返回值（新长度）<span>' + ret + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">新数组<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- pop ----
+                    case 'pop': {
+                        if (Lxy_state.arr.length === 0) { Lxy_show('Lxy_popOut', '数组已空，pop 返回 undefined'); return; }
+                        before = Lxy_snapshot();
+                        ret = Lxy_state.arr.pop();
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_popOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">弹出元素<span>' + ret + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">新数组<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- shift ----
+                    case 'shift': {
+                        if (Lxy_state.arr.length === 0) { Lxy_show('Lxy_shiftOut', '数组已空，shift 返回 undefined'); return; }
+                        before = Lxy_snapshot();
+                        ret = Lxy_state.arr.shift();
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_shiftOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">移出元素<span>' + ret + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">新数组<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- unshift ----
+                    case 'unshift': {
+                        before = Lxy_snapshot();
+                        var usVal = document.getElementById('Lxy_usVal').value;
+                        var nUs = Number(usVal); var uv = isNaN(nUs) || usVal === '' ? usVal : nUs;
+                        ret = Lxy_state.arr.unshift(uv);
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_shiftOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">返回值（新长度）<span>' + ret + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">新数组<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- splice ----
+                    case 'splice': {
+                        before = Lxy_snapshot();
+                        var spS = Number(document.getElementById('Lxy_spStart').value) || 0;
+                        var spC = Number(document.getElementById('Lxy_spCount').value) || 0;
+                        var spI = document.getElementById('Lxy_spIns').value;
+                        var ins = isNaN(Number(spI)) || spI === '' ? null : Number(spI);
+                        var args = [spS, spC];
+                        if (ins !== null) args.push(ins);
+                        ret = Lxy_state.arr.splice.apply(Lxy_state.arr, args);
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_spliceOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">被删元素数组<span>' + Lxy_toStr(ret) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">新数组<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- reverse ----
+                    case 'reverse': {
+                        before = Lxy_snapshot();
+                        Lxy_state.arr.reverse();
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        Lxy_show('Lxy_revOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">翻转后<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- sort 升/降 ----
+                    case 'sort':
+                    case 'sortDesc': {
+                        before = Lxy_snapshot();
+                        if (key === 'sort')      Lxy_state.arr.sort(function (a, b) { return a - b; });
+                        else                    Lxy_state.arr.sort(function (a, b) { return b - a; });
+                        after = Lxy_snapshot();
+                        Lxy_render();
+                        var dir = key === 'sort' ? '升序' : '降序';
+                        Lxy_show('Lxy_sortOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">' + dir + '<span>' + Lxy_toStr(after) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- map（不改原数组，用快照演示） ----
+                    case 'map': {
+                        before = Lxy_snapshot();
+                        var doubled = before.map(function (x) { return x * 2; });
+                        Lxy_show('Lxy_mapOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">map(x×2)<span>' + Lxy_toStr(doubled) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- filter ----
+                    case 'filter': {
+                        before = Lxy_snapshot();
+                        var th = Number(document.getElementById('Lxy_filtTh').value) || 0;
+                        var filtered = before.filter(function (x) { return x > th; });
+                        Lxy_show('Lxy_filtOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">filter(>' + th + ')<span>' + Lxy_toStr(filtered) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">保留 ' + filtered.length + ' 个 / 原 ' + before.length + ' 个</div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- reduce 求和 ----
+                    case 'reduce': {
+                        before = Lxy_snapshot();
+                        var sum = before.reduce(function (acc, cur) { return acc + cur; }, 0);
+                        Lxy_show('Lxy_redOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">reduce 求和结果<span>' + sum + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- reduce 求最大 ----
+                    case 'reduceMax': {
+                        before = Lxy_snapshot();
+                        var mx = before.reduce(function (acc, cur) { return cur > acc ? cur : acc; }, -Infinity);
+                        Lxy_show('Lxy_redOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">reduce 最大值<span>' + mx + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- slice ----
+                    case 'slice': {
+                        before = Lxy_snapshot();
+                        var mid = before.slice(2, 5);
+                        Lxy_show('Lxy_sliceOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">slice(2, 5) → 索引 2,3,4<span>' + Lxy_toStr(mid) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- concat ----
+                    case 'concat': {
+                        before = Lxy_snapshot();
+                        var all = before.concat([100, 200]);
+                        Lxy_show('Lxy_sliceOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组（未改）<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">concat([100,200])<span>' + Lxy_toStr(all) + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- indexOf / includes ----
+                    case 'find': {
+                        before = Lxy_snapshot();
+                        var fvStr = document.getElementById('Lxy_findVal').value;
+                        var fvNum = Number(fvStr);
+                        var fv = isNaN(fvNum) || fvStr === '' ? fvStr : fvNum;
+                        var idx = before.indexOf(fv);
+                        var inc = before.includes(fv);
+                        Lxy_show('Lxy_findOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">indexOf(' + fv + ')<span>' + idx + (idx === -1 ? '（未找到）' : '') + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--ret">includes(' + fv + ')<span>' + inc + '</span></div>' +
+                            '</div>');
+                        break;
+                    }
+
+                    // ---- forEach ----
+                    case 'forEach': {
+                        before = Lxy_snapshot();
+                        var lines = [];
+                        before.forEach(function (val, i) {
+                            lines.push('[' + i + '] = ' + val);
+                        });
+                        Lxy_show('Lxy_feOut',
+                            '<div class="Lxy_compare">' +
+                            '<div class="Lxy_line Lxy_line--old">原数组<span>' + Lxy_toStr(before) + '</span></div>' +
+                            '<div class="Lxy_line Lxy_line--new">forEach 遍历：</div>' +
+                            '<div style="color:#00f5d4;font-family:Consolas,monospace;font-size:12px;">' +
+                            lines.join('\n') + '</div>' +
+                            '</div>');
+                        break;
+                    }
+                }
+            });
+
+            // ==== 初始渲染 ====
+            Lxy_render();
+        })();
+    </script>
+</body>
+</html>
