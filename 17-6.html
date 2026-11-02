@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-11-02
+    功能：Promise + async/await 包饺子异步流程可视化（串行 + Promise.all 并行）
+    -->
+    <title>包饺子异步流程 · Promise &amp; async · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #1e1e2e, #313244);
+            min-height: 100vh; padding: 30px 20px; color: #cdd6f4;
+        }
+        .Lxy_wrap { max-width: 1150px; margin: 0 auto; }
+
+        /* ====== Header ====== */
+        .Lxy_header {
+            background: linear-gradient(135deg, #f9e2af20, #fab38720);
+            border: 1px solid #f9e2af50; border-radius: 14px; padding: 24px 32px;
+            margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .Lxy_header h1 { font-size: 22px; color: #f9e2af; letter-spacing: 2px; }
+        .Lxy_header h1 small { display: block; font-size: 12px; font-weight: 400; color: #a6adc8; letter-spacing: 3px; margin-top: 4px; }
+        .Lxy_author { padding: 4px 14px; background: #f9e2af; color: #1e1e2e; border-radius: 14px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+
+        /* ====== 流程 SVG ====== */
+        .Lxy_flow-wrap {
+            background: #181825; border: 1px solid #45475a; border-radius: 14px;
+            padding: 30px; margin-bottom: 18px; overflow-x: auto;
+        }
+        .Lxy_flow-svg { display: block; margin: 0 auto; }
+
+        /* 节点圆圈状态 */
+        .Lxy-node circle { transition: fill 0.35s, stroke 0.35s; }
+        .Lxy-node text { fill: #cdd6f4; font-size: 14px; font-weight: 600; pointer-events: none; }
+        .Lxy-node rect { fill: transparent; }
+        .Lxy-node .Lxy-label { fill: #f9e2af; font-size: 12px; font-weight: 500; }
+        .Lxy-node--idle circle    { fill: #313244; stroke: #45475a; stroke-width: 2; }
+        .Lxy-node--running circle { fill: #89b4fa; stroke: #b4befe; stroke-width: 3; filter: drop-shadow(0 0 12px #89b4fa); animation: Lxy-pulse 1.2s infinite; }
+        .Lxy-node--done circle    { fill: #a6e3a1; stroke: #94e2d5; stroke-width: 2; }
+        .Lxy-node--done text      { fill: #11111b; }
+        .Lxy-node--current circle { fill: #fab387; stroke: #f9e2af; stroke-width: 3; filter: drop-shadow(0 0 14px #fab387); animation: Lxy-pulse 0.8s infinite; }
+        .Lxy-node--current text   { fill: #11111b; }
+        @keyframes Lxy-pulse { 50% { opacity: 0.75; } }
+
+        /* 连接线状态 */
+        .Lxy-line { stroke: #45475a; stroke-width: 2; stroke-dasharray: 6 4; fill: none; transition: stroke 0.4s; }
+        .Lxy-line--active   { stroke: #89b4fa; stroke-width: 3; stroke-dasharray: 0; }
+        .Lxy-line--done     { stroke: #a6e3a1; stroke-width: 3; stroke-dasharray: 0; }
+        .Lxy-line--parallel { stroke: #cba6f7; stroke-width: 2; stroke-dasharray: 8 4; }
+        .Lxy-line--parallel-active { stroke: #cba6f7; stroke-width: 3; stroke-dasharray: 0; animation: Lxy-dash 0.6s infinite linear; }
+        @keyframes Lxy-dash { to { stroke-dashoffset: -12; } }
+
+        /* ====== 下方双栏 ====== */
+        .Lxy_main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+        .Lxy_panel {
+            background: #181825; border: 1px solid #45475a; border-radius: 12px;
+            padding: 18px;
+        }
+        .Lxy_panel-title { font-size: 13px; font-weight: 700; color: #a6adc8; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* 状态表 */
+        .Lxy_step-row {
+            display: grid; grid-template-columns: 36px 1fr auto 70px;
+            gap: 10px; align-items: center; padding: 9px 10px;
+            border-radius: 6px; margin-bottom: 6px; font-size: 13px;
+            background: #11111b; transition: background 0.25s;
+        }
+        .Lxy_step-row--running { background: #2a2e55; }
+        .Lxy_step-row--done    { background: #1e2a1e; }
+
+        .Lxy_step-emoji { font-size: 18px; text-align: center; }
+        .Lxy_step-name { color: #cdd6f4; font-weight: 500; }
+        .Lxy_step-name b { color: #cba6f7; font-weight: 600; margin-right: 6px; font-size: 11px; }
+        .Lxy_step-time { font-family: "Consolas", monospace; font-size: 12px; color: #a6adc8; text-align: right; }
+        .Lxy_step-time b { color: #f9e2af; }
+
+        /* 按钮 */
+        .Lxy_btn {
+            padding: 9px 28px; border: none; border-radius: 20px; cursor: pointer;
+            font-size: 13px; font-weight: 700; letter-spacing: 2px; color: #11111b;
+            transition: transform 0.15s, box-shadow 0.15s; margin-right: 8px; margin-bottom: 8px;
+        }
+        .Lxy_btn:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(0,0,0,0.4); }
+        .Lxy_btn--orange { background: #f9e2af; }
+        .Lxy_btn--green  { background: #a6e3a1; }
+        .Lxy_btn--red    { background: #f38ba8; color: #fff; }
+        .Lxy_btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* 日志 */
+        .Lxy_log {
+            background: #11111b; border-radius: 8px; padding: 12px 14px;
+            font-family: "Consolas", monospace; font-size: 12px; line-height: 1.8;
+            max-height: 320px; overflow: auto;
+        }
+        .Lxy_log .Lxy_line { white-space: pre-wrap; }
+        .Lxy_log .Lxy_time { color: #6c7086; margin-right: 8px; }
+        .Lxy_log .Lxy_info { color: #bac2de; }
+        .Lxy_log .Lxy_ok   { color: #a6e3a1; font-weight: 600; }
+        .Lxy_log .Lxy_run  { color: #89b4fa; }
+        .Lxy_log .Lxy_par  { color: #cba6f7; font-weight: 600; }
+        .Lxy_log .Lxy_em   { color: #f38ba8; font-weight: 600; }
+        .Lxy_log .Lxy_halo { color: #f9e2af; font-weight: 700; }
+
+        /* 进度条 */
+        .Lxy_total-time {
+            background: #181825; border: 1px solid #45475a; border-radius: 12px;
+            padding: 16px 22px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .Lxy_total-time b { color: #f9e2af; font-size: 18px; }
+        .Lxy_progress-bar { flex: 1; height: 10px; background: #313244; border-radius: 5px; margin: 0 20px; overflow: hidden; }
+        .Lxy_progress-fill { height: 100%; background: linear-gradient(90deg, #89b4fa, #a6e3a1); width: 0%; transition: width 0.3s; border-radius: 5px; }
+
+        /* 代码区 */
+        .Lxy_code-block {
+            background: #181825; border: 1px solid #45475a; border-radius: 12px;
+            padding: 18px; margin-bottom: 18px; font-family: "Consolas", monospace;
+            font-size: 12px; line-height: 1.75;
+        }
+        .Lxy_code-block .kw { color: #cba6f7; font-weight: 600; }
+        .Lxy_code-block .fn { color: #89b4fa; }
+        .Lxy_code-block .st { color: #a6e3a1; }
+        .Lxy_code-block .cm { color: #6c7086; }
+        .Lxy_code-block .nu { color: #fab387; }
+        .Lxy_code-block .pn { color: #f9e2af; }
+        .Lxy_code-block .lt { color: #f38ba8; }
+
+        .Lxy_legend {
+            display: flex; gap: 18px; font-size: 11.5px; color: #bac2de; padding: 10px 20px;
+            background: #11111b; border-radius: 8px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .Lxy_legend span { display: flex; align-items: center; gap: 6px; }
+        .Lxy_legend i {
+            display: inline-block; width: 14px; height: 14px; border-radius: 3px;
+        }
+
+        .Lxy_footer { text-align: center; margin-top: 24px; color: #6c7086; font-size: 11px; letter-spacing: 3px; }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <div class="Lxy_header">
+            <h1>🥟 包饺子 · Promise &amp; async/await 异步流程
+                <small>SERIAL + PROMISE.ALL · 刘馨月</small>
+            </h1>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- 按钮 -->
+        <div style="margin-bottom:14px;">
+            <button class="Lxy_btn Lxy_btn--orange" id="Lxy_runBtn" onclick="Lxy_start()">▶ 开始包饺子</button>
+            <button class="Lxy_btn Lxy_btn--green" onclick="Lxy_reset()">🔄 重置</button>
+        </div>
+
+        <!-- 进度 -->
+        <div class="Lxy_total-time">
+            <span>⏱ 总耗时：<b id="Lxy_totalMs">0</b> ms</span>
+            <div class="Lxy_progress-bar"><div class="Lxy_progress-fill" id="Lxy_progFill"></div></div>
+            <span>状态：<b id="Lxy_phase" style="color:#a6adc8;">待开始</b></span>
+        </div>
+
+        <!-- 图例 -->
+        <div class="Lxy_legend">
+            <span><i style="background:#313244;border:2px solid #45475a;"></i> 等待中</span>
+            <span><i style="background:#fab387;border-radius:50%;"></i> 正在执行</span>
+            <span><i style="background:#a6e3a1;"></i> 已完成</span>
+            <span><i style="background:#89b4fa;border-radius:50%;"></i> 并行分支</span>
+        </div>
+
+        <!-- ====== 流程图 SVG ====== -->
+        <div class="Lxy_flow-wrap">
+            <svg class="Lxy_flow-svg" id="Lxy_flowSvg" width="1060" height="310" viewBox="0 0 1060 310">
+                <defs>
+                    <marker id="Lxy-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#45475a"/>
+                    </marker>
+                    <marker id="Lxy-arrow-active" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#a6e3a1"/>
+                    </marker>
+                </defs>
+
+                <!-- 节点：坐标 (x,y) + 名字 -->
+                <!-- 买原料(130,40) → 取原料(270,40) → fork → 和面(480,110) + 和馅(480,220) → join 包饺子(720,165) → 吃饺子(890,165) -->
+
+                <!-- 连接线 -->
+                <!-- 1→2 -->
+                <line class="Lxy-line" id="Lxy_l_1_2" x1="170" y1="40" x2="230" y2="40" marker-end="url(#Lxy-arrow)"/>
+                <!-- 2→fork (270→380, 40→40) -->
+                <line class="Lxy-line" id="Lxy_l_2_fork" x1="310" y1="40" x2="430" y2="40" marker-end="url(#Lxy-arrow)"/>
+                <!-- fork 分叉下和馅 -->
+                <path class="Lxy-line Lxy-line--parallel" id="Lxy_l_fork_dumpling" d="M430,40 L430,220 L440,220" marker-end="url(#Lxy-arrow)"/>
+                <!-- fork 分叉上和面 -->
+                <path class="Lxy-line Lxy-line--parallel" id="Lxy_l_fork_mix" d="M430,40 L430,110 L440,110" marker-end="url(#Lxy-arrow)"/>
+                <!-- 和面 → join -->
+                <line class="Lxy-line" id="Lxy_l_mix_join" x1="560" y1="110" x2="680" y2="155" marker-end="url(#Lxy-arrow)"/>
+                <!-- 和馅 → join -->
+                <line class="Lxy-line" id="Lxy_l_dumpling_join" x1="560" y1="220" x2="680" y2="175" marker-end="url(#Lxy-arrow)"/>
+                <!-- 包饺子 → 吃饺子 -->
+                <line class="Lxy-line" id="Lxy_l_wrap_eat" x1="800" y1="165" x2="850" y2="165" marker-end="url(#Lxy-arrow)"/>
+                <!-- 吃饺子 → 完成 -->
+                <line class="Lxy-line" id="Lxy_l_eat_done" x1="930" y1="165" x2="1000" y2="165" marker-end="url(#Lxy-arrow)"/>
+
+                <!-- 1. 买原料 -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_buy" data-step="buy">
+                    <circle cx="130" cy="40" r="28"/>
+                    <text x="130" y="45" text-anchor="middle">🛒</text>
+                    <text class="Lxy-label" x="130" y="82" text-anchor="middle">买原料 6s</text>
+                </g>
+                <!-- 2. 取原料 -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_get" data-step="get">
+                    <circle cx="270" cy="40" r="28"/>
+                    <text x="270" y="45" text-anchor="middle">📦</text>
+                    <text class="Lxy-label" x="270" y="82" text-anchor="middle">取原料 1s</text>
+                </g>
+                <!-- 3. 和面 (上分支) -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_mix" data-step="mix">
+                    <circle cx="500" cy="110" r="28"/>
+                    <text x="500" y="115" text-anchor="middle">🥣</text>
+                    <text class="Lxy-label" x="500" y="152" text-anchor="middle">和面 5s</text>
+                </g>
+                <!-- 4. 和馅 (下分支) -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_fill" data-step="fill">
+                    <circle cx="500" cy="220" r="28"/>
+                    <text x="500" y="225" text-anchor="middle">🥕</text>
+                    <text class="Lxy-label" x="500" y="262" text-anchor="middle">和馅 3s</text>
+                </g>
+                <!-- 5. 包饺子 -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_wrap" data-step="wrap">
+                    <circle cx="760" cy="165" r="28"/>
+                    <text x="760" y="170" text-anchor="middle">🥟</text>
+                    <text class="Lxy-label" x="760" y="207" text-anchor="middle">包饺子 4s</text>
+                </g>
+                <!-- 6. 吃饺子 -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_eat" data-step="eat">
+                    <circle cx="890" cy="165" r="28"/>
+                    <text x="890" y="170" text-anchor="middle">😋</text>
+                    <text class="Lxy-label" x="890" y="207" text-anchor="middle">吃饺子 2s</text>
+                </g>
+                <!-- 7. 完成 -->
+                <g class="Lxy-node Lxy-node--idle" id="Lxy_n_done">
+                    <circle cx="1030" cy="165" r="28"/>
+                    <text x="1030" y="170" text-anchor="middle">🎉</text>
+                    <text class="Lxy-label" x="1030" y="207" text-anchor="middle">完成</text>
+                </g>
+            </svg>
+        </div>
+
+        <!-- ====== 下方两栏 ====== -->
+        <div class="Lxy_main">
+            <!-- 步骤状态表 -->
+            <div class="Lxy_panel">
+                <div class="Lxy_panel-title">📋 步骤状态表</div>
+                <div id="Lxy_stepsList"></div>
+            </div>
+
+            <!-- 控制台日志 -->
+            <div class="Lxy_panel">
+                <div class="Lxy_panel-title">📝 实时控制台日志</div>
+                <div class="Lxy_log" id="Lxy_log"></div>
+            </div>
+        </div>
+
+        <!-- 代码展示 -->
+        <div class="Lxy_code-block">
+            <div style="color:#a6adc8;font-size:11px;letter-spacing:2px;margin-bottom:10px;">📄 async/await 完整实现（复制即用）</div>
+<pre><span class="cm">// 把 setTimeout 包装成 Promise</span>
+<span class="kw">function</span> <span class="fn">wait</span>(ms) {
+    <span class="kw">return new</span> <span class="kw">Promise</span>(resolve =&gt; <span class="fn">setTimeout</span>(resolve, ms));
+}
+
+<span class="cm">// 包饺子完整流程</span>
+<span class="kw">async function</span> <span class="fn">makeDumplings</span>() {
+    <span class="kw">const</span> start = performance.<span class="fn">now</span>();
+
+    <span class="cm">// 串行：买完 → 取完</span>
+    <span class="kw">await</span> <span class="fn">wait</span>(<span class="nu">6000</span>);   <span class="lt">// 🛒 买原料</span>
+    <span class="kw">await</span> <span class="fn">wait</span>(<span class="nu">1000</span>);   <span class="lt">// 📦 取原料</span>
+
+    <span class="cm">// 并行：同时和面 &amp; 和馅（Promise.all）</span>
+    <span class="kw">await</span> <span class="kw">Promise</span>.<span class="fn">all</span>([
+        <span class="fn">wait</span>(<span class="nu">5000</span>),  <span class="lt">// 🥣 和面</span>
+        <span class="fn">wait</span>(<span class="nu">3000</span>)   <span class="lt">// 🥕 和馅</span>
+    ]);
+
+    <span class="cm">// 串行：包完 → 吃完 → 完成</span>
+    <span class="kw">await</span> <span class="fn">wait</span>(<span class="nu">4000</span>);   <span class="lt">// 🥟 包饺子</span>
+    <span class="kw">await</span> <span class="fn">wait</span>(<span class="nu">2000</span>);   <span class="lt">// 😋 吃饺子</span>
+
+    <span class="kw">return</span> performance.<span class="fn">now</span>() - start;
+}</pre>
+        </div>
+
+        <div class="Lxy_footer">Promise &amp; async/await · 原生 JS · 刘馨月 · 2026</div>
+    </div>
+
+    <script>
+        // ========== 步骤定义 ==========
+        var Lxy_steps = [
+            { id: 'buy',  name: '🛒 买原料',  ms: 6000, type: 'serial' },
+            { id: 'get',  name: '📦 取原料',  ms: 1000, type: 'serial' },
+            { id: 'mix',  name: '🥣 和面',    ms: 5000, type: 'parallel', group: 1 },
+            { id: 'fill', name: '🥕 和馅',    ms: 3000, type: 'parallel', group: 1 },
+            { id: 'wrap', name: '🥟 包饺子',  ms: 4000, type: 'serial' },
+            { id: 'eat',  name: '😋 吃饺子',  ms: 2000, type: 'serial' }
+        ];
+        var Lxy_stepState = {}; // { id: { status: 'idle|run|done', start: 0 } }
+
+        // ========== DOM 渲染 ==========
+        function Lxy_renderStepsList() {
+            var list = document.getElementById('Lxy_stepsList');
+            list.innerHTML = '';
+            Lxy_steps.forEach(function (s) {
+                var row = document.createElement('div');
+                row.className = 'Lxy_step-row';
+                row.id = 'Lxy_steprow_' + s.id;
+                var typeTag = s.type === 'parallel' ? '<b>并行</b>' : '';
+                row.innerHTML =
+                    '<div class="Lxy_step-emoji">' + s.name.split(' ')[0] + '</div>' +
+                    '<div class="Lxy_step-name">' + typeTag + s.name.split(' ')[1] + '</div>' +
+                    '<div class="Lxy_step-time">⏱ ' + (s.ms / 1000) + 's</div>' +
+                    '<div id="Lxy_stepTimer_' + s.id + '" style="font-size:11px;color:#a6adc8;">—</div>';
+                list.appendChild(row);
+            });
+        }
+
+        function Lxy_setNode(nodeId, cls) {
+            var el = document.getElementById(nodeId);
+            if (el) el.className.baseVal = 'Lxy-node Lxy-node--' + cls;
+        }
+        function Lxy_setLine(lineId, cls) {
+            var el = document.getElementById(lineId);
+            if (!el) return;
+            el.classList.remove('Lxy-line', 'Lxy-line--active', 'Lxy-line--done', 'Lxy-line--parallel-active');
+            el.classList.add(cls);
+        }
+
+        function Lxy_log(msg, cls) {
+            var log = document.getElementById('Lxy_log');
+            var now = new Date();
+            var ts = now.toTimeString().slice(0,8) + '.' + String(now.getMilliseconds()).padStart(3,'0');
+            var div = document.createElement('div');
+            div.className = 'Lxy_line';
+            div.innerHTML = '<span class="Lxy_time">[' + ts + ']</span><span class="' + (cls || 'Lxy_info') + '">' + msg + '</span>';
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function Lxy_setStepRow(id, cls, statusText) {
+            var row = document.getElementById('Lxy_steprow_' + id);
+            if (!row) return;
+            row.classList.remove('Lxy_step-row--running', 'Lxy_step-row--done');
+            if (cls) row.classList.add('Lxy_step-row--' + cls);
+            var timerEl = document.getElementById('Lxy_stepTimer_' + id);
+            if (timerEl) timerEl.textContent = statusText || '—';
+        }
+
+        // ========== Promise 包装 setTimeout ==========
+        function Lxy_promise(ms, stepId, opts) {
+            opts = opts || {};
+            return new Promise(function (resolve) {
+                var start = performance.now();
+                Lxy_stepState[stepId] = { status: 'run', start: start, ms: ms };
+
+                // 启动倒计时显示
+                var timerEl = document.getElementById('Lxy_stepTimer_' + stepId);
+                var counter = setInterval(function () {
+                    var remain = Math.max(0, ms - (performance.now() - start));
+                    if (timerEl) timerEl.textContent = remain > 0 ? '⏳ ' + (remain / 1000).toFixed(1) + 's' : '✨';
+                    // 进度条
+                    var totalMs = Lxy_totalMs || 21000;
+                    Lxy_updateProgress();
+                    if (remain <= 0) clearInterval(counter);
+                }, 50);
+
+                setTimeout(function () {
+                    clearInterval(counter);
+                    Lxy_stepState[stepId].status = 'done';
+                    Lxy_stepState[stepId].end = performance.now();
+                    resolve({ id: stepId, ms: ms, elapsed: performance.now() - start });
+                }, ms);
+            });
+        }
+
+        // ========== 总计时 ==========
+        var Lxy_totalStart = 0;
+        var Lxy_totalMs = 21000; // 6+1+5+4+2=18s，但并行和馅先完成，所以实际 ≈ 18s
+        function Lxy_updateProgress() {
+            var elapsed = performance.now() - Lxy_totalStart;
+            var pct = Math.min(100, elapsed / Lxy_totalMs * 100);
+            document.getElementById('Lxy_progFill').style.width = pct + '%';
+            document.getElementById('Lxy_totalMs').textContent = Math.floor(elapsed);
+        }
+        setInterval(function () { if (Lxy_totalStart) Lxy_updateProgress(); }, 50);
+
+        // ========== 主流程 ==========
+        async function Lxy_start() {
+            var btn = document.getElementById('Lxy_runBtn');
+            btn.disabled = true; btn.textContent = '🍳 正在包饺子…';
+            document.getElementById('Lxy_log').innerHTML = '';
+            document.getElementById('Lxy_phase').textContent = '🛒 串行阶段 1/2';
+            document.getElementById('Lxy_phase').style.color = '#89b4fa';
+
+            Lxy_renderStepsList();
+            Lxy_totalStart = performance.now();
+            document.getElementById('Lxy_totalMs').textContent = '0';
+
+            // ==== 阶段 1: 买原料 ====
+            Lxy_setNode('Lxy_n_buy', 'current');
+            Lxy_setStepRow('buy', 'running', '⏳ 6.0s');
+            Lxy_log('🛒 买原料 — 开始', 'Lxy_run');
+            var r1 = await Lxy_promise(6000, 'buy');
+            Lxy_setNode('Lxy_n_buy', 'done');
+            Lxy_setStepRow('buy', 'done', '✅ +' + r1.elapsed.toFixed(0) + 'ms');
+            Lxy_setLine('Lxy_l_1_2', 'Lxy-line--active');
+            Lxy_log('✅ 买原料完成 (+' + r1.elapsed.toFixed(0) + 'ms)', 'Lxy_ok');
+
+            // ==== 阶段 2: 取原料 ====
+            Lxy_setNode('Lxy_n_get', 'current');
+            Lxy_setLine('Lxy_l_1_2', 'Lxy-line--done');
+            Lxy_setStepRow('get', 'running', '⏳ 1.0s');
+            Lxy_log('📦 取原料 — 开始', 'Lxy_run');
+            var r2 = await Lxy_promise(1000, 'get');
+            Lxy_setNode('Lxy_n_get', 'done');
+            Lxy_setStepRow('get', 'done', '✅ +' + r2.elapsed.toFixed(0) + 'ms');
+            Lxy_setLine('Lxy_l_2_fork', 'Lxy-line--done');
+            Lxy_log('✅ 取原料完成 (+' + r2.elapsed.toFixed(0) + 'ms)', 'Lxy_ok');
+
+            // ==== 阶段 3: Promise.all 并行 ====
+            document.getElementById('Lxy_phase').textContent = '⚡ 并行阶段（Promise.all）';
+            document.getElementById('Lxy_phase').style.color = '#cba6f7';
+            Lxy_log('──────────────────────', 'Lxy_em');
+            Lxy_log('⚡ 进入 Promise.all — 和面 & 和馅 同时开始！', 'Lxy_par');
+            Lxy_log('  Promise.all([ wait(5000), wait(3000) ])', 'Lxy_par');
+
+            Lxy_setLine('Lxy_l_fork_mix', 'Lxy-line--parallel-active');
+            Lxy_setLine('Lxy_l_fork_dumpling', 'Lxy-line--parallel-active');
+
+            // 启动两个并行 promise
+            var p_mix = Lxy_promise(5000, 'mix');
+            var p_fill = Lxy_promise(3000, 'fill');
+
+            Lxy_setNode('Lxy_n_mix', 'current');
+            Lxy_setNode('Lxy_n_fill', 'current');
+            Lxy_setStepRow('mix', 'running', '⏳ 5.0s');
+            Lxy_setStepRow('fill', 'running', '⏳ 3.0s');
+            Lxy_log('🥣 和面开始 (5s)', 'Lxy_run');
+            Lxy_log('🥕 和馅开始 (3s)', 'Lxy_run');
+
+            // 和馅 3s 先完成
+            var r3 = await p_fill;
+            Lxy_setNode('Lxy_n_fill', 'done');
+            Lxy_setStepRow('fill', 'done', '✅ +' + r3.elapsed.toFixed(0) + 'ms 先完成');
+            Lxy_log('✅ 和馅先完成 — 等待和面…', 'Lxy_ok');
+            Lxy_log('   💡 这就是 Promise.all：等最慢的那个', 'Lxy_par');
+
+            // 和面 5s 后完成
+            var r4 = await p_mix;
+            Lxy_setNode('Lxy_n_mix', 'done');
+            Lxy_setLine('Lxy_l_fork_mix', 'Lxy-line--done');
+            Lxy_setLine('Lxy_l_fork_dumpling', 'Lxy-line--done');
+            Lxy_setStepRow('mix', 'done', '✅ +' + r4.elapsed.toFixed(0) + 'ms');
+            Lxy_log('✅ 和面完成 — 两条分支汇合', 'Lxy_ok');
+
+            Lxy_setLine('Lxy_l_mix_join', 'Lxy-line--done');
+            Lxy_setLine('Lxy_l_dumpling_join', 'Lxy-line--done');
+            Lxy_log('──────────────────────', 'Lxy_em');
+            Lxy_log('⚡ Promise.all 完成！两条分支汇合', 'Lxy_halo');
+
+            // ==== 阶段 4: 包饺子 ====
+            document.getElementById('Lxy_phase').textContent = '🥟 串行阶段 2/2';
+            document.getElementById('Lxy_phase').style.color = '#89b4fa';
+            Lxy_setNode('Lxy_n_wrap', 'current');
+            Lxy_setStepRow('wrap', 'running', '⏳ 4.0s');
+            Lxy_log('🥟 包饺子 — 开始', 'Lxy_run');
+            var r5 = await Lxy_promise(4000, 'wrap');
+            Lxy_setNode('Lxy_n_wrap', 'done');
+            Lxy_setStepRow('wrap', 'done', '✅ +' + r5.elapsed.toFixed(0) + 'ms');
+            Lxy_setLine('Lxy_l_wrap_eat', 'Lxy-line--done');
+            Lxy_log('✅ 包饺子完成 (+' + r5.elapsed.toFixed(0) + 'ms)', 'Lxy_ok');
+
+            // ==== 阶段 5: 吃饺子 ====
+            Lxy_setNode('Lxy_n_eat', 'current');
+            Lxy_setStepRow('eat', 'running', '⏳ 2.0s');
+            Lxy_log('😋 吃饺子 — 开吃！', 'Lxy_run');
+            var r6 = await Lxy_promise(2000, 'eat');
+            Lxy_setNode('Lxy_n_eat', 'done');
+            Lxy_setStepRow('eat', 'done', '✅ +' + r6.elapsed.toFixed(0) + 'ms');
+            Lxy_setLine('Lxy_l_eat_done', 'Lxy-line--done');
+            Lxy_log('✅ 吃饺子完成 (+' + r6.elapsed.toFixed(0) + 'ms)', 'Lxy_ok');
+
+            // ==== 完成 ====
+            Lxy_setNode('Lxy_n_done', 'current');
+            document.getElementById('Lxy_phase').textContent = '🎉 完成！';
+            document.getElementById('Lxy_phase').style.color = '#a6e3a1';
+            var total = performance.now() - Lxy_totalStart;
+            document.getElementById('Lxy_totalMs').textContent = Math.floor(total);
+            document.getElementById('Lxy_progFill').style.width = '100%';
+            Lxy_log('', 'Lxy_em');
+            Lxy_log('🎉 饺子做完啦！总耗时：' + Math.floor(total) + 'ms ≈ ' + (total / 1000).toFixed(1) + 's', 'Lxy_halo');
+            Lxy_log('   💡 串行 6+1+4+2=13s + 并行取 max(5,3)=5s —— 总共 ≈ 18s', 'Lxy_par');
+            Lxy_log('      如果不用 Promise.all 串行跑 5+3=8s —— 要 21s！省了 3s', 'Lxy_par');
+
+            btn.disabled = false; btn.textContent = '▶ 再来一次';
+        }
+
+        function Lxy_reset() {
+            Lxy_stepState = {};
+            Lxy_renderStepsList();
+            document.getElementById('Lxy_log').innerHTML = '';
+            document.getElementById('Lxy_totalMs').textContent = '0';
+            document.getElementById('Lxy_progFill').style.width = '0%';
+            document.getElementById('Lxy_phase').textContent = '待开始';
+            document.getElementById('Lxy_phase').style.color = '#a6adc8';
+            document.getElementById('Lxy_runBtn').disabled = false;
+            document.getElementById('Lxy_runBtn').textContent = '▶ 开始包饺子';
+
+            // 重置 SVG
+            var allNodes = document.querySelectorAll('.Lxy_node');
+            allNodes.forEach(function (n) { n.className.baseVal = 'Lxy-node Lxy-node--idle'; });
+            var allLines = document.querySelectorAll('.Lxy-line, .Lxy-line--parallel, .Lxy-line--parallel-active, .Lxy-line--done, .Lxy-line--active');
+            allLines.forEach(function (l) {
+                l.className.baseVal = l.classList.contains('Lxy-line--parallel') ? 'Lxy-line Lxy-line--parallel' : 'Lxy-line';
+            });
+        }
+
+        // 初始渲染
+        Lxy_renderStepsList();
+        Lxy_log('🌟 欢迎来到 Promise 包饺子演示', 'Lxy_halo');
+        Lxy_log('点击上方 ▶ 按钮开始', 'Lxy_info');
+    </script>
+</body>
+</html>

@@ -132,3 +132,7 @@
 ## 2026-11-02-16-03
 - 模型：opencode/mimo-v2.6-flash-free
 - 提示词：完成17-5.html 展示javascript的两种定时器
+
+## 2026-11-02-16-10
+- 模型：opencode/mimo-v2.6-flash-free
+- 提示词：完成17-6.html promise+async包饺子流程演示
