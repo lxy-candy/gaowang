@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-11-02
+    功能：API 远程接口测试台（GET/POST/PUT/DELETE + Headers + Body + 响应高亮 + 错误链路）
+    -->
+    <title>API 测试台 · Fetch · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #1a1d23; min-height: 100vh; padding: 30px 20px; color: #e6e8ec;
+        }
+        .Lxy_wrap { max-width: 1200px; margin: 0 auto; }
+
+        /* ====== Header ====== */
+        .Lxy_header {
+            background: linear-gradient(135deg, #2d2a4a 0%, #1e1b3a 100%);
+            border: 1px solid #3a3757; border-radius: 12px; padding: 20px 28px;
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .Lxy_header h1 { font-size: 20px; color: #cdd6f4; letter-spacing: 2px; }
+        .Lxy_header h1 small { display: block; font-size: 11px; font-weight: 400; color: #7f849c; letter-spacing: 3px; margin-top: 3px; }
+        .Lxy_author { padding: 4px 14px; background: #45475a; color: #cdd6f4; border-radius: 14px; font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+
+        /* ====== 请求行 ====== */
+        .Lxy_req-bar {
+            background: #22252c; border: 1px solid #363a45; border-radius: 10px;
+            padding: 16px 18px; margin-bottom: 14px; display: flex; gap: 10px;
+            align-items: stretch; flex-wrap: wrap;
+        }
+        .Lxy_method {
+            padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 800;
+            letter-spacing: 1px; border: none; cursor: pointer;
+            background: #363a45; color: #a6adc8;
+        }
+        .Lxy-method-get    { background: #1e6f4a; color: #fff; }
+        .Lxy-method-post   { background: #1e4a8a; color: #fff; }
+        .Lxy-method-put     { background: #7a5a1e; color: #fff; }
+        .Lxy-method-delete { background: #8a1e3a; color: #fff; }
+
+        .Lxy_url {
+            flex: 1; min-width: 220px; padding: 11px 14px;
+            background: #1a1d23; border: 1px solid #363a45; border-radius: 6px;
+            color: #cdd6f4; font-family: "Consolas", monospace; font-size: 13px;
+        }
+        .Lxy_url:focus { outline: none; border-color: #89b4fa; }
+
+        .Lxy_send {
+            padding: 11px 28px; border: none; border-radius: 6px; cursor: pointer;
+            font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 2px;
+            background: linear-gradient(135deg, #89b4fa, #74c7ec);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .Lxy_send:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(137,180,250,0.4); }
+        .Lxy_send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .Lxy_clear {
+            padding: 11px 16px; border: 1px solid #363a45; border-radius: 6px;
+            background: transparent; color: #a6adc8; cursor: pointer; font-size: 13px;
+        }
+        .Lxy_clear:hover { background: #363a45; color: #fff; }
+
+        /* ====== 预设快捷 ====== */
+        .Lxy_presets {
+            background: #22252c; border: 1px solid #363a45; border-radius: 10px;
+            padding: 10px 16px; margin-bottom: 14px; display: flex; gap: 8px;
+            align-items: center; flex-wrap: wrap; font-size: 12px;
+        }
+        .Lxy_presets-label { color: #7f849c; font-weight: 600; margin-right: 6px; }
+        .Lxy_preset {
+            padding: 4px 10px; background: #363a45; border-radius: 4px; cursor: pointer;
+            color: #bac2de; transition: background 0.15s;
+        }
+        .Lxy_preset:hover { background: #45475a; color: #fff; }
+        .Lxy_preset b { color: #89b4fa; margin-right: 6px; font-size: 11px; }
+
+        /* ====== 三列布局 ====== */
+        .Lxy_main { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+        .Lxy_panel {
+            background: #22252c; border: 1px solid #363a45; border-radius: 10px;
+            padding: 14px 16px; display: flex; flex-direction: column;
+        }
+        .Lxy_panel-title {
+            font-size: 12px; font-weight: 700; color: #7f849c; letter-spacing: 2px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            text-transform: uppercase;
+        }
+
+        textarea.Lxy_body {
+            width: 100%; flex: 1; min-height: 180px; resize: vertical;
+            background: #1a1d23; border: 1px solid #363a45; border-radius: 6px;
+            color: #a6e3a1; font-family: "Consolas", monospace; font-size: 12.5px;
+            padding: 12px; line-height: 1.6;
+        }
+        textarea.Lxy_body:focus { outline: none; border-color: #89b4fa; }
+
+        /* ====== 响应区 ====== */
+        .Lxy_resp-top {
+            background: #22252c; border: 1px solid #363a45; border-radius: 10px;
+            padding: 14px 16px; margin-bottom: 14px;
+        }
+        .Lxy_status-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 12.5px; }
+        .Lxy_status-code {
+            padding: 4px 14px; font-size: 15px; font-weight: 800; border-radius: 14px;
+            font-family: "Consolas", monospace;
+        }
+        .Lxy_code-ok      { background: #1e6f4a; color: #fff; }
+        .Lxy_code-err     { background: #8a1e3a; color: #fff; }
+        .Lxy_code-pending { background: #363a45; color: #a6adc8; }
+
+        .Lxy_meta b { color: #cdd6f4; margin-right: 6px; }
+        .Lxy_meta span { color: #a6adc8; font-family: "Consolas", monospace; }
+
+        .Lxy_resp-pre {
+            background: #1a1d23; border: 1px solid #363a45; border-radius: 10px;
+            padding: 16px; font-family: "Consolas", monospace; font-size: 12.5px;
+            line-height: 1.6; max-height: 420px; overflow: auto; white-space: pre-wrap;
+            color: #cdd6f4;
+        }
+
+        /* 语法高亮 */
+        .kw  { color: #89b4fa; }
+        .str { color: #a6e3a1; }
+        .num { color: #fab387; }
+        .bol { color: #cba6f7; }
+        .nul { color: #f38ba8; }
+        .pn  { color: #6c7086; }
+
+        /* 错误链路 */
+        .Lxy_error-chain {
+            background: #3a1a22; border: 1px solid #8a1e3a; border-radius: 10px;
+            padding: 16px; margin-top: 14px; font-size: 12.5px; line-height: 1.7;
+        }
+        .Lxy_error-chain .Lxy_ec-title { color: #f38ba8; font-weight: 700; margin-bottom: 6px; }
+        .Lxy_error-chain pre { font-family: "Consolas", monospace; color: #f5c2e7; white-space: pre-wrap; margin-top: 6px; }
+
+        /* loading */
+        .Lxy_busy {
+            display: inline-block; width: 12px; height: 12px;
+            border: 2px solid #363a45; border-top-color: #89b4fa;
+            border-radius: 50%; animation: Lxy-spin 0.6s linear infinite;
+            vertical-align: middle; margin-right: 6px;
+        }
+        @keyframes Lxy-spin { to { transform: rotate(360deg); } }
+
+        .Lxy_footer { text-align: center; margin-top: 24px; color: #585b70; font-size: 11px; letter-spacing: 3px; }
+
+        @media (max-width: 720px) {
+            .Lxy_main { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <div class="Lxy_header">
+            <h1>API 测试台 · Request Tester
+                <small>FETCH · GET POST PUT DELETE · 刘馨月</small>
+            </h1>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- 请求行 -->
+        <div class="Lxy_req-bar">
+            <button class="Lxy_method Lxy-method-get Lxy_method--active" data-m="GET" onclick="Lxy_setMethod(this)">GET</button>
+            <button class="Lxy_method" data-m="POST" onclick="Lxy_setMethod(this)">POST</button>
+            <button class="Lxy_method" data-m="PUT" onclick="Lxy_setMethod(this)">PUT</button>
+            <button class="Lxy_method" data-m="DELETE" onclick="Lxy_setMethod(this)">DELETE</button>
+            <input class="Lxy_url" id="Lxy_url" type="text" placeholder="https://...  例如 https://dummyjson.com/products/1" value="https://dummyjson.com/products/1">
+            <button class="Lxy_send" id="Lxy_sendBtn" onclick="Lxy_send()">▶ 发送</button>
+            <button class="Lxy_clear" onclick="Lxy_clearAll()">🧹 清空</button>
+        </div>
+
+        <!-- 预设快捷 -->
+        <div class="Lxy_presets">
+            <span class="Lxy_presets-label">⚡ 快捷预设：</span>
+            <span class="Lxy_preset" onclick="Lxy_usePreset({m:'GET',  u:'https://dummyjson.com/products/1', body:''})">
+                <b>GET</b> 商品详情
+            </span>
+            <span class="Lxy_preset" onclick="Lxy_usePreset({m:'GET',  u:'https://dummyjson.com/products?limit=3', body:''})">
+                <b>GET</b> 商品列表
+            </span>
+            <span class="Lxy_preset" onclick="Lxy_usePreset({m:'POST', u:'https://dummyjson.com/products/add', body:JSON.stringify({title:'刘馨月测试商品', price:99}, null, 2)})">
+                <b>POST</b> 新增商品
+            </span>
+            <span class="Lxy_preset" onclick="Lxy_usePreset({m:'PUT',  u:'https://dummyjson.com/products/1', body:JSON.stringify({title:'已更新 · 刘馨月', price:42}, null, 2)})">
+                <b>PUT</b> 更新商品
+            </span>
+            <span class="Lxy_preset" onclick="Lxy_usePreset({m:'DELETE', u:'https://dummyjson.com/products/1', body:''})">
+                <b>DELETE</b> 删除商品
+            </span>
+        </div>
+
+        <!-- Body + Response -->
+        <div class="Lxy_main">
+            <div class="Lxy_panel">
+                <div class="Lxy_panel-title">📤 请求 Body（JSON）<span style="color:#585b70;">POST/PUT 时填</span></div>
+                <textarea class="Lxy_body" id="Lxy_body" spellcheck="false" placeholder='{
+  "key": "value"
+}'></textarea>
+            </div>
+
+            <div class="Lxy_panel">
+                <div class="Lxy_panel-title">📥 响应预览 <span id="Lxy_respCount" style="color:#585b70;"></span></div>
+                <pre class="Lxy_resp-pre" id="Lxy_resp">发送请求后这里会显示响应…</pre>
+            </div>
+        </div>
+
+        <!-- 状态条 + 错误链路 -->
+        <div class="Lxy_resp-top">
+            <div class="Lxy_status-row">
+                <span class="Lxy_status-code Lxy_code-pending" id="Lxy_statusCode">—</span>
+                <span class="Lxy_meta"><b>耗时：</b><span id="Lxy_time">-</span> ms</span>
+                <span class="Lxy_meta"><b>大小：</b><span id="Lxy_size">-</span></span>
+                <span class="Lxy_meta"><b>类型：</b><span id="Lxy_type">-</span></span>
+                <span class="Lxy_meta" style="margin-left:auto;"><b>Method：</b><span id="Lxy_methodLabel">GET</span></span>
+            </div>
+            <div class="Lxy_error-chain" id="Lxy_errChain" style="display:none;"></div>
+        </div>
+
+        <div class="Lxy_footer">Fetch API Test Console · 原生 JS · 刘馨月 · 2026</div>
+    </div>
+
+    <script>
+        var Lxy_state = { method: 'GET' };
+
+        // ========== UI 控制 ==========
+        function Lxy_setMethod(btn) {
+            document.querySelectorAll('.Lxy_method').forEach(function (b) {
+                b.classList.remove('Lxy_method--active');
+                b.classList.remove('Lxy-method-get', 'Lxy-method-post', 'Lxy-method-put', 'Lxy-method-delete');
+                b.classList.add('Lxy-method-get'); // 默认灰
+            });
+            btn.classList.add('Lxy_method--active');
+            var m = btn.dataset.m;
+            Lxy_state.method = m;
+            btn.classList.remove('Lxy-method-get');
+            btn.classList.add('Lxy-method-' + m.toLowerCase());
+            document.getElementById('Lxy_methodLabel').textContent = m;
+            // GET/DELETE 清空 body
+            if (m === 'GET' || m === 'DELETE') document.getElementById('Lxy_body').placeholder = '（GET/DELETE 一般不需要 body）';
+            else document.getElementById('Lxy_body').placeholder = '{\n  "key": "value"\n}';
+        }
+
+        function Lxy_usePreset(p) {
+            document.getElementById('Lxy_url').value = p.u;
+            document.getElementById('Lxy_body').value = p.body;
+            // set method button
+            document.querySelectorAll('.Lxy_method').forEach(function (b) {
+                if (b.dataset.m === p.m) Lxy_setMethod(b);
+            });
+        }
+
+        function Lxy_clearAll() {
+            document.getElementById('Lxy_url').value = 'https://dummyjson.com/products/1';
+            document.getElementById('Lxy_body').value = '';
+            document.getElementById('Lxy_resp').textContent = '发送请求后这里会显示响应…';
+            document.getElementById('Lxy_statusCode').textContent = '—';
+            document.getElementById('Lxy_statusCode').className = 'Lxy_status-code Lxy_code-pending';
+            document.getElementById('Lxy_time').textContent = '-';
+            document.getElementById('Lxy_size').textContent = '-';
+            document.getElementById('Lxy_type').textContent = '-';
+            document.getElementById('Lxy_errChain').style.display = 'none';
+            document.getElementById('Lxy_respCount').textContent = '';
+        }
+
+        // ========== JSON 语法高亮 ==========
+        function Lxy_highlight(s) {
+            return s
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"([^"\\]*(?:\\.[^"\\]*)*)"(\s*:)/g, '<span class="kw">"$1"</span><span class="pn">$2</span>')
+                .replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, '<span class="str">"$1"</span>')
+                .replace(/\b(-?\d+\.?\d*(?:[eE][+-]?\d+)?)\b/g, '<span class="num">$1</span>')
+                .replace(/\b(true|false)\b/g, '<span class="bol">$1</span>')
+                .replace(/\b(null|undefined)\b/g, '<span class="nul">$1</span>');
+        }
+
+        // ========== 核心 fetch ==========
+        async function Lxy_send() {
+            var url = document.getElementById('Lxy_url').value.trim();
+            var method = Lxy_state.method;
+            var bodyRaw = document.getElementById('Lxy_body').value.trim();
+            var btn = document.getElementById('Lxy_sendBtn');
+            var statusEl = document.getElementById('Lxy_statusCode');
+            var errChain = document.getElementById('Lxy_errChain');
+            var respEl = document.getElementById('Lxy_resp');
+            var respCount = document.getElementById('Lxy_respCount');
+
+            // 重置 UI
+            btn.disabled = true; btn.innerHTML = '<span class="Lxy_busy"></span>请求中…';
+            statusEl.textContent = '?';
+            statusEl.className = 'Lxy_status-code Lxy_code-pending';
+            errChain.style.display = 'none';
+            respEl.textContent = '（等待响应…）';
+            document.getElementById('Lxy_time').textContent = '-';
+            document.getElementById('Lxy_size').textContent = '-';
+            document.getElementById('Lxy_type').textContent = '-';
+            respCount.textContent = '';
+
+            if (!url) {
+                Lxy_showErr('URL 不能为空', '请输入完整的接口地址，例如 https://dummyjson.com/products/1');
+                btn.disabled = false; btn.innerHTML = '▶ 发送';
+                return;
+            }
+
+            // 构造 options
+            var opts = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            var hasBody = (method === 'POST' || method === 'PUT' || method === 'PATCH') && bodyRaw.length > 0;
+            if (hasBody) {
+                // 校验 JSON
+                try { JSON.parse(bodyRaw); }
+                catch (e) {
+                    Lxy_showErr('请求 Body JSON 格式错误', e.message + '\n第 ' + (function () { try { JSON.parse(bodyRaw); } catch (ee) { var m = ee.match(/position\s+(\d+)/i); return m ? m[1] : '?'; } })() + ' 字符附近');
+                    btn.disabled = false; btn.innerHTML = '▶ 发送';
+                    return;
+                }
+                opts.body = bodyRaw;
+            }
+
+            var start = performance.now();
+            try {
+                var res = await fetch(url, opts);
+                var elapsed = (performance.now() - start).toFixed(0);
+
+                statusEl.textContent = res.status + ' ' + res.statusText;
+                statusEl.className = 'Lxy_status-code ' + (res.ok ? 'Lxy_code-ok' : 'Lxy_code-err');
+                document.getElementById('Lxy_time').textContent = elapsed;
+
+                var text = await res.text();
+                document.getElementById('Lxy_size').textContent = text.length + ' 字节';
+                document.getElementById('Lxy_type').textContent = res.headers.get('content-type') || 'unknown';
+
+                // 尝试 JSON
+                try {
+                    var obj = JSON.parse(text);
+                    respEl.innerHTML = Lxy_highlight(JSON.stringify(obj, null, 2));
+                    // 统计
+                    var depth = 0;
+                    (function walk(v, d) {
+                        if (d > depth) depth = d;
+                        if (v && typeof v === 'object') (Array.isArray(v) ? v : Object.values(v)).forEach(function (x) { walk(x, d + 1); });
+                    })(obj, 0);
+                    var keys = (function count(v) {
+                        var c = 0;
+                        if (v && typeof v === 'object') {
+                            if (Array.isArray(v)) c = v.length;
+                            else c = Object.keys(v).length;
+                        }
+                        return c;
+                    })(obj);
+                    respCount.textContent = 'JSON · 层级 ' + depth + ' · 顶层键 ' + keys;
+                } catch (e) {
+                    respEl.textContent = text || '（空响应）';
+                    respCount.textContent = '纯文本 (' + (text ? text.length : 0) + ' 字节)';
+                }
+
+                // 非 2xx 显示错误链路
+                if (!res.ok) {
+                    Lxy_showErr('HTTP 状态异常：' + res.status,
+                        'Status: ' + res.status + ' ' + res.statusText + '\n' +
+                        'URL:    ' + url + '\n' +
+                        'Method: ' + method + '\n' +
+                        '服务端响应：\n' + (text || '(空)'));
+                }
+
+            } catch (e) {
+                var elapsed2 = (performance.now() - start).toFixed(0);
+                document.getElementById('Lxy_time').textContent = elapsed2;
+                statusEl.textContent = 'ERR';
+                statusEl.className = 'Lxy_status-code Lxy_code-err';
+                respEl.textContent = '(请求失败，无法获得响应体)';
+
+                // 错误分类
+                var type = '网络错误';
+                var tip = '请检查：URL 是否正确、CORS 是否允许、DNS/网络是否通畅、目标服务器是否在线';
+                var msg = (e.message || String(e));
+                if (/Failed to fetch|NetworkError/i.test(msg)) { type = 'CORS / 网络阻断'; tip = '浏览器跨域策略或网络防火墙阻止了请求'; }
+                else if (/aborted/i.test(msg)) { type = '请求被中止'; }
+                else if (/TypeError/i.test(msg)) { type = 'TypeError'; }
+
+                Lxy_showErr(type, msg + '\n\n💡 排查建议：\n' + tip);
+            } finally {
+                btn.disabled = false; btn.innerHTML = '▶ 发送';
+            }
+        }
+
+        function Lxy_showErr(title, detail) {
+            var el = document.getElementById('Lxy_errChain');
+            el.style.display = 'block';
+            el.innerHTML = '<div class="Lxy_ec-title">❌ ' + title + '</div><pre>' + detail + '</pre>';
+        }
+
+        // Enter 发送
+        document.getElementById('Lxy_url').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') Lxy_send();
+        });
+
+        // Ctrl+Enter 发送 body
+        document.getElementById('Lxy_body').addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'Enter') Lxy_send();
+        });
+    </script>
+</body>
+</html>
