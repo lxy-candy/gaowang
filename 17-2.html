@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-11-02
+    功能：fetch 调用 dog.ceo API，随机展示 hound 品种狗狗图片
+    -->
+    <title>狗狗随机图 · Fetch API · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe4c4 100%);
+            min-height: 100vh; padding: 40px 20px; color: #333;
+        }
+        .Lxy_wrap { max-width: 960px; margin: 0 auto; }
+
+        /* ====== Header ====== */
+        .Lxy_header {
+            background: #fff; border-radius: 14px; padding: 26px 32px;
+            box-shadow: 0 4px 20px rgba(139, 69, 19, 0.1);
+            margin-bottom: 24px; text-align: center;
+        }
+        .Lxy_emoji { font-size: 48px; display: inline-block; animation: Lxy-wag 1.2s ease-in-out infinite; transform-origin: bottom center; }
+        @keyframes Lxy-wag { 0%,100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } }
+        .Lxy_header h1 { font-size: 24px; margin-top: 6px; color: #8b4513; letter-spacing: 2px; }
+        .Lxy_header h1 small { display: block; font-size: 12px; color: #cd853f; font-weight: 400; margin-top: 4px; letter-spacing: 4px; }
+        .Lxy_api-box {
+            margin-top: 14px; padding: 10px 16px; background: #fff8f0; border: 1px dashed #deb887;
+            border-radius: 6px; font-family: "Consolas", monospace; font-size: 12px; color: #8b4513;
+            display: inline-block; word-break: break-all; max-width: 100%;
+        }
+
+        /* ====== 工具栏 ====== */
+        .Lxy_toolbar {
+            background: #fff; border-radius: 10px; padding: 14px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+            justify-content: center;
+        }
+        .Lxy_btn {
+            padding: 9px 22px; border: none; border-radius: 22px; cursor: pointer;
+            font-size: 13px; font-weight: 600; letter-spacing: 1px;
+            transition: transform 0.15s, box-shadow 0.15s; color: #fff;
+        }
+        .Lxy_btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139,69,19,0.3); }
+        .Lxy_btn--primary { background: linear-gradient(135deg, #ff8c42, #ff6b35); }
+        .Lxy_btn--green   { background: linear-gradient(135deg, #52b788, #2d6a4f); }
+        .Lxy_btn--orange  { background: linear-gradient(135deg, #f4a261, #e76f51); }
+        .Lxy_btn--disabled { background: #ddd !important; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        .Lxy_select {
+            padding: 8px 14px; border-radius: 20px; border: 1px solid #deb887;
+            background: #fff; font-size: 13px; color: #8b4513; cursor: pointer;
+            font-weight: 600;
+        }
+        .Lxy_select:focus { outline: none; border-color: #ff8c42; }
+
+        .Lxy_counter { font-size: 12px; color: #8b4513; margin-left: 8px; }
+
+        /* ====== 图片网格 ====== */
+        .Lxy_grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .Lxy_card {
+            background: #fff; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 14px rgba(139,69,19,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: Lxy-pop 0.45s ease-out both;
+        }
+        .Lxy_card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(139,69,19,0.18); }
+        @keyframes Lxy-pop {
+            from { opacity: 0; transform: translateY(16px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .Lxy_img-box {
+            position: relative; padding-top: 100%; background: #faf0e6;
+            overflow: hidden;
+        }
+        .Lxy_img-box img {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; transition: transform 0.4s;
+        }
+        .Lxy_card:hover .Lxy_img-box img { transform: scale(1.06); }
+
+        .Lxy_placeholder {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; color: #cd853f;
+        }
+        .Lxy_spinner {
+            width: 36px; height: 36px; border: 3px solid #ffe4c4;
+            border-top-color: #ff8c42; border-radius: 50%;
+            animation: Lxy-spin 0.8s linear infinite;
+        }
+        @keyframes Lxy-spin { to { transform: rotate(360deg); } }
+
+        .Lxy_card-body { padding: 12px 16px; }
+        .Lxy_breed-tag {
+            display: inline-block; padding: 2px 10px; background: #fff5e6;
+            color: #cd853f; font-size: 11px; font-weight: 700; border-radius: 10px;
+            letter-spacing: 1px;
+        }
+        .Lxy_url {
+            display: block; margin-top: 8px; font-size: 11px; color: #aaa;
+            word-break: break-all; line-height: 1.4;
+        }
+
+        /* ====== 错误 ====== */
+        .Lxy_error {
+            background: #fff5f5; border-left: 4px solid #e53e3e;
+            color: #c53030; padding: 12px 18px; border-radius: 6px;
+            margin-bottom: 18px; font-size: 13px; display: none;
+        }
+        .Lxy_error--show { display: block; }
+
+        /* ====== Raw JSON ====== */
+        .Lxy_raw {
+            margin-top: 24px; background: #2d2d2d; color: #e8d4a0;
+            border-radius: 10px; padding: 18px 22px; font-family: "Consolas", monospace;
+            font-size: 12px; line-height: 1.7; white-space: pre-wrap; max-height: 260px;
+            overflow: auto; box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .Lxy_raw-title {
+            font-size: 12px; color: #ff8c42; font-weight: 700; margin-bottom: 8px;
+            letter-spacing: 2px; font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .Lxy_footer { text-align: center; margin-top: 30px; color: #cd853f; font-size: 11px; letter-spacing: 3px; }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <!-- Header -->
+        <div class="Lxy_header">
+            <div class="Lxy_emoji">🐶</div>
+            <h1>
+                狗狗随机图 · Fetch API 演示
+                <small>刘馨月 · dog.ceo</small>
+            </h1>
+            <div class="Lxy_api-box">GET https://dog.ceo/api/breed/hound/images/random/3</div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div class="Lxy_error" id="Lxy_error"></div>
+
+        <!-- 工具栏 -->
+        <div class="Lxy_toolbar">
+            <label style="font-size:13px;color:#8b4513;font-weight:600;">品种：</label>
+            <select class="Lxy_select" id="Lxy_breedSelect">
+                <option value="hound">hound（猎犬）</option>
+                <option value="pug">pug（巴哥）</option>
+                <option value="shiba">shiba（柴犬）</option>
+                <option value="labrador">labrador（拉布拉多）</option>
+                <option value="husky">husky（哈士奇）</option>
+                <option value="border-collie">border-collie（边牧）</option>
+            </select>
+            <label style="font-size:13px;color:#8b4513;font-weight:600;">数量：</label>
+            <select class="Lxy_select" id="Lxy_countSelect">
+                <option value="1">1 张</option>
+                <option value="3" selected>3 张</option>
+                <option value="6">6 张</option>
+                <option value="9">9 张</option>
+            </select>
+            <button class="Lxy_btn Lxy_btn--primary" onclick="Lxy_fetch()">🔄 获取图片</button>
+            <button class="Lxy_btn Lxy_btn--green" onclick="Lxy_clear()">🧹 清空</button>
+            <span class="Lxy_counter" id="Lxy_counter">· 已加载 0 张</span>
+        </div>
+
+        <!-- 图片网格 -->
+        <div class="Lxy_grid" id="Lxy_grid"></div>
+
+        <!-- Raw JSON -->
+        <div class="Lxy_raw" id="Lxy_raw" style="display:none;"></div>
+
+        <div class="Lxy_footer">Fetch API · 原生 JS · 刘馨月 · 2026</div>
+    </div>
+
+    <script>
+        var Lxy_state = { count: 0 };
+
+        // ========== 核心 fetch ==========
+        async function Lxy_fetch() {
+            var breed = document.getElementById('Lxy_breedSelect').value;
+            var count = document.getElementById('Lxy_countSelect').value;
+            var grid = document.getElementById('Lxy_grid');
+            var errBox = document.getElementById('Lxy_error');
+            var counter = document.getElementById('Lxy_counter');
+
+            var btn = event.target;
+            btn.disabled = true; btn.classList.add('Lxy_btn--disabled'); btn.textContent = '⏳ 请求中…';
+            errBox.classList.remove('Lxy_error--show');
+
+            // 先显示 loading 占位
+            grid.innerHTML = '';
+            for (var i = 0; i < parseInt(count); i++) {
+                var ph = document.createElement('div');
+                ph.className = 'Lxy_card'; ph.style.animationDelay = (i * 80) + 'ms';
+                ph.innerHTML =
+                    '<div class="Lxy_img-box"><div class="Lxy_placeholder">' +
+                        '<div class="Lxy_spinner"></div>' +
+                        '<div style="margin-top:10px;font-size:12px;">加载中…</div>' +
+                    '</div></div>' +
+                    '<div class="Lxy_card-body">' +
+                        '<span class="Lxy_breed-tag">' + breed + '</span>' +
+                    '</div>';
+                grid.appendChild(ph);
+            }
+
+            // 拼 URL + fetch
+            var url = 'https://dog.ceo/api/breed/' + breed + '/images/random/' + count;
+            var rawBox = document.getElementById('Lxy_raw');
+            rawBox.style.display = 'none';
+
+            try {
+                var res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                var data = await res.json();
+
+                if (data.status !== 'success') throw new Error('API 返回 status: ' + data.status);
+                var urls = data.message;
+                if (!Array.isArray(urls)) urls = [urls];
+
+                // 渲染图片
+                grid.innerHTML = '';
+                urls.forEach(function (u, i) {
+                    var card = document.createElement('div');
+                    card.className = 'Lxy_card';
+                    card.style.animationDelay = (i * 80) + 'ms';
+                    card.innerHTML =
+                        '<div class="Lxy_img-box">' +
+                            '<img src="' + u + '" alt="dog ' + (i + 1) + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div class=\\\'Lxy_placeholder\\\'>💔 图片加载失败</div>\'">' +
+                        '</div>' +
+                        '<div class="Lxy_card-body">' +
+                            '<span class="Lxy_breed-tag">' + breed + '</span>' +
+                            '<span class="Lxy_url">' + u + '</span>' +
+                        '</div>';
+                    grid.appendChild(card);
+                });
+
+                // 展示 raw JSON
+                rawBox.innerHTML = '<div class="Lxy_raw-title">📦 原始 JSON 响应</div>' + JSON.stringify(data, null, 2);
+                rawBox.style.display = 'block';
+
+                Lxy_state.count = urls.length;
+                counter.textContent = '· 已加载 ' + Lxy_state.count + ' 张 · ' + breed;
+
+            } catch (e) {
+                errBox.textContent = '❌ 请求失败：' + e.message + '\n(可能原因：网络、CORS 被阻、接口限流)';
+                errBox.classList.add('Lxy_error--show');
+                grid.innerHTML = '';
+                Lxy_state.count = 0;
+                counter.textContent = '· 已加载 0 张';
+            } finally {
+                btn.disabled = false; btn.classList.remove('Lxy_btn--disabled'); btn.textContent = '🔄 再来一批';
+            }
+        }
+
+        function Lxy_clear() {
+            document.getElementById('Lxy_grid').innerHTML = '';
+            document.getElementById('Lxy_raw').style.display = 'none';
+            document.getElementById('Lxy_error').classList.remove('Lxy_error--show');
+            document.getElementById('Lxy_counter').textContent = '· 已加载 0 张';
+        }
+
+        // 页面加载自动 fetch 一次
+        window.addEventListener('load', function () {
+            var btn = document.querySelector('.Lxy_btn--primary');
+            if (btn) { btn.click(); }
+        });
+    </script>
+</body>
+</html>
