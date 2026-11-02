@@ -128,3 +128,7 @@
 ## 2026-11-02-15-58
 - 模型：opencode/mimo-v2.6-flash-free
 - 提示词：完成17-4.html API测试台 get/post/put/delete 响应+错误提示
+
+## 2026-11-02-16-03
+- 模型：opencode/mimo-v2.6-flash-free
+- 提示词：完成17-5.html 展示javascript的两种定时器

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-11-02
+    功能：JavaScript 两种定时器（setTimeout / setInterval）可视化演示
+    -->
+    <title>JS 定时器可视化 · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #1e1e2e, #313244);
+            min-height: 100vh; padding: 30px 20px; color: #cdd6f4;
+        }
+        .Lxy_wrap { max-width: 1100px; margin: 0 auto; }
+
+        /* ====== Header ====== */
+        .Lxy_header {
+            background: linear-gradient(135deg, #89b4fa20, #cba6f720);
+            border: 1px solid #45475a; border-radius: 14px; padding: 24px 32px;
+            margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .Lxy_header h1 { font-size: 22px; color: #f5e0dc; letter-spacing: 2px; }
+        .Lxy_header h1 small { display: block; font-size: 12px; font-weight: 400; color: #a6adc8; letter-spacing: 3px; margin-top: 4px; }
+        .Lxy_author { padding: 4px 14px; background: #89b4fa; color: #1e1e2e; border-radius: 14px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+
+        /* ====== 概念说明 ====== */
+        .Lxy_def-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;
+        }
+        .Lxy_def {
+            border-radius: 12px; padding: 18px 20px; border: 1px solid;
+        }
+        .Lxy_def--setTimeout { background: #1e2a1e; border-color: #a6e3a1; }
+        .Lxy_def--setInterval { background: #1e1e3a; border-color: #89b4fa; }
+        .Lxy_def-name { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+        .Lxy_def--setTimeout .Lxy_def-name { color: #a6e3a1; }
+        .Lxy_def--setInterval .Lxy_def-name { color: #89b4fa; }
+        .Lxy_def-desc { font-size: 12.5px; color: #bac2de; line-height: 1.7; margin-bottom: 10px; }
+        .Lxy_def-code {
+            background: #11111b; border-radius: 6px; padding: 10px 12px;
+            font-family: "Consolas", monospace; font-size: 12px; color: #cdd6f4;
+            line-height: 1.6;
+        }
+        .kw { color: #cba6f7; } .fn { color: #89b4fa; } .nu { color: #fab387; } .cm { color: #6c7086; } .str { color: #a6e3a1; }
+
+        /* ====== 通用面板 ====== */
+        .Lxy_card {
+            background: #181825; border: 1px solid #45475a; border-radius: 14px;
+            padding: 22px; margin-bottom: 16px;
+        }
+        .Lxy_card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .Lxy_dot { width: 8px; height: 8px; border-radius: 50%; }
+        .Lxy_dot--green  { background: #a6e3a1; box-shadow: 0 0 8px #a6e3a1; }
+        .Lxy_dot--blue   { background: #89b4fa; box-shadow: 0 0 8px #89b4fa; }
+        .Lxy_dot--purple { background: #cba6f7; box-shadow: 0 0 8px #cba6f7; }
+        .Lxy_dot--orange { background: #fab387; box-shadow: 0 0 8px #fab387; }
+
+        .Lxy_toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; align-items: center; }
+        .Lxy_btn {
+            padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer;
+            font-size: 12.5px; font-weight: 700; letter-spacing: 1px; color: #fff;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .Lxy_btn:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(0,0,0,0.4); }
+        .Lxy_btn--green  { background: linear-gradient(135deg, #a6e3a1, #6aab73); color: #111; }
+        .Lxy_btn--blue   { background: linear-gradient(135deg, #89b4fa, #5c8fe8); }
+        .Lxy_btn--purple { background: linear-gradient(135deg, #cba6f7, #9b6cd8); }
+        .Lxy_btn--red    { background: #f38ba8; color: #111; }
+        .Lxy_btn--ghost  { background: transparent; border: 1px solid #45475a; color: #bac2de; }
+        .Lxy_btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .Lxy_input {
+            padding: 8px 12px; background: #11111b; border: 1px solid #45475a; border-radius: 6px;
+            color: #cdd6f4; font-family: "Consolas", monospace; font-size: 12.5px; width: 120px;
+        }
+        .Lxy_input:focus { outline: none; border-color: #89b4fa; }
+        .Lxy_label { font-size: 12px; color: #a6adc8; }
+
+        /* ====== Demo 1: 打字机 setTimeout ====== */
+        .Lxy_type-box {
+            background: #11111b; border-radius: 8px; padding: 20px 24px;
+            font-family: "Consolas", monospace; font-size: 17px; min-height: 80px;
+            border-left: 3px solid #a6e3a1; line-height: 1.6;
+            display: flex; align-items: center;
+        }
+        .Lxy_cursor {
+            display: inline-block; width: 2px; height: 18px; background: #a6e3a1;
+            animation: Lxy-blink 0.7s infinite; margin-left: 2px; vertical-align: middle;
+        }
+        @keyframes Lxy-blink { 50% { opacity: 0; } }
+
+        /* ====== Demo 2: 倒计时 setInterval ====== */
+        .Lxy_countdown-wrap { text-align: center; padding: 24px 0; }
+        .Lxy_countdown-num {
+            font-size: 80px; font-weight: 900; color: #f38ba8; font-family: "Consolas", monospace;
+            line-height: 1; letter-spacing: 2px;
+        }
+        .Lxy_progress {
+            width: 100%; height: 8px; background: #313244; border-radius: 4px; overflow: hidden; margin-top: 14px;
+        }
+        .Lxy_progress-bar {
+            height: 100%; background: linear-gradient(90deg, #89b4fa, #f38ba8);
+            width: 100%; transition: width 0.1s linear; border-radius: 4px;
+        }
+
+        /* ====== Demo 3: 时间漂移对比 ====== */
+        .Lxy_drift-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;
+        }
+        .Lxy_drift-col {
+            background: #11111b; border-radius: 8px; padding: 14px 16px; font-size: 12px;
+            font-family: "Consolas", monospace;
+        }
+        .Lxy_drift-col h4 { font-size: 12.5px; margin-bottom: 8px; color: #f5e0dc; }
+        .Lxy_drift-col .Lxy_ts { color: #fab387; }
+        .Lxy_drift-col .Lxy_delta { color: #a6adc8; margin-left: 10px; }
+        .Lxy_drift-col .Lxy_sum { color: #cba6f7; margin-top: 6px; font-weight: 600; }
+
+        /* ====== 状态指示灯 ====== */
+        .Lxy_status {
+            display: inline-block; padding: 3px 12px; border-radius: 10px; font-size: 11px;
+            font-weight: 700; letter-spacing: 1px; margin-left: 10px;
+        }
+        .Lxy_status--idle    { background: #45475a; color: #a6adc8; }
+        .Lxy_status--running  { background: #a6e3a1; color: #11111b; animation: Lxy-pulse 1.2s infinite; }
+        .Lxy_status--stopped { background: #f38ba8; color: #11111b; }
+        @keyframes Lxy-pulse { 50% { opacity: 0.7; } }
+
+        /* ====== Demo 4: 秒表 ====== */
+        .Lxy_stopwatch {
+            text-align: center; padding: 28px 0; font-family: "Consolas", monospace;
+        }
+        .Lxy_stopwatch-num {
+            font-size: 56px; font-weight: 800; color: #89b4fa; letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(137,180,250,0.5);
+        }
+        .Lxy_stopwatch-laps {
+            margin-top: 14px; font-size: 12px; color: #bac2de;
+            max-height: 110px; overflow: auto; font-family: "Consolas", monospace;
+        }
+        .Lxy_stopwatch-laps span { display: block; padding: 3px 0; border-bottom: 1px solid #313244; }
+        .Lxy_stopwatch-laps span b { color: #cba6f7; margin-right: 10px; }
+
+        /* ====== 闪烁指示灯（side demo）====== */
+        .Lxy_blinker {
+            width: 50px; height: 50px; border-radius: 50%; margin: 10px auto;
+            transition: background 0.1s;
+        }
+
+        /* ====== 日志区 ====== */
+        .Lxy_log {
+            background: #11111b; border-radius: 6px; padding: 12px 14px;
+            font-family: "Consolas", monospace; font-size: 12px; max-height: 130px; overflow: auto;
+            line-height: 1.7; color: #bac2de;
+        }
+        .Lxy_log .Lxy_log-line b { color: #f5e0dc; }
+        .Lxy_log .Lxy_log-line span { color: #fab387; margin-left: 8px; }
+
+        @media (max-width: 720px) {
+            .Lxy_def-row, .Lxy_drift-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <div class="Lxy_header">
+            <h1>JS 定时器 · setTimeout &amp; setInterval
+                <small>SET TIMEOUT &amp; SET INTERVAL · 刘馨月</small>
+            </h1>
+            <span class="Lxy_author">刘馨月</span>
+        </div>
+
+        <!-- ====== 概念对照 ====== -->
+        <div class="Lxy_def-row">
+            <div class="Lxy_def Lxy_def--setTimeout">
+                <div class="Lxy_def-name">⏱ setTimeout() — 延迟一次</div>
+                <div class="Lxy_def-desc">在指定的延迟时间后**只执行一次**回调函数。常用于：延迟提示、动画延迟、轮询检测等。返回一个 timeoutId，可用 <code>clearTimeout(id)</code> 取消。</div>
+                <div class="Lxy_def-code">
+<span class="kw">const</span> id = <span class="fn">setTimeout</span>(() =&gt; {
+  <span class="fn">console.log</span>(<span class="str">'2秒后打印'</span>);
+}, <span class="nu">2000</span>);
+
+<span class="cm">// clearTimeout(id); // 取消</span>
+                </div>
+            </div>
+            <div class="Lxy_def Lxy_def--setInterval">
+                <div class="Lxy_def-name">🔁 setInterval() — 循环执行</div>
+                <div class="Lxy_def-desc">每隔指定间隔**重复执行**回调，直到被清除。常用于：倒计时、轮询刷新、动画帧更新等。返回 intervalId，可用 <code>clearInterval(id)</code> 取消。</div>
+                <div class="Lxy_def-code">
+<span class="kw">const</span> id = <span class="fn">setInterval</span>(() =&gt; {
+  <span class="fn">console.log</span>(<span class="str">'每秒打印一次'</span>);
+}, <span class="nu">1000</span>);
+
+<span class="cm">// clearInterval(id); // 取消</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== Demo 1: setTimeout 打字机 ====== -->
+        <div class="Lxy_card">
+            <div class="Lxy_card-title">
+                <span class="Lxy_dot Lxy_dot--green"></span>
+                Demo 1 · setTimeout 延迟打字机
+                <span class="Lxy_status" id="Lxy_typeStatus">idle</span>
+            </div>
+            <p style="font-size:12px;color:#a6adc8;margin-bottom:10px;">
+                用 <code>setTimeout</code> 延迟 80ms 打出一个字符，打完一个再调下一个 — 因为每次都是新的 setTimeout，所以叫"延迟递归"写法。
+            </p>
+            <div class="Lxy_type-box" id="Lxy_typeBox"></div>
+            <div class="Lxy_toolbar">
+                <button class="Lxy_btn Lxy_btn--green" onclick="Lxy_startType()">▶ 开始打字</button>
+                <button class="Lxy_btn Lxy_btn--ghost" onclick="Lxy_stopType()">⏹ 停止（clearTimeout）</button>
+                <button class="Lxy_btn Lxy_btn--ghost" onclick="document.getElementById('Lxy_typeBox').innerHTML=''">🧹 清空</button>
+                <span class="Lxy_label">字符延迟：</span>
+                <input class="Lxy_input" id="Lxy_typeDelay" type="number" value="80" min="10" max="500" style="width:70px;"> ms
+            </div>
+        </div>
+
+        <!-- ====== Demo 2: setInterval 倒计时 ====== -->
+        <div class="Lxy_card">
+            <div class="Lxy_card-title">
+                <span class="Lxy_dot Lxy_dot--blue"></span>
+                Demo 2 · setInterval 倒计时 + 进度条
+                <span class="Lxy_status" id="Lxy_cdStatus">idle</span>
+            </div>
+            <p style="font-size:12px;color:#a6adc8;margin-bottom:10px;">
+                用 <code>setInterval</code> 每 1000ms 让数字减 1，同时更新进度条；到 0 自动 <code>clearInterval</code>。
+            </p>
+            <div class="Lxy_countdown-wrap">
+                <div class="Lxy_countdown-num" id="Lxy_cdNum">10</div>
+                <div class="Lxy_progress"><div class="Lxy_progress-bar" id="Lxy_cdBar"></div></div>
+            </div>
+            <div class="Lxy_toolbar" style="justify-content:center;">
+                <button class="Lxy_btn Lxy_btn--blue" onclick="Lxy_startCountdown()">▶ 开始倒计时</button>
+                <button class="Lxy_btn Lxy_btn--red" onclick="Lxy_stopCountdown()">⏹ 停止（clearInterval）</button>
+                <span class="Lxy_label">初始值：</span>
+                <input class="Lxy_input" id="Lxy_cdStart" type="number" value="10" min="1" max="60" style="width:70px;"> 秒
+            </div>
+        </div>
+
+        <!-- ====== Demo 3: 时间漂移对比 ====== -->
+        <div class="Lxy_card">
+            <div class="Lxy_card-title">
+                <span class="Lxy_dot Lxy_dot--orange"></span>
+                Demo 3 · setInterval vs setTimeout 递归 — 时间漂移对比
+            </div>
+            <p style="font-size:12px;color:#a6adc8;margin-bottom:10px;">
+                左边 <b>setInterval</b> 每隔固定 100ms 触发一次，但如果某次回调执行超过 100ms，后续就会"排队"漂移；右边 <b>setTimeout 递归</b> 是执行完再等 100ms，每次间隔稳定。点下面按钮观察"累计漂移"。
+            </p>
+            <div class="Lxy_toolbar">
+                <button class="Lxy_btn Lxy_btn--orange" onclick="Lxy_startDrift()">▶ 同时开始（各跑 10 次）</button>
+                <button class="Lxy_btn Lxy_btn--ghost" onclick="Lxy_resetDrift()">🧹 重置</button>
+            </div>
+            <div class="Lxy_drift-row">
+                <div class="Lxy_drift-col">
+                    <h4>🔁 setInterval 固定 100ms</h4>
+                    <div id="Lxy_intervalLog">(等待开始…)</div>
+                    <div class="Lxy_sum">累计漂移：<span id="Lxy_intervalDrift">-</span> ms</div>
+                </div>
+                <div class="Lxy_drift-col">
+                    <h4>⏱ setTimeout 递归 100ms</h4>
+                    <div id="Lxy_timeoutLog">(等待开始…)</div>
+                    <div class="Lxy_sum">累计漂移：<span id="Lxy_timeoutDrift">-</span> ms</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== Demo 4: 秒表 setInterval ====== -->
+        <div class="Lxy_card">
+            <div class="Lxy_card-title">
+                <span class="Lxy_dot Lxy_dot--purple"></span>
+                Demo 4 · setInterval 秒表 + 计次 + 闪烁指示灯
+                <span class="Lxy_status" id="Lxy_swStatus">idle</span>
+            </div>
+            <div class="Lxy_stopwatch">
+                <div class="Lxy_stopwatch-num" id="Lxy_swNum">00:00.000</div>
+                <div class="Lxy_blinker" id="Lxy_blinker" style="background:#313244;"></div>
+            </div>
+            <div class="Lxy_toolbar" style="justify-content:center;">
+                <button class="Lxy_btn Lxy_btn--purple" onclick="Lxy_swStartPause()">▶ 开始 / ⏸ 暂停</button>
+                <button class="Lxy_btn Lxy_btn--blue" onclick="Lxy_swLap()">🏁 计次</button>
+                <button class="Lxy_btn Lxy_btn--red" onclick="Lxy_swReset()">🔄 重置</button>
+            </div>
+            <div class="Lxy_stopwatch-laps" id="Lxy_swLaps"></div>
+        </div>
+
+        <!-- 通用日志 -->
+        <div class="Lxy_card">
+            <div class="Lxy_card-title">
+                📝 控制台日志（所有定时器事件都会打印）
+            </div>
+            <div class="Lxy_log" id="Lxy_log"></div>
+        </div>
+
+        <div class="Lxy_footer" style="text-align:center;margin-top:24px;color:#6c7086;font-size:11px;letter-spacing:3px;">
+            setTimeout &amp; setInterval · 原生 JS · 刘馨月 · 2026
+        </div>
+    </div>
+
+    <script>
+        // ========== 日志 ==========
+        var Lxy_logEl = document.getElementById('Lxy_log');
+        function Lxy_log(msg, color) {
+            var now = new Date();
+            var ts = now.toTimeString().slice(0,8) + '.' + String(now.getMilliseconds()).padStart(3,'0');
+            var div = document.createElement('div');
+            div.className = 'Lxy_log-line';
+            div.innerHTML = '<b>[' + ts + ']</b> ' + msg;
+            if (color) div.style.color = color;
+            Lxy_logEl.appendChild(div);
+            Lxy_logEl.scrollTop = Lxy_logEl.scrollHeight;
+        }
+
+        // ========== Demo 1: 打字机 setTimeout ==========
+        var Lxy_typeTimeout = null;
+        function Lxy_startType() {
+            Lxy_stopType();
+            var box = document.getElementById('Lxy_typeBox');
+            box.innerHTML = '';
+            var text = 'Hello Timer! 刘馨月的 setTimeout 演示 ✨ — 每次只打一个字，打完再等下一个，不是 setInterval 哦～';
+            var i = 0;
+            var delay = parseInt(document.getElementById('Lxy_typeDelay').value) || 80;
+            document.getElementById('Lxy_typeStatus').textContent = 'running';
+            document.getElementById('Lxy_typeStatus').className = 'Lxy_status Lxy_status--running';
+            Lxy_log('📝 打字机开始，延迟 ' + delay + 'ms/字', '#a6e3a1');
+
+            function tick() {
+                if (i >= text.length) {
+                    document.getElementById('Lxy_typeStatus').textContent = 'finished';
+                    document.getElementById('Lxy_typeStatus').className = 'Lxy_status Lxy_status--idle';
+                    Lxy_log('📝 打字机完成（' + text.length + ' 字）', '#a6e3a1');
+                    return;
+                }
+                box.innerHTML = text.slice(0, i + 1) + '<span class="Lxy_cursor"></span>';
+                i++;
+                Lxy_typeTimeout = setTimeout(tick, delay);
+            }
+            tick();
+        }
+        function Lxy_stopType() {
+            if (Lxy_typeTimeout !== null) {
+                clearTimeout(Lxy_typeTimeout);
+                Lxy_typeTimeout = null;
+                document.getElementById('Lxy_typeStatus').textContent = 'stopped';
+                document.getElementById('Lxy_typeStatus').className = 'Lxy_status Lxy_status--stopped';
+                Lxy_log('⏹ 打字机 clearTimeout 取消', '#f38ba8');
+            }
+        }
+
+        // ========== Demo 2: 倒计时 setInterval ==========
+        var Lxy_cdInterval = null;
+        function Lxy_startCountdown() {
+            Lxy_stopCountdown();
+            var n = parseInt(document.getElementById('Lxy_cdStart').value) || 10;
+            var el = document.getElementById('Lxy_cdNum');
+            var bar = document.getElementById('Lxy_cdBar');
+            el.textContent = n;
+            bar.style.width = '100%';
+            document.getElementById('Lxy_cdStatus').textContent = 'running';
+            document.getElementById('Lxy_cdStatus').className = 'Lxy_status Lxy_status--running';
+            Lxy_log('⏳ 倒计时开始 ' + n + ' 秒', '#89b4fa');
+
+            var remain = n;
+            Lxy_cdInterval = setInterval(function () {
+                remain--;
+                el.textContent = remain;
+                bar.style.width = (remain / n * 100) + '%';
+                if (remain <= 0) {
+                    clearInterval(Lxy_cdInterval);
+                    Lxy_cdInterval = null;
+                    document.getElementById('Lxy_cdStatus').textContent = 'finished';
+                    document.getElementById('Lxy_cdStatus').className = 'Lxy_status Lxy_status--idle';
+                    Lxy_log('⏳ 倒计时到 0，自动 clearInterval', '#89b4fa');
+                }
+            }, 1000);
+        }
+        function Lxy_stopCountdown() {
+            if (Lxy_cdInterval !== null) {
+                clearInterval(Lxy_cdInterval);
+                Lxy_cdInterval = null;
+                document.getElementById('Lxy_cdStatus').textContent = 'stopped';
+                document.getElementById('Lxy_cdStatus').className = 'Lxy_status Lxy_status--stopped';
+                Lxy_log('⏹ 倒计时 clearInterval 取消', '#f38ba8');
+            }
+        }
+
+        // ========== Demo 3: 时间漂移对比 ==========
+        var Lxy_driftInterval = null;
+        var Lxy_driftTimeout   = null;
+        function Lxy_resetDrift() {
+            clearInterval(Lxy_driftInterval); Lxy_driftInterval = null;
+            clearTimeout(Lxy_driftTimeout);   Lxy_driftTimeout = null;
+            document.getElementById('Lxy_intervalLog').textContent = '(等待开始…)';
+            document.getElementById('Lxy_timeoutLog').textContent = '(等待开始…)';
+            document.getElementById('Lxy_intervalDrift').textContent = '-';
+            document.getElementById('Lxy_timeoutDrift').textContent = '-';
+        }
+        function Lxy_startDrift() {
+            Lxy_resetDrift();
+            var EXPECTED = 100; // 每次 100ms
+            var COUNT = 10;
+
+            // ===== setInterval 组 =====
+            var iLog = '', iCount = 0, iStart = performance.now(), iSumDelta = 0;
+            Lxy_driftInterval = setInterval(function () {
+                var now = performance.now();
+                var delta = now - (iStart + iCount * EXPECTED);
+                iSumDelta += Math.abs(delta);
+                iCount++;
+                iLog += '#' + iCount + ' @' + (now - iStart).toFixed(0) + 'ms' +
+                    '<span class="Lxy_delta">漂移 ' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + 'ms</span>\n';
+                document.getElementById('Lxy_intervalLog').textContent = iLog;
+                document.getElementById('Lxy_intervalDrift').textContent = iSumDelta.toFixed(1);
+                if (iCount >= COUNT) {
+                    clearInterval(Lxy_driftInterval);
+                    Lxy_driftInterval = null;
+                    Lxy_log('🔁 setInterval 累计漂移 ' + iSumDelta.toFixed(1) + 'ms', '#fab387');
+                }
+            }, EXPECTED);
+
+            // ===== setTimeout 递归 组 =====
+            var tLog = '', tCount = 0, tStart = performance.now(), tSumDelta = 0;
+            function tTick() {
+                var now = performance.now();
+                var delta = now - (tStart + tCount * EXPECTED);
+                tSumDelta += Math.abs(delta);
+                tCount++;
+                tLog += '#' + tCount + ' @' + (now - tStart).toFixed(0) + 'ms' +
+                    '<span class="Lxy_delta">漂移 ' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + 'ms</span>\n';
+                document.getElementById('Lxy_timeoutLog').textContent = tLog;
+                document.getElementById('Lxy_timeoutDrift').textContent = tSumDelta.toFixed(1);
+                if (tCount >= COUNT) {
+                    Lxy_log('⏱ setTimeout 递归累计漂移 ' + tSumDelta.toFixed(1) + 'ms', '#a6e3a1');
+                    return;
+                }
+                Lxy_driftTimeout = setTimeout(tTick, EXPECTED);
+            }
+            tTick();
+            Lxy_log('⏱ 漂移对比开始：各跑 ' + COUNT + ' 次 × ' + EXPECTED + 'ms', '#cba6f7');
+        }
+
+        // ========== Demo 4: 秒表 setInterval ==========
+        var Lxy_swInterval = null;
+        var Lxy_swBlinkInterval = null;
+        var Lxy_swStart = 0, Lxy_swElapsed = 0, Lxy_swRunning = false;
+
+        function Lxy_swStartPause() {
+            if (Lxy_swRunning) {
+                // 暂停
+                clearInterval(Lxy_swInterval); Lxy_swInterval = null;
+                clearInterval(Lxy_swBlinkInterval); Lxy_swBlinkInterval = null;
+                Lxy_swElapsed += performance.now() - Lxy_swStart;
+                Lxy_swRunning = false;
+                document.getElementById('Lxy_blinker').style.background = '#313244';
+                document.getElementById('Lxy_swStatus').textContent = 'stopped';
+                document.getElementById('Lxy_swStatus').className = 'Lxy_status Lxy_status--stopped';
+                Lxy_log('⏸ 秒表暂停', '#f38ba8');
+            } else {
+                Lxy_swStart = performance.now();
+                Lxy_swRunning = true;
+                document.getElementById('Lxy_swStatus').textContent = 'running';
+                document.getElementById('Lxy_swStatus').className = 'Lxy_status Lxy_status--running';
+                Lxy_swInterval = setInterval(function () {
+                    var ms = Lxy_swElapsed + (performance.now() - Lxy_swStart);
+                    document.getElementById('Lxy_swNum').textContent = Lxy_formatMs(ms);
+                }, 10);
+                // 指示灯闪烁（200ms）
+                var on = false;
+                Lxy_swBlinkInterval = setInterval(function () {
+                    on = !on;
+                    document.getElementById('Lxy_blinker').style.background = on ? '#f38ba8' : '#313244';
+                }, 200);
+                Lxy_log('▶ 秒表开始', '#89b4fa');
+            }
+        }
+
+        function Lxy_swLap() {
+            if (!Lxy_swRunning && Lxy_swElapsed === 0) return;
+            var ms = Lxy_swElapsed + (Lxy_swRunning ? (performance.now() - Lxy_swStart) : 0);
+            var laps = document.getElementById('Lxy_swLaps');
+            var n = laps.getElementsByTagName('span').length + 1;
+            var span = document.createElement('span');
+            span.innerHTML = '<b># ' + n + '</b>' + Lxy_formatMs(ms);
+            laps.appendChild(span);
+            laps.scrollTop = laps.scrollHeight;
+        }
+
+        function Lxy_swReset() {
+            clearInterval(Lxy_swInterval); Lxy_swInterval = null;
+            clearInterval(Lxy_swBlinkInterval); Lxy_swBlinkInterval = null;
+            Lxy_swRunning = false; Lxy_swElapsed = 0; Lxy_swStart = 0;
+            document.getElementById('Lxy_swNum').textContent = '00:00.000';
+            document.getElementById('Lxy_blinker').style.background = '#313244';
+            document.getElementById('Lxy_swLaps').innerHTML = '';
+            document.getElementById('Lxy_swStatus').textContent = 'idle';
+            document.getElementById('Lxy_swStatus').className = 'Lxy_status Lxy_status--idle';
+            Lxy_log('🔄 秒表重置', '#cba6f7');
+        }
+
+        function Lxy_formatMs(ms) {
+            var totalSec = Math.floor(ms / 1000);
+            var min = Math.floor(totalSec / 60);
+            var sec = totalSec % 60;
+            var mls = Math.floor(ms % 1000);
+            return String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0') + '.' + String(mls).padStart(3,'0');
+        }
+
+        Lxy_log('🌟 定时器演示页加载完成', '#cba6f7');
+    </script>
+</body>
+</html>
