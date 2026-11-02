@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+    姓名：刘馨月
+    日期：2026-11-02
+    功能：Fetch API 商品详情页（dummyjson.com/products/:id），通过 ?id= 传参
+    -->
+    <title>商品详情 · Fetch API · 刘馨月</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f4f5f7; min-height: 100vh; padding: 30px 20px; color: #333;
+        }
+        .Lxy_wrap { max-width: 1000px; margin: 0 auto; }
+
+        /* ====== 面包屑 + 返回 ====== */
+        .Lxy_back-bar {
+            background: #fff; border-radius: 10px; padding: 12px 20px;
+            margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 13px;
+        }
+        .Lxy_back-bar a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .Lxy_back-bar a:hover { text-decoration: underline; }
+        .Lxy_back-bar span { color: #a0aec0; }
+
+        /* ====== 主体 ====== */
+        .Lxy_main {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+            background: #fff; border-radius: 14px; padding: 28px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+            animation: Lxy-fade 0.45s ease-out;
+        }
+        @keyframes Lxy-fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 左：图片 */
+        .Lxy_imgs { }
+        .Lxy_main-img {
+            width: 100%; aspect-ratio: 1; background: #f7f8fa;
+            border-radius: 10px; overflow: hidden; display: flex;
+            align-items: center; justify-content: center; margin-bottom: 14px;
+        }
+        .Lxy_main-img img { width: 100%; height: 100%; object-fit: contain; padding: 14px; }
+        .Lxy_thumb-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .Lxy_thumb {
+            width: 68px; height: 68px; background: #f7f8fa; border-radius: 6px;
+            overflow: hidden; cursor: pointer; border: 2px solid transparent;
+            transition: border-color 0.15s;
+        }
+        .Lxy_thumb:hover, .Lxy_thumb--active { border-color: #667eea; }
+        .Lxy_thumb img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+
+        /* 右：详情 */
+        .Lxy_info { }
+        .Lxy_cat-tag {
+            display: inline-block; padding: 3px 12px; font-size: 11px; font-weight: 700;
+            background: #667eea; color: #fff; border-radius: 12px;
+            text-transform: capitalize; letter-spacing: 1px; margin-bottom: 10px;
+        }
+        .Lxy_title { font-size: 22px; font-weight: 700; color: #2d3748; line-height: 1.35; }
+        .Lxy_brand { color: #a0aec0; font-size: 13px; margin-top: 6px; }
+
+        .Lxy_price-row {
+            display: flex; align-items: baseline; gap: 10px; margin: 16px 0 12px;
+        }
+        .Lxy_price { font-size: 34px; font-weight: 800; color: #ff6b6b; }
+        .Lxy_price-old { font-size: 16px; color: #a0aec0; text-decoration: line-through; }
+        .Lxy_discount {
+            padding: 4px 10px; background: #ff6b6b; color: #fff; font-size: 12px; font-weight: 700;
+            border-radius: 12px;
+        }
+        .Lxy_rating-line { font-size: 13px; color: #f7b924; margin-bottom: 12px; }
+        .Lxy_rating-line span { color: #718096; margin-left: 6px; }
+
+        .Lxy_desc {
+            font-size: 13.5px; color: #4a5568; line-height: 1.7; margin-bottom: 18px;
+        }
+
+        /* 规格网格 */
+        .Lxy_specs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            padding-top: 14px; border-top: 1px dashed #e2e8f0; margin-top: 10px;
+        }
+        .Lxy_spec {
+            font-size: 12.5px; color: #4a5568;
+        }
+        .Lxy_spec b { color: #2d3748; font-weight: 600; }
+        .Lxy_spec .Lxy_k { color: #a0aec0; margin-right: 6px; }
+
+        .Lxy_tags-row { margin-top: 14px; }
+        .Lxy_tag {
+            display: inline-block; padding: 2px 9px; background: #edf2f7; color: #4a5568;
+            font-size: 11px; border-radius: 10px; margin-right: 6px; margin-top: 6px;
+        }
+
+        /* 底部操作条 */
+        .Lxy_actions {
+            margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;
+        }
+        .Lxy_btn {
+            padding: 11px 28px; border: none; border-radius: 22px; cursor: pointer;
+            font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 1px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .Lxy_btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+        .Lxy_btn--primary { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .Lxy_btn--danger  { background: #ff6b6b; }
+        .Lxy_btn--gray    { background: #e2e8f0; color: #4a5568; }
+
+        /* Reviews */
+        .Lxy_reviews {
+            margin-top: 24px; background: #fff; border-radius: 14px; padding: 22px 28px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+        }
+        .Lxy_reviews h3 { font-size: 15px; color: #2d3748; margin-bottom: 14px; letter-spacing: 1px; }
+        .Lxy_rev {
+            padding: 12px 0; border-bottom: 1px dashed #edf2f7; font-size: 13px;
+        }
+        .Lxy_rev:last-child { border-bottom: none; }
+        .Lxy_rev-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .Lxy_rev-name { font-weight: 600; color: #2d3748; }
+        .Lxy_rev-star { color: #f7b924; font-size: 12px; }
+        .Lxy_rev-date { color: #a0aec0; font-size: 11px; }
+        .Lxy_rev-cmt { color: #4a5568; font-style: italic; }
+
+        /* loading skeleton */
+        .Lxy_sk {
+            background: linear-gradient(90deg, #eee 25%, #f7f7f7 50%, #eee 75%);
+            background-size: 200% 100%; animation: Lxy-shimmer 1.4s infinite;
+            border-radius: 8px;
+        }
+        @keyframes Lxy-shimmer { to { background-position: -200% 0; } }
+
+        /* 错误 */
+        .Lxy_error { background: #fff5f5; border-left: 4px solid #e53e3e; color: #c53030; padding: 16px 22px; border-radius: 8px; font-size: 13px; display: none; }
+        .Lxy_error--show { display: block; }
+        .Lxy_error a { color: #667eea; font-weight: 600; text-decoration: none; }
+
+        /* 空状态 */
+        .Lxy_empty { text-align: center; padding: 60px 20px; background: #fff; border-radius: 14px; box-shadow: 0 2px 14px rgba(0,0,0,0.06); }
+        .Lxy-empty-emoji { font-size: 60px; margin-bottom: 14px; }
+        .Lxy_empty p { color: #a0aec0; font-size: 14px; margin-bottom: 16px; }
+
+        .Lxy_footer { text-align: center; margin-top: 30px; color: #a0aec0; font-size: 11px; letter-spacing: 3px; }
+
+        @media (max-width: 720px) {
+            .Lxy_main { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="Lxy_wrap">
+
+        <div class="Lxy_back-bar">
+            <div>
+                <a href="17-3.html">← 商品列表</a>
+                <span id="Lxy_breadCrumb"> / 商品详情 #-</span>
+            </div>
+            <div style="font-size:12px;color:#a0aec0;">URL: <code id="Lxy_url" style="font-family:Consolas,monospace;color:#667eea;"></code></div>
+        </div>
+
+        <div class="Lxy_error" id="Lxy_error"></div>
+
+        <div id="Lxy_body"></div>
+
+        <div class="Lxy_footer">Fetch API · 原生 JS · 刘馨月 · 2026</div>
+    </div>
+
+    <script>
+        var params = new URLSearchParams(location.search);
+        var Lxy_id = params.get('id') || '1';
+        var Lxy_API_DETAIL = 'https://dummyjson.com/products/' + Lxy_id;
+
+        // ========== 取商品名 ==========
+        function Lxy_formatDate(s) {
+            if (!s) return '';
+            var d = new Date(s);
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        async function Lxy_fetch() {
+            var body = document.getElementById('Lxy_body');
+            var errBox = document.getElementById('Lxy_error');
+
+            document.getElementById('Lxy_url').textContent = Lxy_API_DETAIL;
+            document.getElementById('Lxy_breadCrumb').textContent = ' / 商品详情 #' + Lxy_id;
+
+            // skeleton
+            body.innerHTML =
+                '<div class="Lxy_main">' +
+                    '<div class="Lxy_imgs">' +
+                        '<div class="Lxy_main-img"><div class="Lxy_sk" style="width:80%;height:80%;"></div></div>' +
+                        '<div class="Lxy_thumb-row">' +
+                            '<div class="Lxy_thumb"><div class="Lxy_sk" style="width:100%;height:100%;"></div></div>' +
+                            '<div class="Lxy_thumb"><div class="Lxy_sk" style="width:100%;height:100%;"></div></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="Lxy_info">' +
+                        '<div class="Lxy_sk" style="height:18px;width:60px;margin-bottom:14px;"></div>' +
+                        '<div class="Lxy_sk" style="height:28px;margin-bottom:8px;"></div>' +
+                        '<div class="Lxy_sk" style="height:14px;width:120px;margin-bottom:16px;"></div>' +
+                        '<div class="Lxy_sk" style="height:40px;margin-bottom:14px;"></div>' +
+                        '<div class="Lxy_sk" style="height:60px;margin-bottom:16px;"></div>' +
+                        '<div class="Lxy_sk" style="height:80px;"></div>' +
+                    '</div>' +
+                '</div>';
+
+            try {
+                var res = await fetch(Lxy_API_DETAIL);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                var p = await res.json();
+                Lxy_render(p);
+            } catch (e) {
+                body.innerHTML = '';
+                errBox.innerHTML = '❌ 请求失败：' + e.message +
+                    '<br><br><a href="17-3.html">← 返回商品列表</a>';
+                errBox.classList.add('Lxy_error--show');
+            }
+        }
+
+        function Lxy_render(p) {
+            var body = document.getElementById('Lxy_body');
+            var imgs = p.images && p.images.length ? p.images : [p.thumbnail];
+            var mainImg = imgs[0];
+            var oldPrice = (p.price / (1 - p.discountPercentage / 100)).toFixed(2);
+            var isLow = p.stock < 10;
+
+            // 规格项
+            var specsHtml = '';
+            var specList = [
+                { k: '商品 ID', v: p.id },
+                { k: '品牌', v: p.brand || '-' },
+                { k: 'SKU', v: p.sku || '-' },
+                { k: '库存', v: (isLow ? '⚠️ 仅剩 ' : '✅ ') + p.stock + ' 件' },
+                { k: '重量', v: (p.weight || '-') + ' kg' },
+                { k: '尺寸', v: p.dimensions ? (p.dimensions.width + '×' + p.dimensions.height + '×' + p.dimensions.depth) : '-' },
+                { k: '质保', v: p.warrantyInformation || '-' },
+                { k: '发货', v: p.shippingInformation || '-' },
+                { k: '退货', v: p.returnPolicy || '-' },
+                { k: '最低起订', v: p.minimumOrderQuantity || '-' }
+            ];
+            specList.forEach(function (s) {
+                specsHtml += '<div class="Lxy_spec"><span class="Lxy_k">' + s.k + ':</span><b>' + s.v + '</b></div>';
+            });
+
+            // tags
+            var tagsHtml = (p.tags || []).map(function (t) { return '<span class="Lxy_tag">#' + t + '</span>'; }).join('');
+
+            // thumbs
+            var thumbsHtml = imgs.map(function (u, i) {
+                return '<div class="Lxy_thumb' + (i === 0 ? ' Lxy_thumb--active' : '') + '" data-src="' + u + '">' +
+                    '<img src="' + u + '" alt="" loading="lazy" onerror="this.src=\'' + p.thumbnail + '\'">' +
+                '</div>';
+            }).join('');
+
+            // reviews
+            var reviewsHtml = '';
+            if (p.reviews && p.reviews.length) {
+                reviewsHtml = '<div class="Lxy_reviews"><h3>💬 用户评价 (' + p.reviews.length + ')</h3>';
+                p.reviews.forEach(function (r) {
+                    reviewsHtml +=
+                        '<div class="Lxy_rev">' +
+                            '<div class="Lxy_rev-head">' +
+                                '<span class="Lxy_rev-name">' + r.reviewerName + '</span>' +
+                                '<span class="Lxy_rev-star">★ ' + r.rating + '</span>' +
+                            '</div>' +
+                            '<div class="Lxy_rev-cmt">"' + r.comment + '"</div>' +
+                            '<div class="Lxy_rev-date">' + Lxy_formatDate(r.date) + '</div>' +
+                        '</div>';
+                });
+                reviewsHtml += '</div>';
+            }
+
+            body.innerHTML =
+                '<div class="Lxy_main">' +
+                    '<div class="Lxy_imgs">' +
+                        '<div class="Lxy_main-img"><img id="Lxy_mainImg" src="' + mainImg + '" alt="' + p.title + '" onerror="this.src=\'' + p.thumbnail + '\'"></div>' +
+                        '<div class="Lxy_thumb-row">' + thumbsHtml + '</div>' +
+                    '</div>' +
+                    '<div class="Lxy_info">' +
+                        '<span class="Lxy_cat-tag">' + (p.category || '').replace(/-/g, ' ') + '</span>' +
+                        '<h1 class="Lxy_title">' + p.title + '</h1>' +
+                        '<div class="Lxy_brand">' + (p.brand || '') + ' · 商品 ID ' + p.id + '</div>' +
+                        '<div class="Lxy_price-row">' +
+                            '<span class="Lxy_price">$' + p.price.toFixed(2) + '</span>' +
+                            (p.discountPercentage > 0 ? '<span class="Lxy_price-old">$' + oldPrice + '</span>' : '') +
+                            (p.discountPercentage > 0 ? '<span class="Lxy_discount">-' + p.discountPercentage + '%</span>' : '') +
+                        '</div>' +
+                        '<div class="Lxy_rating-line">★★★★☆ ' + p.rating.toFixed(1) + ' <span>· 100+ 评价</span></div>' +
+                        '<p class="Lxy_desc">' + p.description + '</p>' +
+                        '<div class="Lxy_specs">' + specsHtml + '</div>' +
+                        '<div class="Lxy_tags-row">' + tagsHtml + '</div>' +
+                        '<div class="Lxy_actions">' +
+                            '<button class="Lxy_btn Lxy_btn--primary" onclick="alert(\'🛒 加入购物车：' + p.title + '\')">🛒 加入购物车</button>' +
+                            '<button class="Lxy_btn Lxy_btn--danger"  onclick="alert(\'⚡ 立即购买\')">⚡ 立即购买</button>' +
+                            '<a href="17-3.html" class="Lxy_btn Lxy_btn--gray" style="text-decoration:none;">← 返回列表</a>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                reviewsHtml;
+
+            // thumbs 点击切换主图
+            body.querySelectorAll('.Lxy_thumb').forEach(function (t) {
+                t.addEventListener('click', function () {
+                    body.querySelectorAll('.Lxy_thumb').forEach(function (x) { x.classList.remove('Lxy_thumb--active'); });
+                    t.classList.add('Lxy_thumb--active');
+                    var main = document.getElementById('Lxy_mainImg');
+                    main.src = t.dataset.src;
+                });
+            });
+
+            document.title = p.title + ' · 刘馨月';
+        }
+
+        window.addEventListener('load', Lxy_fetch);
+    </script>
+</body>
+</html>
